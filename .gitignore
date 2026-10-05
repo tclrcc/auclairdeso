@@ -1,0 +1,28 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Java / Maven
+target/
+*.class
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+coverage/
+test-results/
+playwright-report/
+
+# Secrets et configuration locale
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Logs et OS
+*.log
+.DS_Store
+Thumbs.db
