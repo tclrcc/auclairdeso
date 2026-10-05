@@ -1,3 +1,8 @@
-/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
 
-@import 'tailwindcss';
+@theme {
+  --color-sand: #f6f1e9;
+  --color-night: #1f2a44;
+  --color-moon: #e8c27a;
+  --font-display: ui-serif, Georgia, "Times New Roman", serif;
+}
