@@ -1,4 +1,5 @@
 # Au clair de So
+[![CI](https://github.com/tclrcc/auclairdeso/actions/workflows/ci.yml/badge.svg)](https://github.com/tclrcc/auclairdeso/actions/workflows/ci.yml)
 
 Site vitrine et prise de rendez-vous en ligne pour une praticienne médium.
 
