@@ -26,3 +26,6 @@ playwright-report/
 *.log
 .DS_Store
 Thumbs.db
+
+# Local configuration with secrets (loaded automatically by Spring Boot)
+backend/config/
