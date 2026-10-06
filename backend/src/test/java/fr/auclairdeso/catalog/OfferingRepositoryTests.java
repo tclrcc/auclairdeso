@@ -29,11 +29,10 @@ class OfferingRepositoryTests {
 
     @Test
     void findsOnlyActiveOfferingsInDisplayOrderWithTheirModes() {
-        var second = offering("guidance-1-h", 20, Set.of(ConsultationMode.PHONE, ConsultationMode.VIDEO));
-        var first = offering("guidance-30-min", 10, Set.of(ConsultationMode.PHONE));
-        var inactive = offering("ancienne-seance", 0, Set.of(ConsultationMode.IN_PERSON));
-        inactive.deactivate();
-        repository.saveAll(List.of(second, first, inactive));
+        var second = offering("guidance-1-h", 20, true, Set.of(ConsultationMode.PHONE, ConsultationMode.VIDEO));
+        var first = offering("guidance-30-min", 10, true, Set.of(ConsultationMode.PHONE));
+        var hidden = offering("ancienne-seance", 0, false, Set.of(ConsultationMode.IN_PERSON));
+        repository.saveAll(List.of(second, first, hidden));
         entityManager.flush();
         entityManager.clear();
 
@@ -49,14 +48,14 @@ class OfferingRepositoryTests {
 
     @Test
     void databaseRejectsAnInvalidSlug() {
-        var invalid = offering("Guidance 1h", 0, Set.of(ConsultationMode.PHONE));
+        var invalid = offering("Guidance 1h", 0, true, Set.of(ConsultationMode.PHONE));
 
         assertThatExceptionOfType(DataIntegrityViolationException.class)
             .isThrownBy(() -> repository.saveAndFlush(invalid));
     }
 
-    private static Offering offering(String slug, int displayOrder, Set<ConsultationMode> modes) {
-        return new Offering(slug, "Name " + slug, "Description", 60, 8_000,
-            PaymentPolicy.FULL_ONLINE, null, displayOrder, modes);
+    private static Offering offering(String slug, int displayOrder, boolean active, Set<ConsultationMode> modes) {
+        return new Offering(slug, new OfferingDraft("Name " + slug, "Description", 60, 8_000,
+            PaymentPolicy.FULL_ONLINE, null, displayOrder, active, modes));
     }
 }

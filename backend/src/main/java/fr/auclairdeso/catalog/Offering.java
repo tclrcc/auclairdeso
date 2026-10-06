@@ -1,13 +1,23 @@
 package fr.auclairdeso.catalog;
 
-import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.jspecify.annotations.Nullable;
 
 @Entity
 @Table(name = "offering")
@@ -17,7 +27,7 @@ class Offering {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "slug", nullable = false, length = 80)
+    @Column(name = "slug", nullable = false, length = 80, updatable = false)
     private String slug;
 
     @Column(name = "name", nullable = false, length = 120)
@@ -37,13 +47,13 @@ class Offering {
     private PaymentPolicy paymentPolicy;
 
     @Column(name = "deposit_cents")
-    private Integer depositCents;
+    private @Nullable Integer depositCents;
 
     @Column(name = "display_order", nullable = false)
     private int displayOrder;
 
     @Column(name = "active", nullable = false)
-    private boolean active = true;
+    private boolean active;
 
     @ElementCollection
     @CollectionTable(name = "offering_mode", joinColumns = @JoinColumn(name = "offering_id"))
@@ -63,38 +73,50 @@ class Offering {
         // required by JPA
     }
 
-    Offering(String slug, String name, String description, int durationMinutes, int priceCents,
-             PaymentPolicy paymentPolicy, Integer depositCents, int displayOrder,
-             Set<ConsultationMode> modes) {
-        Objects.requireNonNull(paymentPolicy, "paymentPolicy");
-        Objects.requireNonNull(modes, "modes");
-        if (paymentPolicy == PaymentPolicy.DEPOSIT_ONLINE) {
-            if (depositCents == null || depositCents < 1 || depositCents > priceCents) {
-                throw new IllegalArgumentException("A deposit between 1 cent and the price is required");
-            }
-        } else if (depositCents != null) {
-            throw new IllegalArgumentException("A deposit is only allowed with the DEPOSIT_ONLINE policy");
-        }
-        if (modes.isEmpty()) {
-            throw new IllegalArgumentException("At least one consultation mode is required");
-        }
+    Offering(String slug, OfferingDraft draft) {
         this.slug = Objects.requireNonNull(slug, "slug");
-        this.name = Objects.requireNonNull(name, "name");
-        this.description = Objects.requireNonNull(description, "description");
-        this.durationMinutes = durationMinutes;
-        this.priceCents = priceCents;
-        this.paymentPolicy = paymentPolicy;
-        this.depositCents = depositCents;
-        this.displayOrder = displayOrder;
-        this.modes = EnumSet.copyOf(modes);
+        apply(draft);
     }
 
-    void deactivate() {
-        this.active = false;
+    void update(OfferingDraft draft) {
+        apply(draft);
+    }
+
+    private void apply(OfferingDraft draft) {
+        Objects.requireNonNull(draft, "draft");
+        if (!draft.isDepositConsistent()) {
+            throw new IllegalArgumentException("The deposit does not match the payment policy");
+        }
+        if (draft.modes() == null || draft.modes().isEmpty()) {
+            throw new IllegalArgumentException("At least one consultation mode is required");
+        }
+        this.name = draft.name().strip();
+        this.description = draft.description().strip();
+        this.durationMinutes = draft.durationMinutes();
+        this.priceCents = draft.priceCents();
+        this.paymentPolicy = Objects.requireNonNull(draft.paymentPolicy(), "paymentPolicy");
+        this.depositCents = draft.depositCents();
+        this.displayOrder = draft.displayOrder();
+        this.active = draft.active();
+        this.modes.clear();
+        this.modes.addAll(draft.modes());
+    }
+
+    String slug() {
+        return slug;
     }
 
     OfferingView toView() {
         return new OfferingView(slug, name, description, durationMinutes, priceCents,
-            paymentPolicy, depositCents, modes.stream().sorted().toList());
+            paymentPolicy, depositCents, sortedModes());
+    }
+
+    OfferingDetails toDetails() {
+        return new OfferingDetails(slug, name, description, durationMinutes, priceCents,
+            paymentPolicy, depositCents, displayOrder, active, sortedModes());
+    }
+
+    private java.util.List<ConsultationMode> sortedModes() {
+        return modes.stream().sorted().toList();
     }
 }

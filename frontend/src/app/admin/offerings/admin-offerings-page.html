@@ -1,0 +1,41 @@
+<main class="min-h-dvh bg-sand px-6 py-16 text-night">
+  <div class="mx-auto max-w-3xl">
+    <a routerLink="/admin" class="text-sm text-night/70 hover:underline">← Administration</a>
+
+    <div class="mt-4 flex flex-wrap items-center justify-between gap-4">
+      <h1 class="font-display text-4xl tracking-tight">Séances</h1>
+      <a routerLink="/admin/seances/nouvelle" class="btn-primary">Nouvelle séance</a>
+    </div>
+
+    @if (offerings.isLoading()) {
+    <p class="mt-8 text-night/70">Chargement…</p>
+    } @else if (offerings.error()) {
+    <p class="mt-8 text-red-700" role="alert">Impossible de charger les séances.</p>
+    } @else {
+    <ul class="mt-8 divide-y divide-night/10 rounded-2xl bg-white">
+      @for (offering of offerings.value(); track offering.slug) {
+      <li class="flex flex-wrap items-center justify-between gap-4 px-5 py-4">
+        <div>
+          <p class="font-medium">{{ offering.name }}</p>
+          <p class="text-sm text-night/70">
+            {{ offering.durationMinutes }} min · {{ offering.priceCents | euros }}
+          </p>
+        </div>
+        <div class="flex items-center gap-4">
+          @if (offering.active) {
+          <span class="rounded-full bg-green-100 px-3 py-1 text-sm text-green-800">Visible</span>
+          } @else {
+          <span class="rounded-full bg-night/10 px-3 py-1 text-sm">Masquée</span>
+          }
+          <a [routerLink]="['/admin/seances/modifier', offering.slug]" class="text-sm font-medium underline">
+            Modifier
+          </a>
+        </div>
+      </li>
+      } @empty {
+      <li class="px-5 py-4 text-night/70">Aucune séance pour le moment.</li>
+      }
+    </ul>
+    }
+  </div>
+</main>

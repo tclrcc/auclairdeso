@@ -47,5 +47,26 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./admin/password-step/password-step-page').then((m) => m.PasswordStepPage),
   },
+  {
+    path: 'admin/seances',
+    title: 'Séances — Administration',
+    canActivate: [staffGuard],
+    loadComponent: () =>
+      import('./admin/offerings/admin-offerings-page').then((m) => m.AdminOfferingsPage),
+  },
+  {
+    path: 'admin/seances/nouvelle',
+    title: 'Nouvelle séance — Administration',
+    canActivate: [staffGuard],
+    loadComponent: () =>
+      import('./admin/offerings/offering-editor-page').then((m) => m.OfferingEditorPage),
+  },
+  {
+    path: 'admin/seances/modifier/:slug',
+    title: 'Modifier une séance — Administration',
+    canActivate: [staffGuard],
+    loadComponent: () =>
+      import('./admin/offerings/offering-editor-page').then((m) => m.OfferingEditorPage),
+  },
   { path: '**', redirectTo: '' },
 ];
