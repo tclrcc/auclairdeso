@@ -6,3 +6,16 @@
   --color-moon: #e8c27a;
   --font-display: ui-serif, Georgia, "Times New Roman", serif;
 }
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-full bg-night px-5 py-2 text-sand
+    transition-opacity hover:opacity-90 disabled:opacity-60
+    focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-night;
+  }
+
+  .field-input {
+    @apply mt-1 w-full rounded-lg border border-night/20 bg-white px-4 py-2
+    focus-visible:outline-2 focus-visible:outline-night;
+  }
+}

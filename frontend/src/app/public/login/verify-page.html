@@ -1,0 +1,30 @@
+<main class="flex min-h-dvh items-center justify-center bg-sand px-6 text-night">
+  <div class="w-full max-w-sm text-center">
+    @switch (state()) {
+    @case ('invalid') {
+    <h1 class="font-display text-3xl">Lien expiré ou déjà utilisé</h1>
+    <p class="mt-4 leading-relaxed">
+      Pour votre sécurité, chaque lien ne fonctionne qu'une fois et pendant 10 minutes.
+    </p>
+    <a routerLink="/connexion" class="btn-primary mt-8">Recevoir un nouveau lien</a>
+    }
+    @case ('error') {
+    <h1 class="font-display text-3xl">Connexion impossible</h1>
+    <p class="mt-4">Une erreur est survenue. Merci de réessayer dans un instant.</p>
+    <button type="button" class="btn-primary mt-8" (click)="confirm()">Réessayer</button>
+    }
+    @default {
+    <h1 class="font-display text-3xl">Bienvenue</h1>
+    <p class="mt-4">Cliquez sur le bouton pour terminer votre connexion.</p>
+    <button type="button" class="btn-primary mt-8" (click)="confirm()"
+            [disabled]="state() === 'verifying'">
+      @if (state() === 'verifying') {
+      Connexion…
+      } @else {
+      Me connecter
+      }
+    </button>
+    }
+    }
+  </div>
+</main>
