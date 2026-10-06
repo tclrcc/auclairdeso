@@ -6,7 +6,7 @@ import static org.mockito.BDDMockito.given;
 import java.util.List;
 import java.util.Optional;
 
-import fr.auclairdeso.shared.security.SecurityConfiguration;
+import fr.auclairdeso.WebSecurityTestConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -17,7 +17,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
 @WebMvcTest(OfferingController.class)
-@Import(SecurityConfiguration.class)
+@Import(WebSecurityTestConfiguration.class)
 class OfferingControllerTests {
 
     @Autowired
