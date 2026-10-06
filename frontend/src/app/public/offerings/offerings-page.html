@@ -1,0 +1,49 @@
+<main class="min-h-dvh bg-sand px-6 py-16 text-night">
+  <div class="mx-auto max-w-3xl">
+    <h1 class="font-display text-4xl tracking-tight">Séances et tarifs</h1>
+    <p class="mt-4 text-night/70">Les séances proposées, leur durée et leur tarif.</p>
+
+    @if (offerings.isLoading()) {
+    <p class="mt-10" aria-live="polite">Chargement des séances…</p>
+    } @else if (offerings.error()) {
+    <p class="mt-10 rounded-lg bg-white/60 p-4" role="alert">
+      Les séances ne peuvent pas être affichées pour le moment. Merci de réessayer un peu plus tard.
+    </p>
+    } @else {
+    <ul class="mt-10 grid gap-6 sm:grid-cols-2">
+      @for (offering of offerings.value(); track offering.slug) {
+      <li>
+        <article class="flex h-full flex-col rounded-2xl border border-night/10 bg-white/60 p-6">
+          <h2 class="font-display text-2xl">{{ offering.name }}</h2>
+          <p class="mt-1 text-sm text-night/70">{{ offering.durationMinutes }} min</p>
+          <p class="mt-4 flex-1 leading-relaxed">{{ offering.description }}</p>
+
+          <ul class="mt-4 flex flex-wrap gap-2" aria-label="Modes de consultation">
+            @for (mode of offering.modes; track mode) {
+            <li class="rounded-full bg-sand px-3 py-1 text-sm">{{ modeLabels[mode] }}</li>
+            }
+          </ul>
+
+          <p class="mt-6 text-2xl font-semibold">{{ offering.priceCents | euros }}</p>
+          @switch (offering.paymentPolicy) {
+          @case ('FULL_ONLINE') {
+          <p class="text-sm text-night/70">Réglé en ligne à la réservation</p>
+          }
+          @case ('DEPOSIT_ONLINE') {
+          <p class="text-sm text-night/70">
+            Acompte de {{ offering.depositCents | euros }} à la réservation
+          </p>
+          }
+          @case ('ON_SITE') {
+          <p class="text-sm text-night/70">Réglé le jour de la séance</p>
+          }
+          }
+        </article>
+      </li>
+      } @empty {
+      <li class="text-night/70">Aucune séance n'est proposée pour le moment.</li>
+      }
+    </ul>
+    }
+  </div>
+</main>
