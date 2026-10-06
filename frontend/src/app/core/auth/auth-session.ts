@@ -1,10 +1,10 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Service, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { CurrentUser } from './current-user';
+import { CurrentUser, isStaff } from './current-user';
 
 /**
- * Who is logged in, and the magic link login flow.
+ * Who is logged in, and the login flows: magic link, then password for staff members.
  */
 @Service()
 export class AuthSession {
@@ -15,6 +15,10 @@ export class AuthSession {
 
   readonly currentUser = this.user.asReadonly();
   readonly isAuthenticated = computed(() => this.user() != null);
+  readonly isStaff = computed(() => {
+    const user = this.user();
+    return user != null && isStaff(user);
+  });
 
   async refresh(): Promise<CurrentUser | null> {
     try {
@@ -48,6 +52,31 @@ export class AuthSession {
     }
     await this.refresh();
     return true;
+  }
+
+  /** Second factor for staff members. Returns false when the password is wrong. */
+  async confirmPassword(password: string): Promise<boolean> {
+    const email = this.user()?.email;
+    if (!email) {
+      return false;
+    }
+    const body = new HttpParams().set('username', email).set('password', password);
+    try {
+      await firstValueFrom(this.http.post<void>('/api/auth/password', body));
+    } catch (error) {
+      if (isUnauthorized(error)) {
+        return false;
+      }
+      throw error;
+    }
+    await this.refresh();
+    return true;
+  }
+
+  /** First password of a staff member, then immediate use of it as the second factor. */
+  async definePassword(password: string): Promise<void> {
+    await firstValueFrom(this.http.put<void>('/api/account/password', { password }));
+    await this.confirmPassword(password);
   }
 
   async logout(): Promise<void> {

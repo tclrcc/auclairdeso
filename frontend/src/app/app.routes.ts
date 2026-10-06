@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/auth/auth-guard';
+import { authGuard, staffGuard } from './core/auth/auth-guard';
 
 export const routes: Routes = [
   {
@@ -32,6 +32,20 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import('./account/account-page').then((m) => m.AccountPage),
+  },
+  {
+    path: 'admin',
+    title: 'Administration — Au clair de So',
+    canActivate: [staffGuard],
+    loadComponent: () =>
+      import('./admin/home/admin-home-page').then((m) => m.AdminHomePage),
+  },
+  {
+    path: 'admin/verification',
+    title: 'Vérification — Au clair de So',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./admin/password-step/password-step-page').then((m) => m.PasswordStepPage),
   },
   { path: '**', redirectTo: '' },
 ];

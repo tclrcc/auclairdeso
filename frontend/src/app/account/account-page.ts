@@ -1,9 +1,10 @@
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthSession } from '../core/auth/auth-session';
 
 @Component({
   selector: 'app-account-page',
+  imports: [RouterLink],
   templateUrl: './account-page.html',
 })
 export class AccountPage {

@@ -3,6 +3,12 @@
     <h1 class="font-display text-4xl tracking-tight">Mon espace</h1>
     <p class="mt-4">Connecté avec <strong>{{ auth.currentUser()?.email }}</strong>.</p>
     <p class="mt-2 text-night/70">Vos rendez-vous apparaîtront ici.</p>
-    <button type="button" class="btn-primary mt-10" (click)="logout()">Se déconnecter</button>
+
+    <div class="mt-10 flex flex-wrap gap-4">
+      @if (auth.isStaff()) {
+      <a routerLink="/admin" class="btn-primary">Administration</a>
+      }
+      <button type="button" class="btn-primary" (click)="logout()">Se déconnecter</button>
+    </div>
   </div>
 </main>

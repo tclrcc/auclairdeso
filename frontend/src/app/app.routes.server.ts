@@ -5,5 +5,7 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'connexion', renderMode: RenderMode.Client },
   { path: 'connexion/verifier', renderMode: RenderMode.Client },
   { path: 'mon-espace', renderMode: RenderMode.Client },
+  { path: 'admin', renderMode: RenderMode.Client },
+  { path: 'admin/verification', renderMode: RenderMode.Client },
   { path: '**', renderMode: RenderMode.Prerender },
 ];

@@ -10,6 +10,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
 @WebMvcTest(CurrentUserController.class)
@@ -19,10 +20,12 @@ class CurrentUserControllerTests {
     @Autowired
     private MockMvcTester mvc;
 
+    @MockitoBean
+    private UserAccountRepository accounts;
+
     @Test
     void anonymousVisitorGetsUnauthorized() {
-        assertThat(mvc.get().uri("/api/me"))
-            .hasStatus(HttpStatus.UNAUTHORIZED);
+        assertThat(mvc.get().uri("/api/me")).hasStatus(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
@@ -32,19 +35,17 @@ class CurrentUserControllerTests {
             .hasStatusOk()
             .bodyJson()
             .isLenientlyEqualTo("""
-                        {"email": "client@example.com", "roles": ["CLIENT"]}
+                        {"email": "client@example.com", "roles": ["CLIENT"], "factors": [], "passwordSet": false}
                         """);
     }
 
     @Test
     void unsafeRequestWithoutCsrfTokenIsForbidden() {
-        assertThat(mvc.post().uri("/api/me"))
-            .hasStatus(HttpStatus.FORBIDDEN);
+        assertThat(mvc.post().uri("/api/me")).hasStatus(HttpStatus.FORBIDDEN);
     }
 
     @Test
     void unsafeRequestWithCsrfTokenReachesAuthentication() {
-        assertThat(mvc.post().uri("/api/me").with(csrf()))
-            .hasStatus(HttpStatus.UNAUTHORIZED);
+        assertThat(mvc.post().uri("/api/me").with(csrf())).hasStatus(HttpStatus.UNAUTHORIZED);
     }
 }

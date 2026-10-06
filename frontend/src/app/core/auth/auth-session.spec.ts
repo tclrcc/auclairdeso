@@ -42,4 +42,22 @@ describe('AuthSession', () => {
 
     expect(await result).toBe(false);
   });
+
+  it('sends the current email with the password', async () => {
+    const refresh = auth.refresh();
+    httpTesting.expectOne('/api/me').flush({
+      email: 'so@example.com',
+      roles: ['PRACTITIONER'],
+      factors: ['OTT'],
+      passwordSet: true,
+    });
+    await refresh;
+
+    const result = auth.confirmPassword('pas le bon');
+    const request = httpTesting.expectOne('/api/auth/password');
+    expect(request.request.body.get('username')).toBe('so@example.com');
+    request.flush(null, { status: 401, statusText: 'Unauthorized' });
+
+    expect(await result).toBe(false);
+  });
 });

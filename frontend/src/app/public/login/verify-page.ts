@@ -27,7 +27,7 @@ export class VerifyPage {
     this.state.set('verifying');
     try {
       if (await this.auth.verify(token)) {
-        await this.router.navigateByUrl('/mon-espace');
+        await this.router.navigateByUrl(this.auth.isStaff() ? '/admin' : '/mon-espace');
       } else {
         this.state.set('invalid');
       }
