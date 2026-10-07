@@ -69,6 +69,19 @@ export const routes: Routes = [
       import('./admin/offerings/offering-editor-page').then((m) => m.OfferingEditorPage),
   },
   {
+    path: 'admin/agenda',
+    title: 'Agenda — Administration',
+    canActivate: [staffGuard],
+    loadComponent: () => import('./admin/agenda/agenda-page').then((m) => m.AgendaPage),
+  },
+  {
+    path: 'admin/agenda/:id',
+    title: 'Rendez-vous — Administration',
+    canActivate: [staffGuard],
+    loadComponent: () =>
+      import('./admin/agenda/appointment-detail-page').then((m) => m.AppointmentDetailPage),
+  },
+  {
     path: 'reserver/:slug',
     title: 'Réserver une séance — Au clair de So',
     loadComponent: () => import('./booking/booking-page').then((m) => m.BookingPage),

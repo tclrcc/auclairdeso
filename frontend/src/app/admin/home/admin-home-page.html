@@ -4,6 +4,16 @@
     <p class="mt-4">Connecté avec <strong>{{ auth.currentUser()?.email }}</strong>, lien magique et mot de passe.</p>
 
     <nav class="mt-10 grid gap-4 sm:grid-cols-2" aria-label="Rubriques">
+      <a routerLink="/admin/agenda" class="rounded-2xl border border-night/10 bg-white/60 p-6 hover:bg-white">
+        <h2 class="font-display text-2xl">Agenda</h2>
+        <p class="mt-2 text-night/70">
+          @if (pending.hasValue() && pending.value().length > 0) {
+          <strong class="text-night">{{ pending.value().length }} demande(s) à traiter</strong>
+          } @else {
+          Demandes et rendez-vous à venir.
+          }
+        </p>
+      </a>
       <a routerLink="/admin/seances" class="rounded-2xl border border-night/10 bg-white/60 p-6 hover:bg-white">
         <h2 class="font-display text-2xl">Séances</h2>
         <p class="mt-2 text-night/70">Créer, modifier, masquer les séances proposées.</p>

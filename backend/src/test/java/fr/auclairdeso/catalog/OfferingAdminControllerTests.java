@@ -1,9 +1,9 @@
 package fr.auclairdeso.catalog;
 
+import static fr.auclairdeso.TestUsers.practitioner;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
@@ -73,14 +73,5 @@ class OfferingAdminControllerTests {
     void aClientIsForbidden() {
         assertThat(mvc.get().uri("/api/admin/offerings").with(user("client@example.com").roles("CLIENT")))
             .hasStatus(HttpStatus.FORBIDDEN);
-    }
-
-    /** A practitioner who logged in with the magic link and the password. */
-    private static RequestPostProcessor practitioner() {
-        var authorities = List.of(
-            new SimpleGrantedAuthority("ROLE_PRACTITIONER"),
-            FactorGrantedAuthority.fromAuthority(FactorGrantedAuthority.OTT_AUTHORITY),
-            FactorGrantedAuthority.fromAuthority(FactorGrantedAuthority.PASSWORD_AUTHORITY));
-        return authentication(UsernamePasswordAuthenticationToken.authenticated("so@example.com", null, authorities));
     }
 }

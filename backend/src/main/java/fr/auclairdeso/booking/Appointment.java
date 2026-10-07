@@ -19,6 +19,7 @@ import java.time.ZoneId;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.jspecify.annotations.Nullable;
+import org.springframework.http.HttpStatus;
 
 @Entity
 @Table(name = "appointment")
@@ -103,6 +104,32 @@ class Appointment {
 
     Long id() {
         return id;
+    }
+
+    void confirm() {
+        requireStatus(AppointmentStatus.REQUESTED, "Seule une demande en attente peut être confirmée.");
+        this.status = AppointmentStatus.CONFIRMED;
+    }
+
+    void decline() {
+        requireStatus(AppointmentStatus.REQUESTED, "Seule une demande en attente peut être refusée.");
+        this.status = AppointmentStatus.DECLINED;
+    }
+
+    AppointmentStatus status() {
+        return status;
+    }
+
+    AdminAppointmentView toAdminView(ZoneId zone, boolean hasPhoto) {
+        return new AdminAppointmentView(id, offeringSlug, offeringName, mode,
+            startsAt.atZone(zone).toOffsetDateTime(), endsAt.atZone(zone).toOffsetDateTime(),
+            status, priceCents, reason, address, messengerName, hasPhoto, client.toSummary());
+    }
+
+    private void requireStatus(AppointmentStatus expected, String message) {
+        if (status != expected) {
+            throw new BookingRefusedException(HttpStatus.CONFLICT, message);
+        }
     }
 
     BookedSession toBookedSession(ZoneId zone) {

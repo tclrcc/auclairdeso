@@ -1,0 +1,74 @@
+<main class="min-h-dvh bg-sand px-4 py-10 text-night">
+  <div class="mx-auto max-w-2xl">
+    <a routerLink="/admin" class="text-sm text-night/70 hover:underline">← Administration</a>
+    <h1 class="mt-4 font-display text-4xl tracking-tight">Agenda</h1>
+
+    @if (actionError(); as message) {
+    <p class="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">{{ message }}</p>
+    }
+
+    <h2 class="mt-8 font-display text-2xl">Demandes à traiter</h2>
+    @if (pending.isLoading()) {
+    <p class="mt-4 text-night/70">Chargement…</p>
+    } @else if (pending.error()) {
+    <p class="mt-4 text-red-700" role="alert">Les demandes ne peuvent pas être affichées.</p>
+    } @else {
+    <ul class="mt-4 space-y-3">
+      @for (appointment of pending.value(); track appointment.id) {
+      <li class="rounded-xl border-l-4 border-amber-400 bg-white p-4">
+        <a [routerLink]="['/admin/agenda', appointment.id]" class="block">
+          <p class="text-sm text-night/70 first-letter:uppercase">
+            {{ formatDayOf(appointment.start) }} à {{ formatTime(appointment.start) }}
+          </p>
+          <p class="mt-1 font-medium">{{ appointment.client.firstName }} {{ appointment.client.lastName }}</p>
+          <p class="text-sm text-night/70">{{ appointment.offeringName }} · {{ modeLabels[appointment.mode] }}</p>
+        </a>
+        <div class="mt-3 flex gap-3">
+          <button type="button" class="btn-primary flex-1" [disabled]="busy() === appointment.id"
+                  (click)="confirm(appointment)">
+            Confirmer
+          </button>
+          <button type="button" class="flex-1 rounded-full border border-night/30 px-5 py-2 disabled:opacity-60"
+                  [disabled]="busy() === appointment.id" (click)="decline(appointment)">
+            Refuser
+          </button>
+        </div>
+      </li>
+      } @empty {
+      <li class="text-night/70">Aucune demande en attente.</li>
+      }
+    </ul>
+    }
+
+    <h2 class="mt-10 font-display text-2xl">Rendez-vous confirmés</h2>
+    <p class="text-sm text-night/70">Les deux prochaines semaines.</p>
+    @if (upcoming.isLoading()) {
+    <p class="mt-4 text-night/70">Chargement…</p>
+    } @else if (upcoming.error()) {
+    <p class="mt-4 text-red-700" role="alert">Les rendez-vous ne peuvent pas être affichés.</p>
+    } @else {
+    @for (day of confirmedDays(); track day.date) {
+    <section class="mt-5">
+      <h3 class="text-sm font-medium first-letter:uppercase">{{ day.label }}</h3>
+      <ul class="mt-2 space-y-2">
+        @for (appointment of day.items; track appointment.id) {
+        <li>
+          <a [routerLink]="['/admin/agenda', appointment.id]" class="flex items-center gap-4 rounded-xl bg-white p-4">
+            <span class="text-lg font-semibold">{{ formatTime(appointment.start) }}</span>
+            <span>
+                    <span class="block font-medium">{{ appointment.client.firstName }} {{ appointment.client.lastName }}</span>
+                    <span class="block text-sm text-night/70">
+                      {{ appointment.offeringName }} · {{ modeLabels[appointment.mode] }}
+                    </span>
+                  </span>
+          </a>
+        </li>
+        }
+      </ul>
+    </section>
+    } @empty {
+    <p class="mt-4 text-night/70">Aucun rendez-vous confirmé pour l'instant.</p>
+    }
+    }
+  </div>
+</main>

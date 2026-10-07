@@ -23,6 +23,9 @@ export class AdminHomePage {
 
   protected readonly staff = httpResource<StaffMember[]>(() => '/api/admin/staff');
   protected readonly resetError = signal<string | null>(null);
+  protected readonly pending = httpResource<unknown[]>(() => '/api/admin/appointments/pending', {
+    defaultValue: [],
+  });
 
   protected async resetPassword(member: StaffMember): Promise<void> {
     const confirmed = confirm(

@@ -44,3 +44,19 @@ export function formatDayOf(instant: string): string {
 export function formatTime(instant: string): string {
   return timeLabel.format(new Date(instant));
 }
+
+export interface DayGroup<T> {
+  readonly date: string;
+  readonly label: string;
+  readonly items: readonly T[];
+}
+
+/** Groups items by their Paris calendar day, keeping their order. */
+export function groupByParisDay<T>(items: readonly T[], instantOf: (item: T) => string): DayGroup<T>[] {
+  const byDay = new Map<string, T[]>();
+  for (const item of items) {
+    const day = parisDate(instantOf(item));
+    byDay.set(day, [...(byDay.get(day) ?? []), item]);
+  }
+  return [...byDay.entries()].map(([date, dayItems]) => ({ date, label: formatDay(date), items: dayItems }));
+}

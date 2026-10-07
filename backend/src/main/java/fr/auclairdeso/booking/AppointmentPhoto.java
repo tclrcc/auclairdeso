@@ -34,4 +34,12 @@ class AppointmentPhoto {
         this.contentType = photo.contentType();
         this.data = photo.data();
     }
+
+    String contentType() {
+        return contentType;
+    }
+
+    byte[] data() {
+        return data;
+    }
 }
