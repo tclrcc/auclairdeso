@@ -1,4 +1,4 @@
-import { ConsultationMode, MODE_LABELS, PaymentPolicy } from '../../public/offerings/offering';
+import {ConsultationMode, MODE_LABELS, OfferingCategory, PaymentPolicy} from '../../public/offerings/offering';
 import { AdminOffering, OfferingDraft } from './admin-offering';
 
 /** What the editor manipulates: euros instead of cents, one checkbox per mode. */
@@ -13,6 +13,7 @@ export interface OfferingFormModel {
   displayOrder: number;
   active: boolean;
   modes: Record<ConsultationMode, boolean>;
+  category: OfferingCategory;
 }
 
 export const ALL_MODES = Object.keys(MODE_LABELS) as ConsultationMode[];
@@ -29,6 +30,7 @@ export function emptyOfferingForm(): OfferingFormModel {
     displayOrder: 0,
     active: false,
     modes: modesRecord([]),
+    category: 'CLAIRVOYANCE'
   };
 }
 
@@ -44,6 +46,7 @@ export function toFormModel(offering: AdminOffering): OfferingFormModel {
     displayOrder: offering.displayOrder,
     active: offering.active,
     modes: modesRecord(offering.modes),
+    category: offering.category
   };
 }
 
@@ -59,6 +62,7 @@ export function toDraft(model: OfferingFormModel): OfferingDraft {
     displayOrder: model.displayOrder,
     active: model.active,
     modes: ALL_MODES.filter((mode) => model.modes[mode]),
+    category: model.category
   };
 }
 

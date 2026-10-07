@@ -56,6 +56,6 @@ class OfferingRepositoryTests {
 
     private static Offering offering(String slug, int displayOrder, boolean active, Set<ConsultationMode> modes) {
         return new Offering(slug, new OfferingDraft("Name " + slug, "Description", 60, 15, 8_000,
-            PaymentPolicy.FULL_ONLINE, null, displayOrder, active, modes));
+            PaymentPolicy.FULL_ONLINE, null, displayOrder, active, modes, OfferingCategory.CLAIRVOYANCE));
     }
 }

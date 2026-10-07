@@ -14,6 +14,7 @@ const GUIDANCE: Offering = {
   paymentPolicy: 'DEPOSIT_ONLINE',
   depositCents: 3000,
   modes: ['VIDEO', 'PHONE'],
+  category: 'CLAIRVOYANCE'
 };
 
 describe('OfferingsPage', () => {

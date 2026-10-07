@@ -58,6 +58,10 @@ class Offering {
     @Column(name = "active", nullable = false)
     private boolean active;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false, length = 30)
+    private OfferingCategory category;
+
     @ElementCollection
     @CollectionTable(name = "offering_mode", joinColumns = @JoinColumn(name = "offering_id"))
     @Enumerated(EnumType.STRING)
@@ -104,6 +108,7 @@ class Offering {
         this.active = draft.active();
         this.modes.clear();
         this.modes.addAll(draft.modes());
+        this.category = Objects.requireNonNull(draft.category(), "category");
     }
 
     String slug() {
@@ -112,12 +117,12 @@ class Offering {
 
     OfferingView toView() {
         return new OfferingView(slug, name, description, durationMinutes, bufferMinutes, priceCents,
-            paymentPolicy, depositCents, sortedModes());
+            paymentPolicy, depositCents, sortedModes(), category);
     }
 
     OfferingDetails toDetails() {
         return new OfferingDetails(slug, name, description, durationMinutes, bufferMinutes, priceCents,
-            paymentPolicy, depositCents, displayOrder, active, sortedModes());
+            paymentPolicy, depositCents, displayOrder, active, sortedModes(), category);
     }
 
     private java.util.List<ConsultationMode> sortedModes() {

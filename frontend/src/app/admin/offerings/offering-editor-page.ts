@@ -2,7 +2,7 @@ import { Component, computed, inject, input, linkedSignal } from '@angular/core'
 import { httpResource } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { form, FormField, FormRoot, maxLength, required, validate } from '@angular/forms/signals';
-import { MODE_LABELS, PaymentPolicy } from '../../public/offerings/offering';
+import {CATEGORY_LABELS, MODE_LABELS, OfferingCategory, PaymentPolicy} from '../../public/offerings/offering';
 import { FieldErrors } from '../../shared/field-errors';
 import { problemMessage } from '../../shared/problem-message';
 import { AdminOffering, POLICY_LABELS } from './admin-offering';
@@ -26,6 +26,8 @@ export class OfferingEditorPage {
   protected readonly modeLabels = MODE_LABELS;
   protected readonly policies = Object.keys(POLICY_LABELS) as PaymentPolicy[];
   protected readonly policyLabels = POLICY_LABELS;
+  protected readonly categories = Object.keys(CATEGORY_LABELS) as OfferingCategory[];
+  protected readonly categoryLabels = CATEGORY_LABELS;
 
   protected readonly existing = httpResource<AdminOffering>(() => {
     const slug = this.slug();

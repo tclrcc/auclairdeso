@@ -47,6 +47,6 @@ class OfferingControllerTests {
 
     private static OfferingView guidance() {
         return new OfferingView("guidance-1-h", "Guidance — 1 h", "Description", 60, 15, 8_000,
-            PaymentPolicy.FULL_ONLINE, null, List.of(ConsultationMode.PHONE));
+            PaymentPolicy.FULL_ONLINE, null, List.of(ConsultationMode.PHONE), OfferingCategory.CLAIRVOYANCE);
     }
 }

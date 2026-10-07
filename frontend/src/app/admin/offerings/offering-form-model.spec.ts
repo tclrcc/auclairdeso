@@ -33,6 +33,7 @@ describe('offering form model', () => {
       displayOrder: 20,
       active: true,
       modes: ['VIDEO', 'PHONE'],
+      category: 'CLAIRVOYANCE'
     };
 
     expect(toDraft(toFormModel(offering))).toEqual({
@@ -46,6 +47,7 @@ describe('offering form model', () => {
       displayOrder: 20,
       active: true,
       modes: ['VIDEO', 'PHONE'],
+      category: 'CLAIRVOYANCE'
     });
   });
 });

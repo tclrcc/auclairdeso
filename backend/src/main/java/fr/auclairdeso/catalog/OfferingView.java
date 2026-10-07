@@ -11,7 +11,8 @@ public record OfferingView(
     int priceCents,
     PaymentPolicy paymentPolicy,
     Integer depositCents,
-    List<ConsultationMode> modes) {
+    List<ConsultationMode> modes,
+    OfferingCategory category) {
 
     public OfferingView {
         modes = List.copyOf(modes);

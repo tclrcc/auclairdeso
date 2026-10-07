@@ -1,5 +1,7 @@
 export type ConsultationMode = 'IN_PERSON' | 'CLIENT_HOME' | 'VIDEO' | 'PHONE';
 
+export type OfferingCategory = 'CLAIRVOYANCE' | 'MAGNETISM' | 'ENERGY_REBALANCING';
+
 export type PaymentPolicy = 'FULL_ONLINE' | 'DEPOSIT_ONLINE' | 'ON_SITE';
 
 export interface Offering {
@@ -12,6 +14,7 @@ export interface Offering {
   readonly paymentPolicy: PaymentPolicy;
   readonly depositCents: number | null;
   readonly modes: readonly ConsultationMode[];
+  readonly category: OfferingCategory;
 }
 
 export const MODE_LABELS: Record<ConsultationMode, string> = {
@@ -19,4 +22,10 @@ export const MODE_LABELS: Record<ConsultationMode, string> = {
   CLIENT_HOME: 'À domicile',
   VIDEO: 'En visio',
   PHONE: 'Par téléphone',
+};
+
+export const CATEGORY_LABELS: Record<OfferingCategory, string> = {
+  CLAIRVOYANCE: 'Voyance',
+  MAGNETISM: 'Magnétisme',
+  ENERGY_REBALANCING: 'Rééquilibrage énergétique',
 };

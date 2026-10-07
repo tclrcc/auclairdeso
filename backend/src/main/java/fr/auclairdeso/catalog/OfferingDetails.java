@@ -17,7 +17,8 @@ record OfferingDetails(
     @Nullable Integer depositCents,
     int displayOrder,
     boolean active,
-    List<ConsultationMode> modes) {
+    List<ConsultationMode> modes,
+    OfferingCategory category) {
 
     OfferingDetails {
         modes = List.copyOf(modes);

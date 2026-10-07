@@ -272,6 +272,7 @@ Plusieurs données sont **sensibles** : motifs de consultation (parfois liés à
 - Collecte minimale : rien de plus que le tableau 5.2.
 - Photos stockées hors de toute zone publique, jamais servies sans authentification.
 - La cliente peut demander la suppression de son compte et de ses données.
+- Les photos sont stockées dans la base (table `appointment_photo`), jamais sur le disque ni dans une zone publique.
 
 ---
 
@@ -320,9 +321,10 @@ Plusieurs données sont **sensibles** : motifs de consultation (parfois liés à
 | 1 | Catalogue des prestations, page « Séances et tarifs » | Fait |
 | 2 | Comptes, lien magique, double authentification, administration des séances, sessions en base, limitation des demandes | Fait |
 | 3A | Planning : plages, fermetures, calcul des créneaux | En cours |
-| 3B | Demande de réservation par la cliente : formulaire, photo, question ciblée, éligibilité | À faire |
+| 3B | Demande de réservation : API (3B-1), écrans (3B-2) | En cours |
 | 3C | Agenda et validation par la praticienne, saisie manuelle, annulations, absences, liste noire | À faire |
 | 3D | Notifications : emails, SMS, rappel de la veille, programme du soir, expiration | À faire |
+| 3E | Question ciblée, sans créneau | À faire |
 | 4 | Fiches clientes, notes privées, marquage « de confiance » | À faire |
 | 5 | Statistiques, encaissements, livre des recettes | À faire |
 | 6 | Vitrine : contenu, identité visuelle, vidéos, pages légales | À faire |

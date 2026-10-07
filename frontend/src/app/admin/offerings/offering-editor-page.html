@@ -18,6 +18,15 @@
       </div>
 
       <div>
+        <label class="block text-sm font-medium" for="category">Catégorie</label>
+        <select id="category" class="field-input" [formField]="offeringForm.category">
+          @for (category of categories; track category) {
+          <option [value]="category">{{ categoryLabels[category] }}</option>
+          }
+        </select>
+      </div>
+
+      <div>
         <label class="block text-sm font-medium" for="description">Description</label>
         <textarea id="description" rows="5" class="field-input" [formField]="offeringForm.description"></textarea>
         <app-field-errors [state]="offeringForm.description()" />

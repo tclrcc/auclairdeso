@@ -47,7 +47,10 @@ record OfferingDraft(
     boolean active,
 
     @NotEmpty(message = "Choisissez au moins un mode de consultation.")
-    Set<ConsultationMode> modes) {
+    Set<ConsultationMode> modes,
+
+    @NotNull(message = "La catégorie est obligatoire.")
+    OfferingCategory category) {
 
     /** The same rule as the offering_deposit_ck constraint of the database. */
     @AssertTrue(message = "L'acompte doit être compris entre 0,01 € et le prix, et seulement avec le paiement par acompte.")
