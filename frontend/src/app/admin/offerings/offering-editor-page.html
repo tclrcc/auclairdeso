@@ -23,12 +23,18 @@
         <app-field-errors [state]="offeringForm.description()" />
       </div>
 
-      <div class="grid gap-6 sm:grid-cols-2">
+      <div class="grid gap-6 sm:grid-cols-3">
         <div>
           <label class="block text-sm font-medium" for="duration">Durée (minutes)</label>
           <input id="duration" type="number" step="5" class="field-input"
                  [formField]="offeringForm.durationMinutes" />
           <app-field-errors [state]="offeringForm.durationMinutes()" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium" for="buffer">Pause après (minutes)</label>
+          <input id="buffer" type="number" step="5" class="field-input"
+                 [formField]="offeringForm.bufferMinutes" />
+          <app-field-errors [state]="offeringForm.bufferMinutes()" />
         </div>
         <div>
           <label class="block text-sm font-medium" for="price">Prix (€)</label>

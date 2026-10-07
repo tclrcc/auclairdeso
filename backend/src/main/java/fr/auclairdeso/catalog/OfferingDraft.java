@@ -28,6 +28,10 @@ record OfferingDraft(
     @Max(value = 240, message = "La durée maximale est de 240 minutes.")
     int durationMinutes,
 
+    @Min(value = 0, message = "La pause ne peut pas être négative.")
+    @Max(value = 120, message = "La pause ne doit pas dépasser 120 minutes.")
+    int bufferMinutes,
+
     @Min(value = 0, message = "Le prix ne peut pas être négatif.")
     @Max(value = 1_000_000, message = "Le prix ne doit pas dépasser 10 000 €.")
     int priceCents,

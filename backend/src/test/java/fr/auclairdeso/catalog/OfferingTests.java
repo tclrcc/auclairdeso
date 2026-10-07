@@ -34,7 +34,7 @@ class OfferingTests {
     void updateReplacesTheContentButKeepsTheSlug() {
         var offering = new Offering("guidance", draft(PaymentPolicy.FULL_ONLINE, null));
 
-        offering.update(new OfferingDraft("  Guidance renommée ", "Nouvelle description", 45, 6_000,
+        offering.update(new OfferingDraft("  Guidance renommée ", "Nouvelle description", 45, 15, 6_000,
             PaymentPolicy.DEPOSIT_ONLINE, 2_000, 5, true, Set.of(ConsultationMode.VIDEO)));
 
         var details = offering.toDetails();
@@ -45,7 +45,7 @@ class OfferingTests {
     }
 
     private static OfferingDraft draft(PaymentPolicy policy, @Nullable Integer depositCents) {
-        return new OfferingDraft("Guidance", "Description", 60, 8_000, policy, depositCents, 0, true,
+        return new OfferingDraft("Guidance", "Description", 60, 15, 8_000, policy, depositCents, 0, true,
             Set.of(ConsultationMode.PHONE, ConsultationMode.IN_PERSON));
     }
 }

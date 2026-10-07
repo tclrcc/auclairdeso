@@ -7,6 +7,7 @@ public record OfferingView(
     String name,
     String description,
     int durationMinutes,
+    int bufferMinutes,
     int priceCents,
     PaymentPolicy paymentPolicy,
     Integer depositCents,

@@ -26,17 +26,17 @@
 
           <p class="mt-6 text-2xl font-semibold">{{ offering.priceCents | euros }}</p>
           @switch (offering.paymentPolicy) {
-          @case ('FULL_ONLINE') {
-          <p class="text-sm text-night/70">Réglé en ligne à la réservation</p>
-          }
-          @case ('DEPOSIT_ONLINE') {
-          <p class="text-sm text-night/70">
-            Acompte de {{ offering.depositCents | euros }} à la réservation
-          </p>
-          }
-          @case ('ON_SITE') {
-          <p class="text-sm text-night/70">Réglé le jour de la séance</p>
-          }
+            @case ('FULL_ONLINE') {
+            <p class="text-sm text-night/70">Réglé en ligne à la réservation</p>
+            }
+            @case ('DEPOSIT_ONLINE') {
+            <p class="text-sm text-night/70">
+              Acompte de {{ offering.depositCents | euros }} à la réservation
+            </p>
+            }
+            @case ('ON_SITE') {
+            <p class="text-sm text-night/70">Réglé après la séance, par virement ou en espèces</p>
+            }
           }
         </article>
       </li>

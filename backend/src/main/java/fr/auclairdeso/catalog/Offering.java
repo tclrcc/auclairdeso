@@ -39,6 +39,9 @@ class Offering {
     @Column(name = "duration_minutes", nullable = false)
     private int durationMinutes;
 
+    @Column(name = "buffer_minutes", nullable = false)
+    private int bufferMinutes;
+
     @Column(name = "price_cents", nullable = false)
     private int priceCents;
 
@@ -93,6 +96,7 @@ class Offering {
         this.name = draft.name().strip();
         this.description = draft.description().strip();
         this.durationMinutes = draft.durationMinutes();
+        this.bufferMinutes = draft.bufferMinutes();
         this.priceCents = draft.priceCents();
         this.paymentPolicy = Objects.requireNonNull(draft.paymentPolicy(), "paymentPolicy");
         this.depositCents = draft.depositCents();
@@ -107,12 +111,12 @@ class Offering {
     }
 
     OfferingView toView() {
-        return new OfferingView(slug, name, description, durationMinutes, priceCents,
+        return new OfferingView(slug, name, description, durationMinutes, bufferMinutes, priceCents,
             paymentPolicy, depositCents, sortedModes());
     }
 
     OfferingDetails toDetails() {
-        return new OfferingDetails(slug, name, description, durationMinutes, priceCents,
+        return new OfferingDetails(slug, name, description, durationMinutes, bufferMinutes, priceCents,
             paymentPolicy, depositCents, displayOrder, active, sortedModes());
     }
 

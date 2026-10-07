@@ -4,13 +4,14 @@ import java.util.List;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Full view of an offering for the admin area, including hidden ones. Amounts are in euro cents.
+ * Vue complète des détails d'une réservation pour l'admin
  */
 record OfferingDetails(
     String slug,
     String name,
     String description,
     int durationMinutes,
+    int bufferMinutes,
     int priceCents,
     PaymentPolicy paymentPolicy,
     @Nullable Integer depositCents,

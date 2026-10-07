@@ -49,6 +49,11 @@ export class OfferingEditorPage {
           ? null
           : { kind: 'duration', message: 'Une durée entière entre 15 et 240 minutes.' },
       );
+      validate(path.bufferMinutes, ({ value }) =>
+        Number.isInteger(value()) && value() >= 0 && value() <= 120
+          ? null
+          : { kind: 'buffer', message: 'Une pause entière entre 0 et 120 minutes.' },
+      );
       validate(path.priceEuros, ({ value }) =>
         isBetween(value(), 0, 10_000) ? null : { kind: 'price', message: 'Un prix entre 0 et 10 000 €.' },
       );

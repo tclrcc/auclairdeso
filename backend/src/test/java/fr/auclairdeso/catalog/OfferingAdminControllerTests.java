@@ -28,13 +28,13 @@ class OfferingAdminControllerTests {
 
     private static final String VALID = """
             {"name": "Guidance — 1 h", "description": "Une séance complète.", "durationMinutes": 60,
-             "priceCents": 8000, "paymentPolicy": "DEPOSIT_ONLINE", "depositCents": 3000,
+             "bufferMinutes": 15, "priceCents": 8000, "paymentPolicy": "DEPOSIT_ONLINE", "depositCents": 3000,
              "displayOrder": 10, "active": true, "modes": ["PHONE", "VIDEO"]}
             """;
 
     private static final String INVALID = """
             {"name": "", "description": "Une séance.", "durationMinutes": 60,
-             "priceCents": 8000, "paymentPolicy": "DEPOSIT_ONLINE", "depositCents": null,
+             "bufferMinutes": 15, "priceCents": 8000, "paymentPolicy": "DEPOSIT_ONLINE", "depositCents": null,
              "displayOrder": 0, "active": true, "modes": []}
             """;
 
@@ -47,7 +47,7 @@ class OfferingAdminControllerTests {
     @Test
     void createsAnOfferingAndPointsToIt() {
         given(administration.create(any())).willReturn(new OfferingDetails("guidance-1-h", "Guidance — 1 h",
-            "Une séance complète.", 60, 8_000, PaymentPolicy.DEPOSIT_ONLINE, 3_000, 10, true,
+            "Une séance complète.", 60, 15, 8_000, PaymentPolicy.DEPOSIT_ONLINE, 3_000, 10, true,
             List.of(ConsultationMode.VIDEO, ConsultationMode.PHONE)));
 
         var result = mvc.post().uri("/api/admin/offerings").with(practitioner()).with(csrf())

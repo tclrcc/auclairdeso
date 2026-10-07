@@ -9,6 +9,7 @@ const GUIDANCE: Offering = {
   name: 'Guidance — 1 h',
   description: 'Une séance complète.',
   durationMinutes: 60,
+  bufferMinutes: 15,
   priceCents: 8000,
   paymentPolicy: 'DEPOSIT_ONLINE',
   depositCents: 3000,

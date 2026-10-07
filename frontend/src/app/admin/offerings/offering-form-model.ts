@@ -6,6 +6,7 @@ export interface OfferingFormModel {
   name: string;
   description: string;
   durationMinutes: number;
+  bufferMinutes: number;
   priceEuros: number;
   paymentPolicy: PaymentPolicy;
   depositEuros: number;
@@ -21,8 +22,9 @@ export function emptyOfferingForm(): OfferingFormModel {
     name: '',
     description: '',
     durationMinutes: 60,
+    bufferMinutes: 15,
     priceEuros: 0,
-    paymentPolicy: 'FULL_ONLINE',
+    paymentPolicy: 'ON_SITE',
     depositEuros: 0,
     displayOrder: 0,
     active: false,
@@ -35,6 +37,7 @@ export function toFormModel(offering: AdminOffering): OfferingFormModel {
     name: offering.name,
     description: offering.description,
     durationMinutes: offering.durationMinutes,
+    bufferMinutes: offering.bufferMinutes,
     priceEuros: offering.priceCents / 100,
     paymentPolicy: offering.paymentPolicy,
     depositEuros: (offering.depositCents ?? 0) / 100,
@@ -49,6 +52,7 @@ export function toDraft(model: OfferingFormModel): OfferingDraft {
     name: model.name.trim(),
     description: model.description.trim(),
     durationMinutes: model.durationMinutes,
+    bufferMinutes: model.bufferMinutes,
     priceCents: toCents(model.priceEuros),
     paymentPolicy: model.paymentPolicy,
     depositCents: model.paymentPolicy === 'DEPOSIT_ONLINE' ? toCents(model.depositEuros) : null,
