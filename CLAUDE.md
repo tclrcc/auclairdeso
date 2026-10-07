@@ -50,3 +50,7 @@ Le document de cadrage fait référence pour le périmètre, l'architecture et l
 - Jamais `window` ou `document` sans vérifier la plateforme (compatibilité SSR).
 - Le client API est généré depuis l'OpenAPI du backend : ne pas l'éditer à la main.
 - Accessibilité visée : WCAG AA. Mobile d'abord, surtout pour l'admin.
+
+## Spécification
+- Le comportement métier attendu est décrit dans `docs/specification.md`.
+  Le lire avant de développer une fonctionnalité ; le mettre à jour quand une règle change.
