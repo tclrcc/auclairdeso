@@ -73,6 +73,10 @@ class UserAccount {
         this.passwordHash = Objects.requireNonNull(newPasswordHash, "newPasswordHash");
     }
 
+    void clearPassword() {
+        this.passwordHash = null;
+    }
+
     String email() {
         return email;
     }

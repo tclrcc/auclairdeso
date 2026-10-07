@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -49,9 +48,10 @@ class MagicLinkLoginTests {
             .param("token", token)
             .exchange();
         assertThat(login).hasStatus(HttpStatus.NO_CONTENT);
-        var session = (MockHttpSession) login.getRequest().getSession(false);
+        var session = login.getResponse().getCookie("SESSION");
+        assertThat(session).isNotNull();
 
-        assertThat(mvc.get().uri("/api/me").session(session))
+        assertThat(mvc.get().uri("/api/me").cookie(session))
             .hasStatusOk()
             .bodyJson()
             .isLenientlyEqualTo("""

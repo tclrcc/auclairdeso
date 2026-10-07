@@ -1,3 +1,6 @@
+server:
+  forward-headers-strategy: native
+
 spring:
   application:
     name: auclairdeso-backend
@@ -29,6 +32,11 @@ spring:
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:1025}
+
+  session:
+    timeout: 1h
+    jdbc:
+      initialize-schema: never
 
 management:
   endpoints:

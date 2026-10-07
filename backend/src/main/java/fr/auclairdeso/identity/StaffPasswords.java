@@ -5,11 +5,13 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.FactorGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.Session;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Lets a staff member define or change their password.
+ * Staff passwords: defined or changed by their owner, reset by an administrator.
  */
 @Service
 class StaffPasswords {
@@ -21,10 +23,13 @@ class StaffPasswords {
 
     private final UserAccountRepository accounts;
     private final PasswordEncoder passwordEncoder;
+    private final FindByIndexNameSessionRepository<? extends Session> sessions;
 
-    StaffPasswords(UserAccountRepository accounts, PasswordEncoder passwordEncoder) {
+    StaffPasswords(UserAccountRepository accounts, PasswordEncoder passwordEncoder,
+                   FindByIndexNameSessionRepository<? extends Session> sessions) {
         this.accounts = accounts;
         this.passwordEncoder = passwordEncoder;
+        this.sessions = sessions;
     }
 
     @Transactional
@@ -42,6 +47,27 @@ class StaffPasswords {
 
         checkStrength(newPassword);
         account.changePassword(passwordEncoder.encode(newPassword));
+    }
+
+    /**
+     * Clears a staff member's password and ends all their sessions.
+     * They will choose a new password at their next login.
+     *
+     * @return false if there is no staff member with this email
+     */
+    @Transactional
+    boolean reset(String rawEmail) {
+        var email = EmailAddresses.normalize(rawEmail);
+        if (email == null) {
+            return false;
+        }
+        var account = accounts.findByEmail(email).filter(found -> found.role().isStaff());
+        if (account.isEmpty()) {
+            return false;
+        }
+        account.get().clearPassword();
+        sessions.findByPrincipalName(email).keySet().forEach(sessions::deleteById);
+        return true;
     }
 
     private static void checkStrength(String password) {

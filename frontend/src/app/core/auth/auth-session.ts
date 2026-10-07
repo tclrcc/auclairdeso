@@ -19,6 +19,7 @@ export class AuthSession {
     const user = this.user();
     return user != null && isStaff(user);
   });
+  readonly isAdmin = computed(() => this.user()?.roles.includes('ADMIN') ?? false);
 
   async refresh(): Promise<CurrentUser | null> {
     try {

@@ -1,7 +1,7 @@
 <main class="min-h-dvh bg-sand px-6 py-16 text-night">
   <div class="mx-auto max-w-2xl">
     <h1 class="font-display text-4xl tracking-tight">Administration</h1>
-    <p class="mt-4">Connectée avec <strong>{{ auth.currentUser()?.email }}</strong>, lien magique et mot de passe.</p>
+    <p class="mt-4">Connecté avec <strong>{{ auth.currentUser()?.email }}</strong>, lien magique et mot de passe.</p>
 
     <nav class="mt-10 grid gap-4 sm:grid-cols-2" aria-label="Rubriques">
       <a routerLink="/admin/seances" class="rounded-2xl border border-night/10 bg-white/60 p-6 hover:bg-white">
@@ -11,15 +11,22 @@
     </nav>
 
     <h2 class="mt-12 font-display text-2xl">L'équipe</h2>
+    @if (resetError(); as message) {
+    <p class="mt-4 text-red-700" role="alert">{{ message }}</p>
+    }
     @if (staff.hasValue()) {
     <ul class="mt-4 divide-y divide-night/10 rounded-lg bg-white">
       @for (member of staff.value(); track member.email) {
-      <li class="flex items-center justify-between px-4 py-3">
+      <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
         <span>{{ member.email }}</span>
-        <span class="text-sm text-night/70">
+        <span class="flex items-center gap-4 text-sm text-night/70">
               {{ member.role === 'ADMIN' ? 'Administrateur' : 'Praticienne' }}
               @if (!member.passwordSet) {
                 · mot de passe à créer
+              } @else if (auth.isAdmin()) {
+                <button type="button" class="font-medium text-night underline" (click)="resetPassword(member)">
+                  Réinitialiser le mot de passe
+                </button>
               }
             </span>
       </li>

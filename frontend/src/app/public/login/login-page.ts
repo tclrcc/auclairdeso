@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { email, form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { AuthSession } from '../../core/auth/auth-session';
+import {problemMessage} from '../../shared/problem-message';
 
 @Component({
   selector: 'app-login-page',
@@ -29,10 +30,10 @@ export class LoginPage {
             await this.auth.requestMagicLink(address);
             this.sentTo.set(address);
             return;
-          } catch {
+          } catch (error) {
             return {
               kind: 'serverError',
-              message: "L'envoi du lien a échoué. Merci de réessayer dans un instant.",
+              message: problemMessage(error)
             };
           }
         },
