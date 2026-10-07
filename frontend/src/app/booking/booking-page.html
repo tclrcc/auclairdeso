@@ -1,0 +1,184 @@
+<main class="min-h-dvh bg-sand px-6 py-12 text-night">
+  <div class="mx-auto max-w-2xl">
+    <a routerLink="/seances" class="text-sm text-night/70 hover:underline">← Séances et tarifs</a>
+
+    @if (sent(); as appointment) {
+    <section class="mt-6 rounded-2xl bg-white p-6">
+      <h1 class="font-display text-3xl">Demande envoyée</h1>
+      <p class="mt-4 leading-relaxed">
+        Votre demande pour <strong>{{ appointment.offeringName }}</strong>,
+        le <strong>{{ formatDayOf(appointment.start) }} à {{ formatTime(appointment.start) }}</strong>
+        ({{ modeLabels[appointment.mode] }}), est bien enregistrée.
+      </p>
+      <p class="mt-4">Vous recevrez un email dès qu'elle sera confirmée.</p>
+      <p class="mt-4 text-sm text-night/70">En cas d'empêchement, merci d'annuler au moins 48 h à l'avance.</p>
+      <a routerLink="/mon-espace" class="btn-primary mt-8">Voir mes rendez-vous</a>
+    </section>
+    } @else if (offering.isLoading()) {
+    <p class="mt-8 text-night/70">Chargement…</p>
+    } @else if (offering.error()) {
+    <p class="mt-8" role="alert">Cette séance n'est pas disponible à la réservation.</p>
+    } @else if (offering.hasValue()) {
+    @let current = offering.value();
+    <h1 class="mt-4 font-display text-4xl tracking-tight">{{ current.name }}</h1>
+    <p class="mt-2 text-night/70">
+      {{ current.durationMinutes }} min · {{ current.priceCents | euros }}, réglé après la séance
+    </p>
+
+    <section class="mt-10">
+      <h2 class="font-display text-2xl">1. Comment souhaitez-vous consulter ?</h2>
+      @if (availableModes().length === 0) {
+      <p class="mt-4 rounded-xl bg-white p-4">
+        Cette séance a lieu en présentiel, et elle est réservée aux personnes déjà suivies.
+        N'hésitez pas à prendre contact pour en parler.
+      </p>
+      } @else {
+      <div class="mt-4 space-y-3" role="radiogroup" aria-label="Mode de consultation">
+        @for (mode of availableModes(); track mode) {
+        <label class="flex cursor-pointer gap-3 rounded-xl border bg-white p-4"
+               [class.border-night]="selectedMode() === mode"
+               [class.border-night/10]="selectedMode() !== mode">
+        <input type="radio" name="mode" class="mt-1" [checked]="selectedMode() === mode"
+               (change)="selectedMode.set(mode)" />
+        <span>
+                  <span class="font-medium">{{ modeLabels[mode] }}</span>
+                  <span class="block text-sm text-night/70">{{ modeHints[mode] }}</span>
+                </span>
+        </label>
+        }
+      </div>
+      }
+    </section>
+
+    <section class="mt-10">
+      <h2 class="font-display text-2xl">2. Choisissez votre créneau</h2>
+      <app-slot-picker class="mt-4 block" [slug]="slug()" [from]="initialDay()" [(selected)]="selectedStart" />
+    </section>
+
+    <section class="mt-10">
+      <h2 class="font-display text-2xl">3. Vos informations</h2>
+
+      @if (auth.currentUser() === undefined) {
+      <p class="mt-4 text-night/70">Chargement…</p>
+      } @else if (!auth.isAuthenticated()) {
+      <div class="mt-4 rounded-xl bg-white p-6">
+        <p>
+          Pour envoyer votre demande, connectez-vous avec votre adresse email :
+          vous recevrez un lien, sans mot de passe à retenir.
+        </p>
+        <a routerLink="/connexion" [queryParams]="{ redirect: returnUrl() }" class="btn-primary mt-4">
+          Me connecter
+        </a>
+      </div>
+      } @else {
+      <form class="mt-4 space-y-5 rounded-2xl bg-white p-6" [formRoot]="bookingForm">
+        <div class="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label class="block text-sm font-medium" for="first-name">Prénom</label>
+            <input id="first-name" type="text" autocomplete="given-name" class="field-input"
+                   [formField]="bookingForm.firstName" />
+            <app-field-errors [state]="bookingForm.firstName()" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium" for="last-name">Nom</label>
+            <input id="last-name" type="text" autocomplete="family-name" class="field-input"
+                   [formField]="bookingForm.lastName" />
+            <app-field-errors [state]="bookingForm.lastName()" />
+          </div>
+        </div>
+
+        <div class="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label class="block text-sm font-medium" for="birth-date">Date de naissance</label>
+            <input id="birth-date" type="date" autocomplete="bday" class="field-input"
+                   [formField]="bookingForm.birthDate" />
+            <app-field-errors [state]="bookingForm.birthDate()" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium" for="phone">Téléphone</label>
+            <input id="phone" type="tel" autocomplete="tel" class="field-input"
+                   [formField]="bookingForm.phone" />
+            <app-field-errors [state]="bookingForm.phone()" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium" for="city">Ville <span class="text-night/60">(facultatif)</span></label>
+          <input id="city" type="text" autocomplete="address-level2" class="field-input"
+                 [formField]="bookingForm.city" />
+          <app-field-errors [state]="bookingForm.city()" />
+        </div>
+
+        @if (selectedMode() === 'CLIENT_HOME') {
+        <div>
+          <label class="block text-sm font-medium" for="address">Adresse de la séance</label>
+          <textarea id="address" rows="2" autocomplete="street-address" class="field-input"
+                    [formField]="bookingForm.address"></textarea>
+          <app-field-errors [state]="bookingForm.address()" />
+        </div>
+        }
+
+        @if (selectedMode() === 'VIDEO') {
+        <div>
+          <label class="block text-sm font-medium" for="messenger">Votre nom sur Messenger</label>
+          <input id="messenger" type="text" class="field-input" [formField]="bookingForm.messengerName" />
+          <app-field-errors [state]="bookingForm.messengerName()" />
+        </div>
+        }
+
+        <div>
+          <label class="block text-sm font-medium" for="reason">Raison de votre demande</label>
+          <textarea id="reason" rows="4" class="field-input" [formField]="bookingForm.reason"></textarea>
+          <app-field-errors [state]="bookingForm.reason()" />
+        </div>
+
+        @if (needsPhoto()) {
+        <div>
+          <label class="block text-sm font-medium" for="photo">Votre photo portrait</label>
+          <p class="mt-1 text-sm text-night/70">Visage bien visible, sans lunettes de soleil.</p>
+          <input id="photo" type="file" accept="image/jpeg,image/png,image/webp" class="mt-2 block text-sm"
+                 (change)="onPhotoSelected($event)" />
+          @if (photoError(); as message) {
+          <p class="mt-1 text-sm text-red-700" role="alert">{{ message }}</p>
+          }
+          @if (photoPreview(); as preview) {
+          <img [src]="preview" alt="Aperçu de votre photo" class="mt-3 h-32 w-32 rounded-xl object-cover" />
+          }
+        </div>
+        }
+
+        <div class="space-y-3 border-t border-night/10 pt-5">
+          <label class="flex gap-3 text-sm">
+            <input type="checkbox" class="mt-1" [formField]="bookingForm.acceptedTerms" />
+            <span>J'ai 18 ans ou plus, et j'accepte les conditions générales (annulation au moins 48 h avant).</span>
+          </label>
+          <app-field-errors [state]="bookingForm.acceptedTerms()" />
+          <label class="flex gap-3 text-sm">
+            <input type="checkbox" class="mt-1" [formField]="bookingForm.consentsToDataProcessing" />
+            <span>
+                  J'accepte que mes informations, y compris la raison de ma demande et ma photo,
+                  servent uniquement à préparer et suivre ma séance.
+                </span>
+          </label>
+          <app-field-errors [state]="bookingForm.consentsToDataProcessing()" />
+        </div>
+
+        @if (selectedStart(); as start) {
+        <p class="rounded-lg bg-sand p-3 text-sm">
+          Créneau choisi : <strong>{{ formatDayOf(start) }} à {{ formatTime(start) }}</strong>
+        </p>
+        }
+
+        @for (error of bookingForm().errors(); track error.kind) {
+        <p class="text-sm text-red-700" role="alert">{{ error.message }}</p>
+        }
+
+        <button type="submit" class="btn-primary w-full" [disabled]="bookingForm().submitting()">
+          {{ bookingForm().submitting() ? 'Envoi…' : 'Envoyer ma demande' }}
+        </button>
+      </form>
+      }
+    </section>
+    }
+  </div>
+</main>

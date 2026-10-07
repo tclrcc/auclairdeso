@@ -3,6 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { OfferingsPage } from './offerings-page';
 import { Offering } from './offering';
+import {provideRouter, RouterLink} from '@angular/router';
 
 const GUIDANCE: Offering = {
   slug: 'guidance-1-h',
@@ -23,7 +24,7 @@ describe('OfferingsPage', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [OfferingsPage],
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     });
     httpTesting = TestBed.inject(HttpTestingController);
   });

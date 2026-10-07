@@ -38,6 +38,8 @@
             <p class="text-sm text-night/70">Réglé après la séance, par virement ou en espèces</p>
             }
           }
+
+          <a [routerLink]="['/reserver', offering.slug]" class="btn-primary mt-6 self-start">Réserver</a>
         </article>
       </li>
       } @empty {

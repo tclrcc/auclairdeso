@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { Service, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { CurrentUser, isStaff } from './current-user';
+import {isSafeRedirect} from './safe-redirect';
 
 /**
  * Who is logged in, and the login flows: magic link, then password for staff members.
@@ -35,8 +36,11 @@ export class AuthSession {
     }
   }
 
-  async requestMagicLink(email: string): Promise<void> {
-    const body = new HttpParams().set('username', email);
+  async requestMagicLink(email: string, redirect?: string): Promise<void> {
+    let body = new HttpParams().set('username', email);
+    if (isSafeRedirect(redirect)) {
+      body = body.set('redirect', redirect);
+    }
     await firstValueFrom(this.http.post<void>('/api/auth/magic-link', body));
   }
 

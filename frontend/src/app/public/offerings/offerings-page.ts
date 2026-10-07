@@ -3,10 +3,11 @@ import { httpResource } from '@angular/common/http';
 import { Meta } from '@angular/platform-browser';
 import { EurosPipe } from '../../shared/euros-pipe';
 import { MODE_LABELS, Offering } from './offering';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-offerings-page',
-  imports: [EurosPipe],
+  imports: [EurosPipe, RouterLink],
   templateUrl: './offerings-page.html',
 })
 export class OfferingsPage {

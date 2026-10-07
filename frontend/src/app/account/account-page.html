@@ -2,7 +2,30 @@
   <div class="mx-auto max-w-xl">
     <h1 class="font-display text-4xl tracking-tight">Mon espace</h1>
     <p class="mt-4">Connecté avec <strong>{{ auth.currentUser()?.email }}</strong>.</p>
-    <p class="mt-2 text-night/70">Vos rendez-vous apparaîtront ici.</p>
+
+    <h2 class="mt-10 font-display text-2xl">Mes rendez-vous</h2>
+    @if (bookings.isLoading()) {
+    <p class="mt-4 text-night/70">Chargement…</p>
+    } @else if (bookings.error()) {
+    <p class="mt-4 text-red-700" role="alert">Vos rendez-vous ne peuvent pas être affichés pour le moment.</p>
+    } @else {
+    <ul class="mt-4 space-y-3">
+      @for (booking of bookings.value(); track booking.id) {
+      <li class="rounded-xl bg-white p-4">
+        <p class="font-medium">{{ booking.offeringName }}</p>
+        <p class="text-sm text-night/70 first-letter:uppercase">
+          {{ formatDayOf(booking.start) }} à {{ formatTime(booking.start) }} · {{ modeLabels[booking.mode] }}
+          · {{ booking.priceCents | euros }}
+        </p>
+        <p class="mt-2 text-sm font-medium">{{ statusLabels[booking.status] }}</p>
+      </li>
+      } @empty {
+      <li class="text-night/70">
+        Aucun rendez-vous pour le moment. <a routerLink="/seances" class="underline">Voir les séances</a>
+      </li>
+      }
+    </ul>
+    }
 
     <div class="mt-10 flex flex-wrap gap-4">
       @if (auth.isStaff()) {

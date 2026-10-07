@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import {Component, inject, input, signal} from '@angular/core';
 import { email, form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { AuthSession } from '../../core/auth/auth-session';
 import {problemMessage} from '../../shared/problem-message';
@@ -16,6 +16,9 @@ export class LoginPage {
 
   private readonly model = signal({ email: '' });
 
+  /** Bound from the ?redirect= query parameter: where to come back after login. */
+  readonly redirect = input<string>();
+
   protected readonly loginForm = form(
     this.model,
     (path) => {
@@ -27,7 +30,7 @@ export class LoginPage {
         action: async (field) => {
           const address = field().value().email.trim();
           try {
-            await this.auth.requestMagicLink(address);
+            await this.auth.requestMagicLink(address, this.redirect());
             this.sentTo.set(address);
             return;
           } catch (error) {

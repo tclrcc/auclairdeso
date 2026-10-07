@@ -68,5 +68,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./admin/offerings/offering-editor-page').then((m) => m.OfferingEditorPage),
   },
+  {
+    path: 'reserver/:slug',
+    title: 'Réserver une séance — Au clair de So',
+    loadComponent: () => import('./booking/booking-page').then((m) => m.BookingPage),
+  },
   { path: '**', redirectTo: '' },
 ];

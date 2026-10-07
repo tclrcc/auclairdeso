@@ -10,5 +10,6 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'admin/seances', renderMode: RenderMode.Client },
   { path: 'admin/seances/nouvelle', renderMode: RenderMode.Client },
   { path: 'admin/seances/modifier/:slug', renderMode: RenderMode.Client },
+  { path: 'reserver/:slug', renderMode: RenderMode.Client },
   { path: '**', renderMode: RenderMode.Prerender },
 ];

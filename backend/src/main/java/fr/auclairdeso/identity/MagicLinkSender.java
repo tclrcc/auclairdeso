@@ -10,6 +10,8 @@ import org.springframework.security.web.authentication.ott.OneTimeTokenGeneratio
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.HashMap;
+
 /**
  * Emails the magic link once Spring Security has generated a one-time token.
  */
@@ -26,11 +28,16 @@ class MagicLinkSender implements OneTimeTokenGenerationSuccessHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, OneTimeToken token) {
-        var link = UriComponentsBuilder.fromUri(properties.frontendUrl())
+        var variables = new HashMap<String, String>();
+        variables.put("token", token.getTokenValue());
+        var builder = UriComponentsBuilder.fromUri(properties.frontendUrl())
             .path("/connexion/verifier")
-            .queryParam("token", token.getTokenValue())
-            .build()
-            .toUri();
+            .queryParam("token", "{token}");
+        ReturnPaths.from(request.getParameter("redirect")).ifPresent(path -> {
+            builder.queryParam("redirect", "{redirect}");
+            variables.put("redirect", path);
+        });
+        var link = builder.encode().buildAndExpand(variables).toUri();
 
         var message = new SimpleMailMessage();
         message.setFrom(properties.mailFrom());
