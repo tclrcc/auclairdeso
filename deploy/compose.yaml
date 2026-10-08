@@ -1,0 +1,81 @@
+# Acceptance environment ("recette") of Au clair de So, on the VPS.
+# Everything listens on 127.0.0.1 only: reach it through the SSH tunnel.
+name: auclairdeso
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: auclairdeso
+      POSTGRES_USER: auclairdeso
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is missing from deploy/.env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U auclairdeso -d auclairdeso" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    logging: *logging
+
+  mailpit:
+    image: axllent/mailpit
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
+    logging: *logging
+
+  backend:
+    build: ../backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/auclairdeso
+      DB_USERNAME: auclairdeso
+      DB_PASSWORD: ${DB_PASSWORD}
+      MAIL_HOST: mailpit
+      MAIL_PORT: "1025"
+      FRONTEND_URL: ${PUBLIC_URL}
+      AUCLAIRDESO_IDENTITY_ADMINS: ${ADMINS:-}
+      AUCLAIRDESO_IDENTITY_PRACTITIONERS: ${PRACTITIONERS:-}
+      SPRINGDOC_APIDOCS_ENABLED: "false"
+      SPRINGDOC_SWAGGERUI_ENABLED: "false"
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=75"
+    mem_limit: 768m
+    logging: *logging
+
+  frontend:
+    build: ../frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      API_ORIGIN: http://backend:8080
+      NG_ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+    mem_limit: 256m
+    logging: *logging
+
+  gateway:
+    image: nginx:stable-alpine
+    restart: unless-stopped
+    depends_on:
+      - backend
+      - frontend
+    ports:
+      - "127.0.0.1:8090:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    logging: *logging
+
+  volumes:
+    pgdata:

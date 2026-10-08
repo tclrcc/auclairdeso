@@ -29,3 +29,6 @@ Thumbs.db
 
 # Local configuration with secrets (loaded automatically by Spring Boot)
 backend/config/
+
+# Secrets of the acceptance environment, on the VPS only
+deploy/.env
