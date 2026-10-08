@@ -77,5 +77,5 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     logging: *logging
 
-  volumes:
-    pgdata:
+volumes:
+  pgdata:
