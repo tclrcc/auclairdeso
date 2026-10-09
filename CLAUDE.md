@@ -54,7 +54,7 @@ Le document de cadrage fait référence pour le périmètre, l'architecture et l
 ## Déploiement (recette)
 - `deploy/compose.yaml` : gateway nginx, backend, frontend SSR, PostgreSQL, Mailpit ; tout sur 127.0.0.1.
 - Sur le VPS : `~/auclairdeso/deploy/deploy.sh` (git pull, docker compose up --build, redémarrage de la gateway).
-- Accès public : https://vps-5ff241d3.vps.ovh.net:8443, protégé par mot de passe (nginx du VPS ; fichiers dans `deploy/host/`, installés à la main).
+- Accès public : https://vps-5ff241d3.vps.ovh.net:8443 ; mot de passe demandé une fois à la porte `/recette/acces`, puis cookie de 90 jours (nginx du VPS ; fichiers dans `deploy/host/`, installés à la main ; secret dans `/etc/nginx/auclairdeso-recette.conf`).
 - Accès par le tunnel SSH : http://127.0.0.1:8090 ; Mailpit : http://localhost:8025 (tunnel uniquement).
 - Secrets : `deploy/.env` et `/etc/nginx/auclairdeso.htpasswd`, jamais versionnés.
 
