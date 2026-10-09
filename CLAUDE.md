@@ -51,6 +51,13 @@ Le document de cadrage fait référence pour le périmètre, l'architecture et l
 - Le client API est généré depuis l'OpenAPI du backend : ne pas l'éditer à la main.
 - Accessibilité visée : WCAG AA. Mobile d'abord, surtout pour l'admin.
 
+## Déploiement (recette)
+- `deploy/compose.yaml` : gateway nginx, backend, frontend SSR, PostgreSQL, Mailpit ; tout sur 127.0.0.1.
+- Sur le VPS : `~/auclairdeso/deploy/deploy.sh` (git pull, docker compose up --build, redémarrage de la gateway).
+- Accès public : https://vps-5ff241d3.vps.ovh.net:8443, protégé par mot de passe (nginx du VPS ; fichiers dans `deploy/host/`, installés à la main).
+- Accès par le tunnel SSH : http://127.0.0.1:8090 ; Mailpit : http://localhost:8025 (tunnel uniquement).
+- Secrets : `deploy/.env` et `/etc/nginx/auclairdeso.htpasswd`, jamais versionnés.
+
 ## Spécification
 - Le comportement métier attendu est décrit dans `docs/specification.md`.
   Le lire avant de développer une fonctionnalité ; le mettre à jour quand une règle change.

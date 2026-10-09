@@ -1,5 +1,5 @@
 # Acceptance environment ("recette") of Au clair de So, on the VPS.
-# Everything listens on 127.0.0.1 only: reach it through the SSH tunnel.
+# Everything listens on 127.0.0.1 only: the nginx of the VPS publishes the gateway (deploy/host/).
 name: auclairdeso
 
 x-logging: &logging
