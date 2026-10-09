@@ -1,0 +1,16 @@
+<svg viewBox="-230 -150 460 300" aria-hidden="true" class="size-full overflow-visible"
+     fill="none" stroke="currentColor" stroke-linecap="round">
+  <g class="rays" stroke-width="2">
+    @for (ray of rays; track $index) {
+    <line [attr.x1]="ray.x1" [attr.y1]="ray.y1" [attr.x2]="ray.x2" [attr.y2]="ray.y2"
+          [attr.stroke-opacity]="ray.long ? 0.9 : 0.5" [style.--order]="ray.order" />
+    }
+  </g>
+
+  <g class="lids">
+    <path d="M -150 0 Q 0 -118 150 0 Q 0 118 -150 0 Z" stroke-width="2.5" />
+    <path d="M -122 -6 Q 0 -96 122 -6" stroke-width="1.5" stroke-opacity="0.5" />
+    <circle r="44" stroke-width="2" />
+    <path class="iris-moon" [attr.d]="crescent" fill="currentColor" stroke="none" />
+  </g>
+</svg>

@@ -42,11 +42,11 @@ class MagicLinkSender implements OneTimeTokenGenerationSuccessHandler {
         var message = new SimpleMailMessage();
         message.setFrom(properties.mailFrom());
         message.setTo(token.getUsername());
-        message.setSubject("Votre lien de connexion — Au clair de So");
+        message.setSubject("Confirmez votre adresse email — Au clair de So");
         message.setText("""
                 Bonjour,
 
-                Voici votre lien de connexion à Au clair de So.
+                Pour confirmer votre adresse email sur Au clair de So, ouvrez ce lien.
                 Il est valable %d minutes et ne fonctionne qu'une seule fois :
 
                 %s

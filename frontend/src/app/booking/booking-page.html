@@ -62,12 +62,12 @@
       <p class="mt-4 text-night/70">Chargement…</p>
       } @else if (!auth.isAuthenticated()) {
       <div class="mt-4 rounded-xl bg-white p-6">
-        <p>
-          Pour envoyer votre demande, connectez-vous avec votre adresse email :
-          vous recevrez un lien, sans mot de passe à retenir.
+        <p class="leading-relaxed">
+          Pour envoyer votre demande, confirmez d'abord votre adresse email. Vous recevrez un lien
+          qui vous ramène ici, avec votre créneau déjà choisi. Pas de compte à créer, pas de mot de passe.
         </p>
         <a routerLink="/connexion" [queryParams]="{ redirect: returnUrl() }" class="btn-primary mt-4">
-          Me connecter
+          Confirmer mon adresse email
         </a>
       </div>
       } @else {

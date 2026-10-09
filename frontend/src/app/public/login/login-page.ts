@@ -1,7 +1,6 @@
-import {Component, inject, input, signal} from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { email, form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { AuthSession } from '../../core/auth/auth-session';
-import {problemMessage} from '../../shared/problem-message';
 
 @Component({
   selector: 'app-login-page',
@@ -11,13 +10,16 @@ import {problemMessage} from '../../shared/problem-message';
 export class LoginPage {
   private readonly auth = inject(AuthSession);
 
+  /** Bound from the ?redirect= query parameter: where the link of the email leads back to. */
+  readonly redirect = input<string>();
+
+  /** Coming from a booking, the email confirms the request: no account vocabulary. */
+  protected readonly fromBooking = computed(() => this.redirect()?.startsWith('/reserver/') ?? false);
+
   /** Set once the link has been requested, to show the confirmation message. */
   protected readonly sentTo = signal<string | null>(null);
 
   private readonly model = signal({ email: '' });
-
-  /** Bound from the ?redirect= query parameter: where to come back after login. */
-  readonly redirect = input<string>();
 
   protected readonly loginForm = form(
     this.model,
@@ -33,10 +35,10 @@ export class LoginPage {
             await this.auth.requestMagicLink(address, this.redirect());
             this.sentTo.set(address);
             return;
-          } catch (error) {
+          } catch {
             return {
               kind: 'serverError',
-              message: problemMessage(error)
+              message: "L'envoi du lien a échoué. Merci de réessayer dans un instant.",
             };
           }
         },

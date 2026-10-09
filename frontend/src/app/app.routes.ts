@@ -1,37 +1,45 @@
 import { Routes } from '@angular/router';
 import { authGuard, staffGuard } from './core/auth/auth-guard';
+import { PublicLayout } from './layout/public-layout';
 
 export const routes: Routes = [
   {
     path: '',
-    title: 'Au clair de So — bientôt en ligne',
-    loadComponent: () =>
-      import('./public/coming-soon/coming-soon').then((m) => m.ComingSoon),
-  },
-  {
-    path: 'seances',
-    title: 'Séances et tarifs — Au clair de So',
-    loadComponent: () =>
-      import('./public/offerings/offerings-page').then((m) => m.OfferingsPage),
-  },
-  {
-    path: 'connexion',
-    title: 'Connexion — Au clair de So',
-    loadComponent: () =>
-      import('./public/login/login-page').then((m) => m.LoginPage),
-  },
-  {
-    path: 'connexion/verifier',
-    title: 'Connexion — Au clair de So',
-    loadComponent: () =>
-      import('./public/login/verify-page').then((m) => m.VerifyPage),
-  },
-  {
-    path: 'mon-espace',
-    title: 'Mon espace — Au clair de So',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./account/account-page').then((m) => m.AccountPage),
+    component: PublicLayout,
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        title: 'Au clair de So — voyance, magnétisme et rééquilibrage énergétique dans l’Ain',
+        loadComponent: () => import('./public/home/home-page').then((m) => m.HomePage),
+      },
+      {
+        path: 'seances',
+        title: 'Séances et tarifs — Au clair de So',
+        loadComponent: () => import('./public/offerings/offerings-page').then((m) => m.OfferingsPage),
+      },
+      {
+        path: 'reserver/:slug',
+        title: 'Réserver une séance — Au clair de So',
+        loadComponent: () => import('./booking/booking-page').then((m) => m.BookingPage),
+      },
+      {
+        path: 'connexion',
+        title: 'Confirmer mon adresse email — Au clair de So',
+        loadComponent: () => import('./public/login/login-page').then((m) => m.LoginPage),
+      },
+      {
+        path: 'connexion/verifier',
+        title: 'Confirmer mon adresse email — Au clair de So',
+        loadComponent: () => import('./public/login/verify-page').then((m) => m.VerifyPage),
+      },
+      {
+        path: 'mon-espace',
+        title: 'Mes rendez-vous — Au clair de So',
+        canActivate: [authGuard],
+        loadComponent: () => import('./account/account-page').then((m) => m.AccountPage),
+      },
+    ],
   },
   {
     path: 'admin',
@@ -92,11 +100,6 @@ export const routes: Routes = [
     canActivate: [staffGuard],
     loadComponent: () =>
       import('./admin/agenda/appointment-detail-page').then((m) => m.AppointmentDetailPage),
-  },
-  {
-    path: 'reserver/:slug',
-    title: 'Réserver une séance — Au clair de So',
-    loadComponent: () => import('./booking/booking-page').then((m) => m.BookingPage),
   },
   { path: '**', redirectTo: '' },
 ];

@@ -1,7 +1,7 @@
 import { Component, inject, input, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthSession } from '../../core/auth/auth-session';
-import {isSafeRedirect} from '../../core/auth/safe-redirect';
+import { isSafeRedirect } from '../../core/auth/safe-redirect';
 
 type VerifyState = 'idle' | 'verifying' | 'invalid' | 'error';
 
@@ -16,10 +16,10 @@ export class VerifyPage {
 
   /** Bound from the ?token= query parameter. */
   readonly token = input<string>();
+  /** Bound from the ?redirect= query parameter: where to go once the address is confirmed. */
+  readonly redirect = input<string>();
 
   protected readonly state = signal<VerifyState>('idle');
-
-  readonly redirect = input<string>();
 
   protected async confirm(): Promise<void> {
     const token = this.token();

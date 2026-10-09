@@ -1,15 +1,27 @@
-<main class="flex min-h-dvh items-center justify-center bg-sand px-6 text-night">
-  <div class="w-full max-w-sm">
+<main class="px-6 py-20 sm:py-28">
+  <div class="mx-auto w-full max-w-sm">
     @if (sentTo(); as address) {
-    <h1 class="font-display text-3xl">Vérifiez votre boîte mail</h1>
+    <h1 class="font-display text-4xl">Vérifiez votre boîte mail</h1>
     <p class="mt-4 leading-relaxed">
-      Un lien de connexion vient d'être envoyé à <strong>{{ address }}</strong>.
+      Un lien vient d'être envoyé à <strong>{{ address }}</strong>.
       Il est valable 10 minutes et ne fonctionne qu'une fois.
     </p>
+    @if (fromBooking()) {
+    <p class="mt-4 leading-relaxed">Il vous ramène à votre réservation, avec votre créneau déjà choisi.</p>
+    }
     <p class="mt-4 text-sm text-night/70">Pensez à regarder dans les courriers indésirables.</p>
     } @else {
-    <h1 class="font-display text-3xl">Connexion</h1>
-    <p class="mt-2 text-night/70">Recevez un lien de connexion par email, sans mot de passe.</p>
+    @if (fromBooking()) {
+    <h1 class="font-display text-4xl">Confirmez votre adresse email</h1>
+    <p class="mt-3 leading-relaxed text-night/70">
+      Vous recevrez un lien pour terminer votre demande. Pas de compte à créer, pas de mot de passe.
+    </p>
+    } @else {
+    <h1 class="font-display text-4xl">Mes rendez-vous</h1>
+    <p class="mt-3 leading-relaxed text-night/70">
+      Indiquez votre adresse email : vous recevrez un lien pour retrouver vos rendez-vous, sans mot de passe.
+    </p>
+    }
 
     <form class="mt-8" [formRoot]="loginForm">
       <label class="block text-sm font-medium" for="email">Adresse email</label>
@@ -26,11 +38,11 @@
       <p class="mt-4 text-sm text-red-700" role="alert">{{ error.message }}</p>
       }
 
-      <button type="submit" class="btn-primary mt-6 w-full" [disabled]="loginForm().submitting()">
+      <button type="submit" class="btn-primary mt-6 w-full py-3" [disabled]="loginForm().submitting()">
         @if (loginForm().submitting()) {
         Envoi…
         } @else {
-        Recevoir mon lien
+        Recevoir le lien
         }
       </button>
     </form>

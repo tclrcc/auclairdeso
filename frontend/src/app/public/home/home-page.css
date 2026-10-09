@@ -1,0 +1,25 @@
+/* The crescent shines a little on the night around it. */
+.moonlight {
+  filter: drop-shadow(0 0 1.25rem color-mix(in oklab, var(--color-pearl) 45%, transparent));
+}
+
+/* The four moons are linked like a lunar calendar: downwards on a phone, across on a wide screen. */
+.step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 3.75rem;
+  bottom: -1.75rem;
+  left: 1.5rem;
+  border-left: 1px solid color-mix(in oklab, var(--color-lilac) 35%, transparent);
+}
+
+@media (width >= 64rem) {
+  .step:not(:last-child)::before {
+    top: 1.5rem;
+    bottom: auto;
+    left: 3.75rem;
+    right: -1.25rem;
+    border-left: 0;
+    border-top: 1px solid color-mix(in oklab, var(--color-lilac) 35%, transparent);
+  }
+}

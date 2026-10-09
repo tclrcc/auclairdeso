@@ -1,0 +1,26 @@
+<header class="bg-night text-pearl">
+  <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+    <a routerLink="/"
+       class="flex items-center gap-3 rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-pearl">
+      <img src="logo.jpg" alt="" width="44" height="44" class="size-11 rounded-full" />
+      <span class="sr-only font-display text-2xl sm:not-sr-only">Au clair de So</span>
+    </a>
+
+    <nav aria-label="Navigation principale">
+      <ul class="flex items-center gap-6 sm:gap-8">
+        <li>
+          <a routerLink="/seances" routerLinkActive="text-pearl! underline" ariaCurrentWhenActive="page"
+             class="text-pearl/75 underline-offset-8 transition-colors hover:text-pearl">Séances</a>
+        </li>
+        <li>
+          @if (auth.isStaff()) {
+          <a routerLink="/admin" class="text-pearl/75 transition-colors hover:text-pearl">Administration</a>
+          } @else {
+          <a routerLink="/mon-espace" routerLinkActive="text-pearl! underline" ariaCurrentWhenActive="page"
+             class="text-pearl/75 underline-offset-8 transition-colors hover:text-pearl">Mes rendez-vous</a>
+          }
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>

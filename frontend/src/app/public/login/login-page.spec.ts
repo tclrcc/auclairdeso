@@ -46,4 +46,12 @@ describe('LoginPage', () => {
     await fixture.whenStable();
     expect(fixture.nativeElement.textContent).toContain('Vérifiez votre boîte mail');
   });
+
+  it('presents the link as a confirmation of the email address during a booking', async () => {
+    const fixture = TestBed.createComponent(LoginPage);
+    fixture.componentRef.setInput('redirect', '/reserver/guidance-1-h?mode=VIDEO');
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.querySelector('h1').textContent).toContain('Confirmez votre adresse email');
+  });
 });

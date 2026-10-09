@@ -1,10 +1,37 @@
 @import "tailwindcss";
+@import "@fontsource/italiana";
+@import "@fontsource-variable/jost";
 
+/*
+ * The palette comes from the logo: its plum night, the lilac of its line art, the pearl of its highlights.
+ * "sand", "night" and "moon" keep their names so that every existing screen follows the new identity.
+ */
 @theme {
-  --color-sand: #f6f1e9;
-  --color-night: #1f2a44;
-  --color-moon: #e8c27a;
-  --font-display: ui-serif, Georgia, "Times New Roman", serif;
+  --color-night: #2e1b33;
+  --color-night-deep: #1f1124;
+  --color-lilac: #a0919d;
+  --color-pearl: #f3eaec;
+  --color-sand: #f7f2f4;
+  --color-moon: #e6cf9c;
+
+  --font-sans: "Jost Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Italiana", ui-serif, Georgia, serif;
+}
+
+@layer base {
+  body {
+    @apply bg-sand text-night antialiased;
+  }
+
+  ::selection {
+    @apply bg-night text-pearl;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
 }
 
 @layer components {
@@ -12,6 +39,13 @@
     @apply inline-flex items-center justify-center rounded-full bg-night px-5 py-2 text-sand
     transition-opacity hover:opacity-90 disabled:opacity-60
     focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-night;
+  }
+
+  /* The same button, on a night background. */
+  .btn-pearl {
+    @apply inline-flex items-center justify-center rounded-full bg-pearl px-6 py-3 font-medium text-night
+    transition-colors hover:bg-white
+    focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-pearl;
   }
 
   .field-input {
