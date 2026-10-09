@@ -131,6 +131,29 @@ class AgendaFlowTests {
             .hasStatus(HttpStatus.FORBIDDEN);
     }
 
+    @Test
+    void thePractitionerCanBookOutsideOpeningHoursButNeverOverAnotherSession() {
+        var urgent = """
+                {"offeringSlug": "consultation-1-h", "mode": "VIDEO", "start": "2026-10-23T19:00",
+                 "newClient": {"firstName": "Louise", "lastName": "Urgent", "phone": "06 11 22 33 44"},
+                 "messengerName": "Louise U", "note": "Appel en urgence"}
+                """;
+
+        assertThat(mvc.post().uri("/api/admin/appointments").with(practitioner()).with(csrf())
+            .contentType(MediaType.APPLICATION_JSON).content(urgent))
+            .hasStatus(HttpStatus.CREATED)
+            .bodyJson()
+            .extractingPath("$.status").isEqualTo("CONFIRMED");
+
+        assertThat(mvc.post().uri("/api/admin/appointments").with(practitioner()).with(csrf())
+            .contentType(MediaType.APPLICATION_JSON).content(urgent))
+            .hasStatus(HttpStatus.CONFLICT);
+
+        assertThat(mvc.get().uri("/api/admin/clients?query=urgent").with(practitioner()))
+            .bodyJson()
+            .extractingPath("$[*].lastName").asArray().contains("Urgent");
+    }
+
     /** A confirmed session on Friday 16 October, before the frozen "today". */
     private long pastConfirmedSession(String email) {
         var clientId = jdbc.queryForObject("""

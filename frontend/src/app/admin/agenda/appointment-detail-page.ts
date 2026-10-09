@@ -22,9 +22,10 @@ export class AppointmentDetailPage {
 
   protected readonly appointment = httpResource<AdminAppointment>(() => `/api/admin/appointments/${this.id()}`);
   protected readonly photoUrl = computed(() => `/api/admin/appointments/${this.id()}/photo`);
-  protected readonly age = computed(() =>
-    this.appointment.hasValue() ? ageOn(this.appointment.value().client.birthDate, todayInParis()) : null,
-  );
+  protected readonly age = computed(() => {
+    const birthDate = this.appointment.hasValue() ? this.appointment.value().client.birthDate : null;
+    return birthDate ? ageOn(birthDate, todayInParis()) : null;
+  });
   protected readonly hasStarted = computed(
     () => this.appointment.hasValue() && new Date(this.appointment.value().start).getTime() <= Date.now(),
   );

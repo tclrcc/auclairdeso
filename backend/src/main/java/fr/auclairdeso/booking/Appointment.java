@@ -59,8 +59,12 @@ class Appointment {
     @Column(name = "status", nullable = false, length = 20)
     private AppointmentStatus status;
 
-    @Column(name = "reason", nullable = false, columnDefinition = "text")
-    private String reason;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "source", nullable = false, length = 20, updatable = false)
+    private AppointmentSource source;
+
+    @Column(name = "reason", columnDefinition = "text")
+    private @Nullable String reason;
 
     @Column(name = "address", length = 300)
     private @Nullable String address;
@@ -75,8 +79,8 @@ class Appointment {
     @Column(name = "late_cancellation", nullable = false)
     private boolean lateCancellation;
 
-    @Column(name = "consented_at", nullable = false, updatable = false)
-    private Instant consentedAt;
+    @Column(name = "consented_at", updatable = false)
+    private @Nullable Instant consentedAt;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -90,18 +94,25 @@ class Appointment {
         // required by JPA
     }
 
-    /** A new request, waiting for the practitioner's decision. Name and price are copied from the offering. */
+    /** What every appointment shares. Name and price are copied from the offering at creation. */
+    private Appointment(Client client, OfferingView offering, ConsultationMode mode, Instant start,
+                        AppointmentStatus status, AppointmentSource source) {
+        this.client = client;
+        this.offeringSlug = offering.slug();
+        this.offeringName = offering.name();
+        this.priceCents = offering.priceCents();
+        this.mode = mode;
+        this.startsAt = start;
+        this.endsAt = start.plus(Duration.ofMinutes(offering.durationMinutes()));
+        this.occupiedUntil = endsAt.plus(Duration.ofMinutes(offering.bufferMinutes()));
+        this.status = status;
+        this.source = source;
+    }
+
+    /** A request sent by the client on the site, waiting for the practitioner's decision. */
     static Appointment request(Client client, OfferingView offering, BookingRequest request, Instant now) {
-        var appointment = new Appointment();
-        appointment.client = client;
-        appointment.offeringSlug = offering.slug();
-        appointment.offeringName = offering.name();
-        appointment.priceCents = offering.priceCents();
-        appointment.mode = request.mode();
-        appointment.startsAt = request.start().toInstant();
-        appointment.endsAt = appointment.startsAt.plus(Duration.ofMinutes(offering.durationMinutes()));
-        appointment.occupiedUntil = appointment.endsAt.plus(Duration.ofMinutes(offering.bufferMinutes()));
-        appointment.status = AppointmentStatus.REQUESTED;
+        var appointment = new Appointment(client, offering, request.mode(), request.start().toInstant(),
+            AppointmentStatus.REQUESTED, AppointmentSource.ONLINE);
         appointment.reason = request.reason().strip();
         appointment.address = request.mode() == ConsultationMode.CLIENT_HOME ? blankToNull(request.address()) : null;
         appointment.messengerName = request.mode() == ConsultationMode.VIDEO ? blankToNull(request.messengerName()) : null;
@@ -109,8 +120,15 @@ class Appointment {
         return appointment;
     }
 
-    Long id() {
-        return id;
+    /** An appointment taken by the practitioner herself: confirmed at once. */
+    static Appointment byPractitioner(Client client, OfferingView offering, ManualAppointmentRequest request,
+                                      Instant start) {
+        var appointment = new Appointment(client, offering, request.mode(), start,
+            AppointmentStatus.CONFIRMED, AppointmentSource.PRACTITIONER);
+        appointment.reason = blankToNull(request.note());
+        appointment.address = request.mode() == ConsultationMode.CLIENT_HOME ? blankToNull(request.address()) : null;
+        appointment.messengerName = request.mode() == ConsultationMode.VIDEO ? blankToNull(request.messengerName()) : null;
+        return appointment;
     }
 
     void confirm() {
@@ -159,8 +177,40 @@ class Appointment {
         client.block();
     }
 
+    Long id() {
+        return id;
+    }
+
     Client client() {
         return client;
+    }
+
+    AppointmentStatus status() {
+        return status;
+    }
+
+    BookedSession toBookedSession(ZoneId zone) {
+        return new BookedSession(startsAt.atZone(zone),
+            Duration.between(startsAt, endsAt), Duration.between(endsAt, occupiedUntil));
+    }
+
+    AppointmentView toView(ZoneId zone, Duration notice) {
+        return new AppointmentView(id, offeringSlug, offeringName, mode,
+            startsAt.atZone(zone).toOffsetDateTime(), endsAt.atZone(zone).toOffsetDateTime(),
+            status, priceCents, startsAt.minus(notice).atZone(zone).toOffsetDateTime(), lateCancellation);
+    }
+
+    AdminAppointmentView toAdminView(ZoneId zone, boolean hasPhoto) {
+        return new AdminAppointmentView(id, offeringSlug, offeringName, mode,
+            startsAt.atZone(zone).toOffsetDateTime(), endsAt.atZone(zone).toOffsetDateTime(),
+            status, source, priceCents, reason, address, messengerName, hasPhoto,
+            cancelledBy, lateCancellation, client.toSummary());
+    }
+
+    private void requireStatus(AppointmentStatus expected, String message) {
+        if (status != expected) {
+            throw new BookingRefusedException(HttpStatus.CONFLICT, message);
+        }
     }
 
     private void requireHoldingSlot(String message) {
@@ -173,34 +223,6 @@ class Appointment {
         if (status != AppointmentStatus.CONFIRMED || now.isBefore(startsAt)) {
             throw new BookingRefusedException(HttpStatus.CONFLICT, message);
         }
-    }
-
-    AppointmentStatus status() {
-        return status;
-    }
-
-    AdminAppointmentView toAdminView(ZoneId zone, boolean hasPhoto) {
-        return new AdminAppointmentView(id, offeringSlug, offeringName, mode,
-            startsAt.atZone(zone).toOffsetDateTime(), endsAt.atZone(zone).toOffsetDateTime(),
-            status, priceCents, reason, address, messengerName, hasPhoto,
-            cancelledBy, lateCancellation, client.toSummary());
-    }
-
-    private void requireStatus(AppointmentStatus expected, String message) {
-        if (status != expected) {
-            throw new BookingRefusedException(HttpStatus.CONFLICT, message);
-        }
-    }
-
-    BookedSession toBookedSession(ZoneId zone) {
-        return new BookedSession(startsAt.atZone(zone),
-            Duration.between(startsAt, endsAt), Duration.between(endsAt, occupiedUntil));
-    }
-
-    AppointmentView toView(ZoneId zone, Duration notice) {
-        return new AppointmentView(id, offeringSlug, offeringName, mode,
-            startsAt.atZone(zone).toOffsetDateTime(), endsAt.atZone(zone).toOffsetDateTime(),
-            status, priceCents, startsAt.minus(notice).atZone(zone).toOffsetDateTime(), lateCancellation);
     }
 
     private static @Nullable String blankToNull(@Nullable String value) {

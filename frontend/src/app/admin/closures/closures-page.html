@@ -1,0 +1,59 @@
+<main class="min-h-dvh bg-sand px-4 py-10 text-night">
+  <div class="mx-auto max-w-2xl">
+    <a routerLink="/admin" class="text-sm text-night/70 hover:underline">← Administration</a>
+    <h1 class="mt-4 font-display text-4xl tracking-tight">Fermetures</h1>
+    <p class="mt-2 text-night/70">Vacances, indisponibilités : aucun créneau n'est proposé ces jours-là.</p>
+
+    <form class="mt-8 space-y-4 rounded-2xl bg-white p-5" [formRoot]="closureForm">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium" for="first-day">Du</label>
+          <input id="first-day" type="date" class="field-input" [formField]="closureForm.firstDay" />
+          <app-field-errors [state]="closureForm.firstDay()" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium" for="last-day">Au <span class="text-night/60">(inclus)</span></label>
+          <input id="last-day" type="date" class="field-input" [formField]="closureForm.lastDay" />
+          <app-field-errors [state]="closureForm.lastDay()" />
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium" for="reason">Motif <span class="text-night/60">(pour vous seulement)</span></label>
+        <input id="reason" type="text" class="field-input" [formField]="closureForm.reason" />
+        <app-field-errors [state]="closureForm.reason()" />
+      </div>
+      <p class="text-sm text-night/70">Les rendez-vous déjà pris ces jours-là ne sont pas annulés automatiquement.</p>
+      @for (error of closureForm().errors(); track error.kind) {
+      <p class="text-sm text-red-700" role="alert">{{ error.message }}</p>
+      }
+      <button type="submit" class="btn-primary w-full" [disabled]="closureForm().submitting()">Ajouter la fermeture</button>
+    </form>
+
+    <h2 class="mt-10 font-display text-2xl">À venir</h2>
+    @if (listError(); as message) {
+    <p class="mt-4 text-sm text-red-700" role="alert">{{ message }}</p>
+    }
+    @if (closures.hasValue()) {
+    <ul class="mt-4 space-y-3">
+      @for (closure of closures.value(); track closure.id) {
+      <li class="flex items-center justify-between gap-4 rounded-xl bg-white p-4">
+            <span>
+              <span class="block font-medium first-letter:uppercase">
+                {{ formatDay(closure.firstDay) }}
+                @if (closure.lastDay !== closure.firstDay) {
+                  → {{ formatDay(closure.lastDay) }}
+                }
+              </span>
+              @if (closure.reason) {
+                <span class="block text-sm text-night/70">{{ closure.reason }}</span>
+              }
+            </span>
+        <button type="button" class="text-sm text-red-700 underline" (click)="remove(closure)">Supprimer</button>
+      </li>
+      } @empty {
+      <li class="text-night/70">Aucune fermeture prévue.</li>
+      }
+    </ul>
+    }
+  </div>
+</main>

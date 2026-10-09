@@ -7,10 +7,8 @@ import fr.auclairdeso.catalog.ConsultationMode;
 import fr.auclairdeso.catalog.OfferingCategory;
 import fr.auclairdeso.catalog.OfferingView;
 import fr.auclairdeso.catalog.PaymentPolicy;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
+
+import java.time.*;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -82,6 +80,19 @@ class AppointmentTests {
         appointment.markNoShow(START.plus(Duration.ofHours(1)));
 
         assertThat(appointment.client().isBlocked()).isTrue();
+    }
+
+    @Test
+    void anAppointmentTakenByThePractitionerIsConfirmedAtOnce() {
+        var client = Client.byPractitioner(new ManualClient("Louise", "Martin", "06 11 22 33 44", null, null), null);
+        var offering = new OfferingView("consultation-1-h", "Consultation approfondie", "Une heure.", 60, 15, 8_000,
+            PaymentPolicy.ON_SITE, null, List.of(ConsultationMode.PHONE), OfferingCategory.CLAIRVOYANCE);
+        var request = new ManualAppointmentRequest("consultation-1-h", ConsultationMode.PHONE,
+            LocalDateTime.of(2026, 10, 23, 19, 0), null, null, "Appel en urgence", null, null);
+
+        var appointment = Appointment.byPractitioner(client, offering, request, Instant.parse("2026-10-23T17:00:00Z"));
+
+        assertThat(appointment.status()).isEqualTo(AppointmentStatus.CONFIRMED);
     }
 
     private static Appointment confirmed() {

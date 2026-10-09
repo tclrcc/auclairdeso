@@ -3,6 +3,11 @@
     <a routerLink="/admin" class="text-sm text-night/70 hover:underline">← Administration</a>
     <h1 class="mt-4 font-display text-4xl tracking-tight">Agenda</h1>
 
+    <div class="mt-4 flex flex-wrap gap-3">
+      <a routerLink="/admin/agenda/nouveau" class="btn-primary">Ajouter un rendez-vous</a>
+      <a routerLink="/admin/fermetures" class="rounded-full border border-night/30 px-5 py-2">Fermetures</a>
+    </div>
+
     @if (actionError(); as message) {
     <p class="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">{{ message }}</p>
     }

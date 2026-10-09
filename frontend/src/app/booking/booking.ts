@@ -32,7 +32,7 @@ export interface AppointmentView {
 export interface ClientProfile {
   readonly firstName: string;
   readonly lastName: string;
-  readonly birthDate: string;
+  readonly birthDate: string | null;
   readonly phone: string;
   readonly city: string | null;
   readonly trusted: boolean;

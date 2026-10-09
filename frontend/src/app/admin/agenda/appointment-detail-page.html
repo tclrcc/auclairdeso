@@ -18,11 +18,16 @@
     <p class="mt-1 text-night/70">
       {{ current.offeringName }} · {{ modeLabels[current.mode] }} · {{ current.priceCents | euros }}
     </p>
+    @if (current.source === 'PRACTITIONER') {
+    <p class="mt-1 text-sm text-night/70">Rendez-vous saisi par vous</p>
+    }
 
     <section class="mt-6 rounded-2xl bg-white p-5">
       <h2 class="font-display text-xl">{{ current.client.firstName }} {{ current.client.lastName }}</h2>
       <p class="text-sm text-night/70">
+        @if (age() !== null) {
         {{ age() }} ans
+        }
         @if (current.client.city) {
         · {{ current.client.city }}
         }
@@ -35,7 +40,9 @@
       }
       <div class="mt-4 flex flex-wrap gap-3">
         <a class="btn-primary" [href]="'tel:' + current.client.phone">Appeler</a>
-        <a class="rounded-full border border-night/30 px-5 py-2" [href]="'mailto:' + current.client.email">Écrire</a>
+        @if (current.client.email) {
+          <a class="rounded-full border border-night/30 px-5 py-2" [href]="'mailto:' + current.client.email">Écrire</a>
+        }
       </div>
     </section>
 
@@ -52,10 +59,14 @@
     </section>
     }
 
+    @if (current.reason) {
     <section class="mt-4 rounded-2xl bg-white p-5">
-      <h2 class="text-sm font-medium text-night/70">Raison de la demande</h2>
+      <h2 class="text-sm font-medium text-night/70">
+        {{ current.source === 'ONLINE' ? 'Raison de la demande' : 'Note' }}
+      </h2>
       <p class="mt-1 whitespace-pre-line">{{ current.reason }}</p>
     </section>
+    }
 
     @if (current.hasPhoto) {
     <section class="mt-4 rounded-2xl bg-white p-5">

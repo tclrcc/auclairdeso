@@ -36,7 +36,7 @@ export function fromProfile(profile: ClientProfile): BookingFormModel {
     ...emptyBookingForm(),
     firstName: profile.firstName,
     lastName: profile.lastName,
-    birthDate: profile.birthDate,
+    birthDate: profile.birthDate ?? '',
     phone: profile.phone,
     city: profile.city ?? '',
   };

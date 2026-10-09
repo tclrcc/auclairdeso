@@ -75,6 +75,18 @@ export const routes: Routes = [
     loadComponent: () => import('./admin/agenda/agenda-page').then((m) => m.AgendaPage),
   },
   {
+    path: 'admin/agenda/nouveau',
+    title: 'Ajouter un rendez-vous — Administration',
+    canActivate: [staffGuard],
+    loadComponent: () => import('./admin/agenda/new-appointment-page').then((m) => m.NewAppointmentPage),
+  },
+  {
+    path: 'admin/fermetures',
+    title: 'Fermetures — Administration',
+    canActivate: [staffGuard],
+    loadComponent: () => import('./admin/closures/closures-page').then((m) => m.ClosuresPage),
+  },
+  {
     path: 'admin/agenda/:id',
     title: 'Rendez-vous — Administration',
     canActivate: [staffGuard],

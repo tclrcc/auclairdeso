@@ -21,8 +21,8 @@ class Client {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "email", nullable = false, length = 254, updatable = false)
-    private String email;
+    @Column(name = "email", length = 254)
+    private @Nullable String email;
 
     @Column(name = "first_name", nullable = false, length = 80)
     private String firstName;
@@ -30,8 +30,8 @@ class Client {
     @Column(name = "last_name", nullable = false, length = 80)
     private String lastName;
 
-    @Column(name = "birth_date", nullable = false)
-    private LocalDate birthDate;
+    @Column(name = "birth_date")
+    private @Nullable LocalDate birthDate;
 
     @Column(name = "phone", nullable = false, length = 20)
     private String phone;
@@ -57,25 +57,33 @@ class Client {
         // required by JPA
     }
 
+    /** A client who books online: her email comes from her login. */
     Client(String email) {
         this.email = Objects.requireNonNull(email, "email");
     }
 
-    /** The client may correct her details at each booking. */
+    /** A client entered by the practitioner, e.g. after a phone call: email and birth date are optional. */
+    static Client byPractitioner(ManualClient details, @Nullable String email) {
+        var client = new Client();
+        client.email = email;
+        client.firstName = details.firstName().strip();
+        client.lastName = details.lastName().strip();
+        client.phone = details.phone().strip();
+        client.city = blankToNull(details.city());
+        return client;
+    }
+
+    /** The client may correct her details at each online booking. */
     void update(ClientDetails details) {
         this.firstName = details.firstName().strip();
         this.lastName = details.lastName().strip();
         this.birthDate = details.birthDate();
         this.phone = details.phone().strip();
-        this.city = details.city() == null || details.city().isBlank() ? null : details.city().strip();
+        this.city = blankToNull(details.city());
     }
 
     void block() {
         this.blocked = true;
-    }
-
-    ClientSummary toSummary() {
-        return new ClientSummary(id, email, firstName, lastName, birthDate, phone, city, trusted, blocked);
     }
 
     @Nullable Long id() {
@@ -92,5 +100,13 @@ class Client {
 
     ClientProfile toProfile() {
         return new ClientProfile(firstName, lastName, birthDate, phone, city, trusted);
+    }
+
+    ClientSummary toSummary() {
+        return new ClientSummary(id, email, firstName, lastName, birthDate, phone, city, trusted, blocked);
+    }
+
+    private static @Nullable String blankToNull(@Nullable String value) {
+        return value == null || value.isBlank() ? null : value.strip();
     }
 }

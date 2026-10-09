@@ -3,6 +3,7 @@ package fr.auclairdeso.booking;
 import static fr.auclairdeso.TestUsers.practitioner;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 import fr.auclairdeso.WebSecurityTestConfiguration;
@@ -41,5 +42,17 @@ class AgendaControllerTests {
 
         assertThat(result).hasStatusOk().hasContentType(MediaType.IMAGE_JPEG);
         assertThat(result.getResponse().getHeader(HttpHeaders.CACHE_CONTROL)).contains("no-store");
+    }
+
+    @Test
+    void aManualAppointmentNeedsAClient() {
+        assertThat(mvc.post().uri("/api/admin/appointments").with(practitioner()).with(csrf())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                        {"offeringSlug": "consultation-1-h", "mode": "PHONE", "start": "2026-10-23T19:00"}
+                        """))
+            .hasStatus(HttpStatus.BAD_REQUEST)
+            .bodyJson()
+            .extractingPath("$.errors[*].field").asArray().contains("clientChosen");
     }
 }

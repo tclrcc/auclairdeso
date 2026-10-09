@@ -13,5 +13,7 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'admin/agenda', renderMode: RenderMode.Client },
   { path: 'admin/agenda/:id', renderMode: RenderMode.Client },
   { path: 'reserver/:slug', renderMode: RenderMode.Client },
+  { path: 'admin/agenda/nouveau', renderMode: RenderMode.Client },
+  { path: 'admin/fermetures', renderMode: RenderMode.Client },
   { path: '**', renderMode: RenderMode.Prerender },
 ];
