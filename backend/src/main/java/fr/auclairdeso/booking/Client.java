@@ -70,6 +70,10 @@ class Client {
         this.city = details.city() == null || details.city().isBlank() ? null : details.city().strip();
     }
 
+    void block() {
+        this.blocked = true;
+    }
+
     ClientSummary toSummary() {
         return new ClientSummary(id, email, firstName, lastName, birthDate, phone, city, trusted, blocked);
     }

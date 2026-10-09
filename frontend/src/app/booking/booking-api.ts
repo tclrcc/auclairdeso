@@ -16,4 +16,8 @@ export class BookingApi {
     }
     return firstValueFrom(this.http.post<AppointmentView>('/api/bookings', body));
   }
+
+  cancel(id: number): Promise<AppointmentView> {
+    return firstValueFrom(this.http.post<AppointmentView>(`/api/bookings/${id}/cancel`, null));
+  }
 }

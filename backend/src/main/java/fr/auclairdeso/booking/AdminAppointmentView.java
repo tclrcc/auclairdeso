@@ -18,5 +18,7 @@ record AdminAppointmentView(
     @Nullable String address,
     @Nullable String messengerName,
     boolean hasPhoto,
+    @Nullable CancelledBy cancelledBy,
+    boolean lateCancellation,
     ClientSummary client) {
 }

@@ -68,4 +68,24 @@ class AgendaController {
     AdminAppointmentView decline(@PathVariable long id) {
         return agenda.decline(id);
     }
+
+    @GetMapping("/to-close")
+    List<AdminAppointmentView> toClose() {
+        return agenda.toClose();
+    }
+
+    @PostMapping("/{id}/cancel")
+    AdminAppointmentView cancel(@PathVariable long id) {
+        return agenda.cancel(id);
+    }
+
+    @PostMapping("/{id}/complete")
+    AdminAppointmentView complete(@PathVariable long id) {
+        return agenda.complete(id);
+    }
+
+    @PostMapping("/{id}/no-show")
+    AdminAppointmentView noShow(@PathVariable long id) {
+        return agenda.noShow(id);
+    }
 }

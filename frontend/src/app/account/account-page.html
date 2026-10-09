@@ -4,6 +4,9 @@
     <p class="mt-4">Connecté avec <strong>{{ auth.currentUser()?.email }}</strong>.</p>
 
     <h2 class="mt-10 font-display text-2xl">Mes rendez-vous</h2>
+    @if (notice(); as message) {
+    <p class="mt-4 rounded-lg bg-white p-3 text-sm" role="status">{{ message }}</p>
+    }
     @if (bookings.isLoading()) {
     <p class="mt-4 text-night/70">Chargement…</p>
     } @else if (bookings.error()) {
@@ -18,6 +21,11 @@
           · {{ booking.priceCents | euros }}
         </p>
         <p class="mt-2 text-sm font-medium">{{ statusLabels[booking.status] }}</p>
+        @if (canCancel(booking)) {
+        <button type="button" class="mt-3 text-sm font-medium underline" (click)="cancel(booking)">
+          {{ booking.status === 'REQUESTED' ? 'Retirer ma demande' : 'Annuler' }}
+        </button>
+        }
       </li>
       } @empty {
       <li class="text-night/70">

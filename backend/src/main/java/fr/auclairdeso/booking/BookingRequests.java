@@ -91,14 +91,26 @@ class BookingRequests {
         if (photo != null) {
             photos.save(new AppointmentPhoto(appointment.id(), photo));
         }
-        return appointment.toView(rules.zone());
+        return appointment.toView(rules.zone(), rules.cancellationNotice());
     }
 
     @Transactional(readOnly = true)
     List<AppointmentView> mine(String email) {
         return appointments.findByClientEmailOrderByStartsAtDesc(email).stream()
-            .map(appointment -> appointment.toView(rules.zone()))
+            .map(appointment -> appointment.toView(rules.zone(), rules.cancellationNotice()))
             .toList();
+    }
+
+    @Transactional
+    AppointmentView cancel(String email, long id) {
+        var appointment = appointments.findByIdAndClientEmail(id, email)
+            .orElseThrow(() -> refused(HttpStatus.NOT_FOUND, "Rendez-vous introuvable."));
+        var late = appointment.cancelByClient(Instant.now(clock), rules.cancellationNotice());
+        if (late && appointments.countByClientAndLateCancellationTrue(appointment.client())
+            >= rules.lateCancellationsBeforeBlock()) {
+            appointment.client().block();
+        }
+        return appointment.toView(rules.zone(), rules.cancellationNotice());
     }
 
     @Transactional(readOnly = true)

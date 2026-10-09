@@ -7,7 +7,7 @@ import { EurosPipe } from '../../shared/euros-pipe';
 import { formatDayOf, formatTime, todayInParis } from '../../shared/paris-time';
 import { problemMessage } from '../../shared/problem-message';
 import { AdminAppointment, ageOn } from './admin-appointment';
-import { AgendaApi } from './agenda-api';
+import { AgendaAction, AgendaApi } from './agenda-api';
 
 @Component({
   selector: 'app-appointment-detail-page',
@@ -25,6 +25,9 @@ export class AppointmentDetailPage {
   protected readonly age = computed(() =>
     this.appointment.hasValue() ? ageOn(this.appointment.value().client.birthDate, todayInParis()) : null,
   );
+  protected readonly hasStarted = computed(
+    () => this.appointment.hasValue() && new Date(this.appointment.value().start).getTime() <= Date.now(),
+  );
 
   protected readonly busy = signal(false);
   protected readonly actionError = signal<string | null>(null);
@@ -34,22 +37,14 @@ export class AppointmentDetailPage {
   protected readonly formatDayOf = formatDayOf;
   protected readonly formatTime = formatTime;
 
-  protected confirm(): Promise<void> {
-    return this.act((id) => this.api.confirm(id));
-  }
-
-  protected decline(): Promise<void> {
-    if (!confirm('Refuser cette demande ?')) {
-      return Promise.resolve();
+  protected async act(action: AgendaAction, question?: string): Promise<void> {
+    if (question && !confirm(question)) {
+      return;
     }
-    return this.act((id) => this.api.decline(id));
-  }
-
-  private async act(action: (id: number) => Promise<unknown>): Promise<void> {
     this.busy.set(true);
     this.actionError.set(null);
     try {
-      await action(Number(this.id()));
+      await this.api.apply(Number(this.id()), action);
       this.appointment.reload();
     } catch (error) {
       this.actionError.set(problemMessage(error));

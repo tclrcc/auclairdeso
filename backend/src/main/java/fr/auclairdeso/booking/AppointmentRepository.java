@@ -27,4 +27,12 @@ interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
     @EntityGraph(attributePaths = "client")
     Optional<Appointment> findWithClientById(Long id);
+
+    long countByClientAndLateCancellationTrue(Client client);
+
+    /** An appointment of this client only: someone else's is simply not found. */
+    Optional<Appointment> findByIdAndClientEmail(Long id, String email);
+
+    @EntityGraph(attributePaths = "client")
+    List<Appointment> findByStatusAndStartsAtBeforeOrderByStartsAtAsc(AppointmentStatus status, Instant before);
 }

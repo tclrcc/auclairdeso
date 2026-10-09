@@ -3,15 +3,13 @@ import { Service, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { AdminAppointment } from './admin-appointment';
 
+export type AgendaAction = 'confirm' | 'decline' | 'cancel' | 'complete' | 'no-show';
+
 @Service()
 export class AgendaApi {
   private readonly http = inject(HttpClient);
 
-  confirm(id: number): Promise<AdminAppointment> {
-    return firstValueFrom(this.http.post<AdminAppointment>(`/api/admin/appointments/${id}/confirm`, null));
-  }
-
-  decline(id: number): Promise<AdminAppointment> {
-    return firstValueFrom(this.http.post<AdminAppointment>(`/api/admin/appointments/${id}/decline`, null));
+  apply(id: number, action: AgendaAction): Promise<AdminAppointment> {
+    return firstValueFrom(this.http.post<AdminAppointment>(`/api/admin/appointments/${id}/${action}`, null));
   }
 }

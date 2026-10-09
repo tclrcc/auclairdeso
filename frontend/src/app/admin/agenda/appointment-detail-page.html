@@ -68,14 +68,46 @@
     <p class="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">{{ message }}</p>
     }
 
-    @if (current.status === 'REQUESTED') {
+    @switch (current.status) {
+    @case ('REQUESTED') {
     <div class="mt-6 flex gap-3">
-      <button type="button" class="btn-primary flex-1" [disabled]="busy()" (click)="confirm()">Confirmer</button>
+      <button type="button" class="btn-primary flex-1" [disabled]="busy()" (click)="act('confirm')">
+        Confirmer
+      </button>
       <button type="button" class="flex-1 rounded-full border border-night/30 px-5 py-2 disabled:opacity-60"
-              [disabled]="busy()" (click)="decline()">
+              [disabled]="busy()" (click)="act('decline', 'Refuser cette demande ?')">
         Refuser
       </button>
     </div>
+    }
+    @case ('CONFIRMED') {
+      @if (hasStarted()) {
+      <div class="mt-6 flex gap-3">
+        <button type="button" class="btn-primary flex-1" [disabled]="busy()" (click)="act('complete')">
+          Séance effectuée
+        </button>
+        <button type="button" class="flex-1 rounded-full border border-night/30 px-5 py-2 disabled:opacity-60"
+                [disabled]="busy()"
+                (click)="act('no-show', 'Marquer une absence ? La cliente ne pourra plus réserver en ligne.')">
+          Absence
+        </button>
+      </div>
+      } @else {
+      <button type="button" class="mt-6 w-full rounded-full border border-red-700 px-5 py-2 text-red-700 disabled:opacity-60"
+              [disabled]="busy()"
+              (click)="act('cancel', 'Annuler ce rendez-vous ? Pensez à prévenir la cliente par téléphone.')">
+        Annuler le rendez-vous
+      </button>
+      }
+      }
+      @case ('CANCELLED') {
+      <p class="mt-6 rounded-xl bg-white p-4 text-sm">
+        Annulé par {{ current.cancelledBy === 'CLIENT' ? 'la cliente' : 'vous' }}
+        @if (current.lateCancellation) {
+        <strong class="text-red-700">, moins de 48 h avant la séance</strong>
+        }
+      </p>
+      }
     }
     }
   </div>

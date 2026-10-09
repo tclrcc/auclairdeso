@@ -97,6 +97,56 @@ class AgendaFlowTests {
         assertThat(photo.getResponse().getContentAsByteArray()).isEqualTo(TestBookings.JPEG);
     }
 
+    @Test
+    void twoLateCancellationsBlockTheClient() throws Exception {
+        for (var round = 1; round <= 2; round++) {
+            var id = book("dora@example.com", "2026-10-19T15:15:00+02:00");
+            assertThat(mvc.post().uri("/api/admin/appointments/{id}/confirm", id).with(practitioner()).with(csrf()))
+                .hasStatusOk();
+            assertThat(mvc.post().uri("/api/bookings/{id}/cancel", id).with(user("dora@example.com")).with(csrf()))
+                .hasStatusOk()
+                .bodyJson()
+                .extractingPath("$.lateCancellation").isEqualTo(true);
+        }
+
+        assertThat(mvc.perform(TestBookings.bookingRequest("2026-10-19T15:15:00+02:00", true)
+            .with(user("dora@example.com")).with(csrf())))
+            .hasStatus(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void aNoShowBlocksTheClient() throws Exception {
+        var id = pastConfirmedSession("eric@example.com");
+        assertThat(mvc.get().uri("/api/admin/appointments/to-close").with(practitioner()))
+            .bodyJson()
+            .extractingPath("$[*].client.email").asArray().contains("eric@example.com");
+
+        assertThat(mvc.post().uri("/api/admin/appointments/{id}/no-show", id).with(practitioner()).with(csrf()))
+            .hasStatusOk()
+            .bodyJson()
+            .extractingPath("$.status").isEqualTo("NO_SHOW");
+
+        assertThat(mvc.perform(TestBookings.bookingRequest("2026-10-21T15:15:00+02:00", true)
+            .with(user("eric@example.com")).with(csrf())))
+            .hasStatus(HttpStatus.FORBIDDEN);
+    }
+
+    /** A confirmed session on Friday 16 October, before the frozen "today". */
+    private long pastConfirmedSession(String email) {
+        var clientId = jdbc.queryForObject("""
+                INSERT INTO client (email, first_name, last_name, birth_date, phone)
+                VALUES (?, 'Eric', 'Absent', '1985-03-02', '0600000000')
+                RETURNING id
+                """, Long.class, email);
+        return jdbc.queryForObject("""
+                INSERT INTO appointment (client_id, offering_slug, offering_name, price_cents, mode, starts_at,
+                                         ends_at, occupied_until, status, reason, messenger_name, consented_at)
+                VALUES (?, 'consultation-1-h', 'Consultation', 8000, 'VIDEO', '2026-10-16 14:00+02',
+                        '2026-10-16 15:00+02', '2026-10-16 15:15+02', 'CONFIRMED', 'Test', 'Eric', now())
+                RETURNING id
+                """, Long.class, clientId);
+    }
+
     private long book(String email, String start) throws Exception {
         var result = mvc.perform(TestBookings.bookingRequest(start, true).with(user(email)).with(csrf()));
         assertThat(result).hasStatus(HttpStatus.CREATED);

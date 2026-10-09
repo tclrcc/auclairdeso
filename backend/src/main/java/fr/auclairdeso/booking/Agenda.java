@@ -80,4 +80,23 @@ class Agenda {
     private AdminAppointmentView view(Appointment appointment) {
         return appointment.toAdminView(rules.zone(), photos.existsById(appointment.id()));
     }
+
+    /** Confirmed sessions that have started and still wait to be marked completed or no-show. */
+    @Transactional(readOnly = true)
+    List<AdminAppointmentView> toClose() {
+        return views(appointments.findByStatusAndStartsAtBeforeOrderByStartsAtAsc(
+            AppointmentStatus.CONFIRMED, Instant.now(clock)));
+    }
+
+    AdminAppointmentView cancel(long id) {
+        return change(id, Appointment::cancelByPractitioner);
+    }
+
+    AdminAppointmentView complete(long id) {
+        return change(id, appointment -> appointment.complete(Instant.now(clock)));
+    }
+
+    AdminAppointmentView noShow(long id) {
+        return change(id, appointment -> appointment.markNoShow(Instant.now(clock)));
+    }
 }

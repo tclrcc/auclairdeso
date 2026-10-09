@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 class SlotCalculatorTests {
 
     private static final ZoneId PARIS = ZoneId.of("Europe/Paris");
-    private static final BookingRules RULES = new BookingRules(PARIS, 3, 1, Period.ofMonths(2));
+    private static final BookingRules RULES = new BookingRules(PARIS, 3, 1, Period.ofMonths(2), Duration.ofHours(48), 2);
 
     /** Sunday 11 October 2026, 10:00 in Paris. */
     private static final Clock SUNDAY = Clock.fixed(Instant.parse("2026-10-11T08:00:00Z"), ZoneOffset.UTC);

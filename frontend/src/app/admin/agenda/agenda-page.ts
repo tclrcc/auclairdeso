@@ -5,7 +5,7 @@ import { MODE_LABELS } from '../../public/offerings/offering';
 import { addDays, formatDayOf, formatTime, groupByParisDay, todayInParis } from '../../shared/paris-time';
 import { problemMessage } from '../../shared/problem-message';
 import { AdminAppointment } from './admin-appointment';
-import { AgendaApi } from './agenda-api';
+import { AgendaAction, AgendaApi } from './agenda-api';
 
 const UPCOMING_DAYS = 14;
 
@@ -18,6 +18,9 @@ export class AgendaPage {
   private readonly api = inject(AgendaApi);
   private readonly today = todayInParis();
 
+  protected readonly toClose = httpResource<AdminAppointment[]>(() => '/api/admin/appointments/to-close', {
+    defaultValue: [],
+  });
   protected readonly pending = httpResource<AdminAppointment[]>(() => '/api/admin/appointments/pending', {
     defaultValue: [],
   });
@@ -26,16 +29,18 @@ export class AgendaPage {
     { defaultValue: [] },
   );
 
+  /** Confirmed sessions still to come: those already started are in "to close". */
   protected readonly confirmedDays = computed(() =>
     this.upcoming.hasValue()
       ? groupByParisDay(
-        this.upcoming.value().filter((appointment) => appointment.status === 'CONFIRMED'),
+        this.upcoming
+          .value()
+          .filter((appointment) => appointment.status === 'CONFIRMED' && !this.hasStarted(appointment)),
         (appointment) => appointment.start,
       )
       : [],
   );
 
-  /** The appointment whose action is running, to disable its buttons. */
   protected readonly busy = signal<number | null>(null);
   protected readonly actionError = signal<string | null>(null);
 
@@ -43,22 +48,15 @@ export class AgendaPage {
   protected readonly formatDayOf = formatDayOf;
   protected readonly formatTime = formatTime;
 
-  protected confirm(appointment: AdminAppointment): Promise<void> {
-    return this.act(appointment, () => this.api.confirm(appointment.id));
-  }
-
-  protected decline(appointment: AdminAppointment): Promise<void> {
-    if (!confirm(`Refuser la demande de ${appointment.client.firstName} ${appointment.client.lastName} ?`)) {
-      return Promise.resolve();
+  protected async act(appointment: AdminAppointment, action: AgendaAction, question?: string): Promise<void> {
+    if (question && !confirm(question)) {
+      return;
     }
-    return this.act(appointment, () => this.api.decline(appointment.id));
-  }
-
-  private async act(appointment: AdminAppointment, action: () => Promise<unknown>): Promise<void> {
     this.busy.set(appointment.id);
     this.actionError.set(null);
     try {
-      await action();
+      await this.api.apply(appointment.id, action);
+      this.toClose.reload();
       this.pending.reload();
       this.upcoming.reload();
     } catch (error) {
@@ -66,5 +64,13 @@ export class AgendaPage {
     } finally {
       this.busy.set(null);
     }
+  }
+
+  protected fullName(appointment: AdminAppointment): string {
+    return `${appointment.client.firstName} ${appointment.client.lastName}`;
+  }
+
+  private hasStarted(appointment: AdminAppointment): boolean {
+    return new Date(appointment.start).getTime() <= Date.now();
   }
 }

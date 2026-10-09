@@ -54,7 +54,7 @@ class BookingControllerTests {
         given(bookings.request(eq("alice@example.com"), any(), any())).willReturn(new AppointmentView(1L,
             "consultation-1-h", "Consultation approfondie", ConsultationMode.VIDEO,
             OffsetDateTime.parse("2026-10-12T14:00:00+02:00"), OffsetDateTime.parse("2026-10-12T15:00:00+02:00"),
-            AppointmentStatus.REQUESTED, 8_000));
+            AppointmentStatus.REQUESTED, 8_000, OffsetDateTime.parse("2026-10-10T14:00:00+02:00"), false));
 
         assertThat(mvc.perform(multipart("/api/bookings").file(requestPart(true))
             .with(user("alice@example.com")).with(csrf())))

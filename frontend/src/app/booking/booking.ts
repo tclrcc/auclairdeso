@@ -24,6 +24,8 @@ export interface AppointmentView {
   readonly end: string;
   readonly status: AppointmentStatus;
   readonly priceCents: number;
+  readonly cancellationDeadline: string;
+  readonly lateCancellation: boolean;
 }
 
 /** Mirror of the backend ClientProfile record. */

@@ -203,6 +203,8 @@ La cliente **ne peut pas déplacer** un rendez-vous : elle annule et fait une no
 - La praticienne peut **débloquer** une cliente depuis sa fiche.
 - Le blocage s'appuie sur le compte (email) et sur le numéro de téléphone.
 - La liste noire doit être mentionnée dans la politique de confidentialité et les conditions générales.
+- Seule l'annulation tardive d'un rendez-vous **confirmé** compte comme manquement : retirer une demande en attente n'en est jamais un.
+- Le délai (48 h) et le seuil de blocage (2 manquements) sont paramétrables : `auclairdeso.booking.cancellation-notice` et `auclairdeso.booking.late-cancellations-before-block`.
 
 ---
 

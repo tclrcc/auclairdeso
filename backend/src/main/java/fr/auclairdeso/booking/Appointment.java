@@ -68,6 +68,13 @@ class Appointment {
     @Column(name = "messenger_name", length = 100)
     private @Nullable String messengerName;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "cancelled_by", length = 20)
+    private @Nullable CancelledBy cancelledBy;
+
+    @Column(name = "late_cancellation", nullable = false)
+    private boolean lateCancellation;
+
     @Column(name = "consented_at", nullable = false, updatable = false)
     private Instant consentedAt;
 
@@ -116,6 +123,58 @@ class Appointment {
         this.status = AppointmentStatus.DECLINED;
     }
 
+    void cancelByPractitioner() {
+        requireHoldingSlot("Ce rendez-vous ne peut plus être annulé.");
+        this.status = AppointmentStatus.CANCELLED;
+        this.cancelledBy = CancelledBy.PRACTITIONER;
+    }
+
+    /**
+     * Cancellation by the client. Only a confirmed session cancelled less than the notice
+     * before it starts is late: withdrawing a pending request never is.
+     *
+     * @return whether the cancellation is late
+     */
+    boolean cancelByClient(Instant now, Duration notice) {
+        requireHoldingSlot("Ce rendez-vous ne peut plus être annulé.");
+        if (!now.isBefore(startsAt)) {
+            throw new BookingRefusedException(HttpStatus.CONFLICT,
+                "La séance a déjà commencé : elle ne peut plus être annulée en ligne.");
+        }
+        this.lateCancellation = status == AppointmentStatus.CONFIRMED && now.isAfter(startsAt.minus(notice));
+        this.status = AppointmentStatus.CANCELLED;
+        this.cancelledBy = CancelledBy.CLIENT;
+        return lateCancellation;
+    }
+
+    void complete(Instant now) {
+        requireStartedConfirmedSession(now, "Seule une séance confirmée et commencée peut être marquée comme effectuée.");
+        this.status = AppointmentStatus.COMPLETED;
+    }
+
+    /** The client did not come: she is blocked at once (docs/specification.md, 6). */
+    void markNoShow(Instant now) {
+        requireStartedConfirmedSession(now, "Seule une séance confirmée et commencée peut être marquée comme absence.");
+        this.status = AppointmentStatus.NO_SHOW;
+        client.block();
+    }
+
+    Client client() {
+        return client;
+    }
+
+    private void requireHoldingSlot(String message) {
+        if (!AppointmentStatus.HOLDING_SLOT.contains(status)) {
+            throw new BookingRefusedException(HttpStatus.CONFLICT, message);
+        }
+    }
+
+    private void requireStartedConfirmedSession(Instant now, String message) {
+        if (status != AppointmentStatus.CONFIRMED || now.isBefore(startsAt)) {
+            throw new BookingRefusedException(HttpStatus.CONFLICT, message);
+        }
+    }
+
     AppointmentStatus status() {
         return status;
     }
@@ -123,7 +182,8 @@ class Appointment {
     AdminAppointmentView toAdminView(ZoneId zone, boolean hasPhoto) {
         return new AdminAppointmentView(id, offeringSlug, offeringName, mode,
             startsAt.atZone(zone).toOffsetDateTime(), endsAt.atZone(zone).toOffsetDateTime(),
-            status, priceCents, reason, address, messengerName, hasPhoto, client.toSummary());
+            status, priceCents, reason, address, messengerName, hasPhoto,
+            cancelledBy, lateCancellation, client.toSummary());
     }
 
     private void requireStatus(AppointmentStatus expected, String message) {
@@ -137,10 +197,10 @@ class Appointment {
             Duration.between(startsAt, endsAt), Duration.between(endsAt, occupiedUntil));
     }
 
-    AppointmentView toView(ZoneId zone) {
+    AppointmentView toView(ZoneId zone, Duration notice) {
         return new AppointmentView(id, offeringSlug, offeringName, mode,
             startsAt.atZone(zone).toOffsetDateTime(), endsAt.atZone(zone).toOffsetDateTime(),
-            status, priceCents);
+            status, priceCents, startsAt.minus(notice).atZone(zone).toOffsetDateTime(), lateCancellation);
     }
 
     private static @Nullable String blankToNull(@Nullable String value) {

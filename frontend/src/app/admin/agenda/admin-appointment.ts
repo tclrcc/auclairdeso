@@ -28,6 +28,8 @@ export interface AdminAppointment {
   readonly address: string | null;
   readonly messengerName: string | null;
   readonly hasPhoto: boolean;
+  readonly cancelledBy: 'CLIENT' | 'PRACTITIONER' | null;
+  readonly lateCancellation: boolean;
   readonly client: ClientSummary;
 }
 
