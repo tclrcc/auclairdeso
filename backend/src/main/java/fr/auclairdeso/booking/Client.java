@@ -45,6 +45,9 @@ class Client {
     @Column(name = "blocked", nullable = false)
     private boolean blocked;
 
+    @Column(name = "late_cancellations", nullable = false)
+    private int lateCancellations;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -82,12 +85,56 @@ class Client {
         this.city = blankToNull(details.city());
     }
 
+    /** The practitioner corrects the details from the client file. The email has its own rules: see ClientFiles. */
+    void correct(ClientCorrection correction) {
+        this.firstName = correction.firstName().strip();
+        this.lastName = correction.lastName().strip();
+        this.birthDate = correction.birthDate();
+        this.phone = correction.phone().strip();
+        this.city = blankToNull(correction.city());
+    }
+
+    void changeEmail(@Nullable String email) {
+        this.email = email;
+    }
+
+    void markTrusted(boolean trusted) {
+        this.trusted = trusted;
+    }
+
+    /**
+     * One more late cancellation (docs/specification.md, 6): at the threshold, the client is blocked.
+     *
+     * @return whether the client is now blocked
+     */
+    boolean recordLateCancellation(int threshold) {
+        lateCancellations++;
+        if (lateCancellations >= threshold) {
+            blocked = true;
+        }
+        return blocked;
+    }
+
     void block() {
         this.blocked = true;
     }
 
+    /** The practitioner lifts the block: the late cancellations of the past no longer count. */
+    void unblock() {
+        this.blocked = false;
+        this.lateCancellations = 0;
+    }
+
     @Nullable Long id() {
         return id;
+    }
+
+    @Nullable String email() {
+        return email;
+    }
+
+    String phone() {
+        return phone;
     }
 
     boolean isTrusted() {
@@ -96,6 +143,10 @@ class Client {
 
     boolean isBlocked() {
         return blocked;
+    }
+
+    int lateCancellations() {
+        return lateCancellations;
     }
 
     ClientProfile toProfile() {

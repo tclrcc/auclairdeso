@@ -1,0 +1,70 @@
+<main class="min-h-dvh bg-sand px-4 py-10 text-night">
+  <div class="mx-auto max-w-2xl">
+    <a routerLink="/admin" class="text-sm text-night/70 hover:underline">← Administration</a>
+    <h1 class="mt-4 font-display text-4xl tracking-tight">Clientes</h1>
+
+    <label class="mt-6 block text-sm font-medium" for="search">Nom, téléphone ou email</label>
+    <input id="search" type="search" autocomplete="off" class="field-input" [value]="query()" (input)="onSearch($event)" />
+
+    <fieldset class="mt-4">
+      <legend class="sr-only">Afficher</legend>
+      <div class="flex flex-wrap gap-2">
+        @for (option of filters; track option) {
+        <label class="cursor-pointer rounded-full border border-night/20 bg-white px-4 py-1.5 text-sm
+                      has-checked:border-night has-checked:bg-night has-checked:text-pearl
+                      has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-night">
+          <input type="radio" name="filter" class="sr-only" [value]="option" [checked]="filter() === option"
+                 (change)="filter.set(option)" />
+          {{ filterLabels[option] }}
+        </label>
+        }
+      </div>
+    </fieldset>
+
+    @if (tooShort()) {
+    <p class="mt-6 text-night/70">Encore un caractère, et la recherche commence.</p>
+    } @else if (clients.error()) {
+    <p class="mt-6 text-red-700" role="alert">Les clientes ne peuvent pas être affichées.</p>
+    } @else {
+    <ul class="mt-6 divide-y divide-night/10 overflow-hidden rounded-2xl bg-white" [attr.aria-busy]="clients.isLoading()">
+      @for (client of clients.value(); track client.id) {
+      <li>
+        <a [routerLink]="['/admin/clientes', client.id]"
+           class="flex items-center justify-between gap-4 px-4 py-3 hover:bg-sand/60 focus-visible:bg-sand/60">
+          <span class="min-w-0">
+            <span class="block truncate font-medium">{{ client.firstName }} {{ client.lastName }}</span>
+            <span class="block truncate text-sm text-night/70">
+              {{ client.phone }}
+              @if (client.city) {
+              · {{ client.city }}
+              }
+            </span>
+          </span>
+          <span class="flex shrink-0 flex-col items-end gap-1">
+            @if (client.blocked) {
+            <span class="rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700">Bloquée</span>
+            }
+            @if (client.trusted) {
+            <span class="rounded-full bg-lilac/40 px-2.5 py-0.5 text-xs font-medium">De confiance</span>
+            }
+          </span>
+        </a>
+      </li>
+      } @empty {
+      <li class="px-4 py-6 text-night/70">
+        @if (clients.isLoading()) {
+        Chargement…
+        } @else {
+        {{ emptyMessage() }}
+        }
+      </li>
+      }
+    </ul>
+    @if (truncated()) {
+    <p class="mt-3 text-sm text-night/70">
+      Seules les {{ clients.value().length }} premières s’affichent : précisez la recherche.
+    </p>
+    }
+    }
+  </div>
+</main>

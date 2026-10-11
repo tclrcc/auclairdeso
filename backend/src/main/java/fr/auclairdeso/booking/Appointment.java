@@ -231,6 +231,11 @@ class Appointment {
             priceCents, address, messengerName);
     }
 
+    ClientHistoryEntry toHistoryEntry(ZoneId zone) {
+        return new ClientHistoryEntry(id, startsAt.atZone(zone).toOffsetDateTime(), offeringName, mode, status,
+            priceCents, lateCancellation);
+    }
+
     AdminAppointmentView toAdminView(ZoneId zone, boolean hasPhoto) {
         return new AdminAppointmentView(id, offeringSlug, offeringName, mode,
             startsAt.atZone(zone).toOffsetDateTime(), endsAt.atZone(zone).toOffsetDateTime(),

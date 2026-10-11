@@ -200,8 +200,8 @@ La cliente **ne peut pas déplacer** un rendez-vous : elle annule et fait une no
 | La cliente **ne vient pas** | Marquée `NO_SHOW` par la praticienne, cliente **bloquée** immédiatement |
 | La praticienne annule | Elle appelle la cliente ; l'application enregistre l'annulation et envoie un email |
 
-- La praticienne peut **débloquer** une cliente depuis sa fiche.
-- Le blocage s'appuie sur le compte (email) et sur le numéro de téléphone.
+- La praticienne peut **bloquer** ou **débloquer** une cliente depuis sa fiche. Débloquer remet le compteur de manquements à zéro.
+- Le blocage s'appuie sur le compte (email) et sur le numéro de téléphone : une demande envoyée avec le numéro d'une cliente bloquée est refusée, quelle que soit l'adresse email, et quelle que soit l'écriture du numéro (`06 12 34 56 78`, `+33 6 12 34 56 78`…).
 - La liste noire doit être mentionnée dans la politique de confidentialité et les conditions générales.
 - Seule l'annulation tardive d'un rendez-vous **confirmé** compte comme manquement : retirer une demande en attente n'en est jamais un.
 - Le délai (48 h) et le seuil de blocage (2 manquements) sont paramétrables : `auclairdeso.booking.cancellation-notice` et `auclairdeso.booking.late-cancellations-before-block`.
@@ -230,15 +230,22 @@ Réservée au personnel, conçue pour mobile.
 
 | Écran | Contenu |
 | --- | --- |
-| Agenda | Demandes en attente en tête, puis séances à venir par jour. Actions : confirmer, refuser, annuler, marquer honorée / absente / payée. |
-| Saisie manuelle | Créer un rendez-vous pris par téléphone ou Messenger, y compris en dehors des plages (urgences) |
-| Fermetures | Ajouter et supprimer des jours de fermeture |
-| Clientes | Liste, fiche (coordonnées, historique), **notes privées**, marquage « de confiance », blocage et déblocage |
+| Agenda | Demandes en attente en tête, puis séances à venir par jour. Actions : confirmer, refuser, annuler, marquer honorée / absente / payée. (**fait**, sauf « payée » : tranche 5) |
+| Saisie manuelle | Créer un rendez-vous pris par téléphone ou Messenger, y compris en dehors des plages (urgences) (**fait**) |
+| Fermetures | Ajouter et supprimer des jours de fermeture (**fait**) |
+| Clientes | Liste, fiche (coordonnées, historique), **notes privées**, marquage « de confiance », blocage et déblocage (**fait**) |
 | Séances | Créer, modifier, masquer les prestations (**fait**) |
 | Statistiques | Voir ci-dessous |
 | Encaissements | Séances payées, bilans, **livre des recettes** exportable |
 | Équipe | Membres, réinitialisation des mots de passe par l'`ADMIN` (**fait**) |
 | Paramètres | Notifications de la praticienne : email, SMS |
+
+Fiche cliente :
+
+- La praticienne corrige les coordonnées. L'email d'une cliente qui a déjà réservé en ligne est son identifiant de connexion : il ne change pas. Celui d'une cliente saisie par téléphone peut être ajouté, corrigé ou retiré.
+- Les notes privées ne sont jamais montrées à la cliente. On en ajoute ou on en supprime ; on ne les modifie pas.
+- La fiche affiche les manquements depuis le dernier déblocage, face au seuil de blocage.
+- Si son numéro de téléphone est aussi celui d'une cliente bloquée, la fiche le signale : c'est ce numéro qui l'empêche de réserver.
 
 ### Statistiques
 
@@ -322,12 +329,12 @@ Plusieurs données sont **sensibles** : motifs de consultation (parfois liés à
 | 0 | Dépôt, squelettes, CI | Fait |
 | 1 | Catalogue des prestations, page « Séances et tarifs » | Fait |
 | 2 | Comptes, lien magique, double authentification, administration des séances, sessions en base, limitation des demandes | Fait |
-| 3A | Planning : plages, fermetures, calcul des créneaux | En cours |
-| 3B | Demande de réservation : API (3B-1), écrans (3B-2) | En cours |
-| 3C | Agenda et validation par la praticienne, saisie manuelle, annulations, absences, liste noire | À faire |
-| 3D | Notifications : En partie (emails faits ; SMS et envoi réel par Gmail à faire)
+| 3A | Planning : plages, fermetures, calcul des créneaux | Fait |
+| 3B | Demande de réservation : API (3B-1), écrans (3B-2) | Fait |
+| 3C | Agenda et validation par la praticienne, saisie manuelle, annulations, absences, liste noire | Fait |
+| 3D | Notifications | En partie : emails faits ; SMS et envoi réel par Gmail à faire |
 | 3E | Question ciblée, sans créneau | À faire |
-| 4 | Fiches clientes, notes privées, marquage « de confiance » | À faire |
+| 4 | Fiches clientes, notes privées, marquage « de confiance », déblocage | Fait |
 | 5 | Statistiques, encaissements, livre des recettes | À faire |
 | 6 | Vitrine : contenu, identité visuelle, vidéos, pages légales | À faire |
 | 7 | Mise en production : nom de domaine, HTTPS, Docker, sauvegardes, Ubuntu 26.04 | À faire |

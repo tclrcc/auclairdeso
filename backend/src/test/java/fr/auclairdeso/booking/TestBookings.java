@@ -3,6 +3,7 @@ package fr.auclairdeso.booking;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
@@ -11,6 +12,9 @@ import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequ
 final class TestBookings {
 
     static final byte[] JPEG = {(byte) 0xFF, (byte) 0xD8, (byte) 0xFF, (byte) 0xE0, 0, 0x10};
+
+    /** Each request gets its own phone number: a client blocked by one test never blocks the others. */
+    private static final AtomicInteger PHONES = new AtomicInteger();
 
     private TestBookings() {
     }
@@ -32,13 +36,17 @@ final class TestBookings {
     }
 
     static MockMultipartHttpServletRequestBuilder bookingRequest(String start, boolean withPhoto) {
+        return bookingRequest(start, withPhoto, "07%08d".formatted(PHONES.incrementAndGet()));
+    }
+
+    static MockMultipartHttpServletRequestBuilder bookingRequest(String start, boolean withPhoto, String phone) {
         var json = """
                 {"offeringSlug": "consultation-1-h", "mode": "VIDEO", "start": "%s",
                  "client": {"firstName": "Alice", "lastName": "Martin", "birthDate": "1990-05-04",
-                            "phone": "06 12 34 56 78", "city": null},
+                            "phone": "%s", "city": null},
                  "reason": "Une question sur mon avenir professionnel.", "address": null,
                  "messengerName": "Alice Martin", "acceptedTerms": true, "consentsToDataProcessing": true}
-                """.formatted(start);
+                """.formatted(start, phone);
         var request = multipart("/api/bookings").file(new MockMultipartFile("request", "",
             MediaType.APPLICATION_JSON_VALUE, json.getBytes(StandardCharsets.UTF_8)));
         if (withPhoto) {

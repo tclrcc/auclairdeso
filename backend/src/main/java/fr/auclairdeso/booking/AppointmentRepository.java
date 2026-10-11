@@ -18,6 +18,10 @@ interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
     List<Appointment> findByClientEmailOrderByStartsAtDesc(String email);
 
+    List<Appointment> findByClientOrderByStartsAtDesc(Client client);
+
+    boolean existsByClientAndSource(Client client, AppointmentSource source);
+
     @EntityGraph(attributePaths = "client")
     List<Appointment> findByStartsAtGreaterThanEqualAndStartsAtLessThanOrderByStartsAtAsc(Instant from, Instant to);
 
@@ -26,8 +30,6 @@ interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
     @EntityGraph(attributePaths = "client")
     Optional<Appointment> findWithClientById(Long id);
-
-    long countByClientAndLateCancellationTrue(Client client);
 
     /** An appointment of this client only: someone else's is simply not found. */
     Optional<Appointment> findByIdAndClientEmail(Long id, String email);

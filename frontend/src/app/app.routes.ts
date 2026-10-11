@@ -95,6 +95,18 @@ export const routes: Routes = [
     loadComponent: () => import('./admin/closures/closures-page').then((m) => m.ClosuresPage),
   },
   {
+    path: 'admin/clientes',
+    title: 'Clientes — Administration',
+    canActivate: [staffGuard],
+    loadComponent: () => import('./admin/clients/clients-page').then((m) => m.ClientsPage),
+  },
+  {
+    path: 'admin/clientes/:id',
+    title: 'Fiche cliente — Administration',
+    canActivate: [staffGuard],
+    loadComponent: () => import('./admin/clients/client-file-page').then((m) => m.ClientFilePage),
+  },
+  {
     path: 'admin/agenda/:id',
     title: 'Rendez-vous — Administration',
     canActivate: [staffGuard],

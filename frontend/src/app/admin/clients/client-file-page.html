@@ -1,0 +1,249 @@
+<main class="min-h-dvh bg-sand px-4 py-10 text-night">
+  <div class="mx-auto max-w-2xl">
+    <a routerLink="/admin/clientes" class="text-sm text-night/70 hover:underline">← Clientes</a>
+
+    @if (file.isLoading() && !file.hasValue()) {
+    <p class="mt-6 text-night/70">Chargement…</p>
+    } @else if (file.error()) {
+    <p class="mt-6 text-red-700" role="alert">Cette fiche est introuvable.</p>
+    } @else if (file.hasValue()) {
+    @let current = file.value();
+    @let client = current.client;
+
+    <h1 class="mt-4 font-display text-4xl tracking-tight">{{ fullName() }}</h1>
+    @if (age() !== null || client.city) {
+    <p class="mt-1 text-night/70">
+      @if (age() !== null) {
+      {{ age() }} ans
+      }
+      @if (age() !== null && client.city) {
+      ·
+      }
+      {{ client.city }}
+    </p>
+    }
+    @if (client.trusted || client.blocked) {
+    <p class="mt-3 flex flex-wrap gap-2">
+      @if (client.blocked) {
+      <span class="rounded-full bg-red-50 px-3 py-1 text-sm font-medium text-red-700">Bloquée</span>
+      }
+      @if (client.trusted) {
+      <span class="rounded-full bg-lilac/40 px-3 py-1 text-sm font-medium">De confiance</span>
+      }
+    </p>
+    }
+    <div class="mt-5 flex flex-wrap gap-3">
+      <a class="btn-primary" [href]="'tel:' + client.phone">Appeler</a>
+      @if (client.email) {
+      <a class="rounded-full border border-night/30 px-5 py-2" [href]="'mailto:' + client.email">Écrire</a>
+      }
+    </div>
+
+    @if (actionError(); as message) {
+    <p class="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">{{ message }}</p>
+    }
+
+    @if (client.blocked) {
+    <section class="mt-6 rounded-2xl border border-red-200 bg-red-50 p-5 text-red-900" aria-labelledby="blocked-title">
+      <h2 id="blocked-title" class="font-display text-xl">Réservation en ligne bloquée</h2>
+      <p class="mt-1 text-sm">
+        Elle ne peut plus réserver sur le site, ni avec son adresse email ni avec son numéro.
+        Vous pouvez toujours lui fixer un rendez-vous vous-même.
+      </p>
+      <button type="button" class="btn-primary mt-4" [disabled]="busy()" (click)="unblock()">
+        Débloquer
+      </button>
+    </section>
+    }
+
+    @if (current.phoneBlocked && !client.blocked) {
+    <p class="mt-6 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm">
+      Son numéro de téléphone est aussi celui d’une cliente bloquée :
+      elle ne peut pas réserver en ligne avec ce numéro.
+      Débloquez l’autre cliente, ou corrigez le numéro dans ses coordonnées s’il n’est plus le bon.
+    </p>
+    }
+
+    <section class="mt-6 rounded-2xl bg-white p-5" aria-labelledby="notes-title">
+      <h2 id="notes-title" class="font-display text-xl">Notes privées</h2>
+      <p class="text-sm text-night/70">Pour vous seule : la cliente ne les voit jamais.</p>
+
+      <form class="mt-4" [formRoot]="noteForm">
+        <label class="sr-only" for="note">Nouvelle note</label>
+        <textarea id="note" rows="3" class="field-input" [formField]="noteForm.text"
+                  placeholder="Ce qu’il faut retenir pour la prochaine séance"></textarea>
+        <app-field-errors [state]="noteForm.text()" />
+        @for (error of noteForm().errors(); track error.kind) {
+        <p class="mt-1 text-sm text-red-700" role="alert">{{ error.message }}</p>
+        }
+        <button type="submit" class="btn-primary mt-3" [disabled]="noteForm().submitting()">Ajouter la note</button>
+      </form>
+
+      <ul class="mt-6 space-y-5">
+        @for (note of current.notes; track note.id) {
+        <li class="border-l-2 border-lilac pl-4">
+          <p class="whitespace-pre-line">{{ note.text }}</p>
+          <p class="mt-1 flex flex-wrap items-center gap-x-4 text-sm text-night/60">
+            <time [attr.datetime]="note.createdAt">{{ formatDateTime(note.createdAt) }}</time>
+            <button type="button" class="underline hover:text-red-700" (click)="deleteNote(note)">Supprimer</button>
+          </p>
+        </li>
+        } @empty {
+        <li class="text-sm text-night/70">Aucune note pour l’instant.</li>
+        }
+      </ul>
+    </section>
+
+    <section class="mt-6" aria-labelledby="history-title">
+      <h2 id="history-title" class="font-display text-2xl">Historique</h2>
+      <p class="text-sm text-night/70">{{ completedSessions() }}</p>
+      <ul class="mt-3 space-y-2">
+        @for (entry of current.appointments; track entry.id) {
+        <li>
+          <a [routerLink]="['/admin/agenda', entry.id]" class="block rounded-xl bg-white p-4 hover:bg-white/70">
+            <span class="flex flex-wrap items-baseline justify-between gap-x-3">
+              <span class="font-medium">{{ formatDateTime(entry.start) }}</span>
+              <span class="text-sm">{{ statusLabels[entry.status] }}</span>
+            </span>
+            <span class="block text-sm text-night/70">
+              {{ entry.offeringName }} · {{ modeLabels[entry.mode] }} · {{ entry.priceCents | euros }}
+            </span>
+            @if (entry.lateCancellation) {
+            <span class="mt-1 block text-sm font-medium text-red-700">Annulée tardivement</span>
+            }
+          </a>
+        </li>
+        } @empty {
+        <li class="text-night/70">Aucun rendez-vous.</li>
+        }
+      </ul>
+    </section>
+
+    <section class="mt-6 rounded-2xl bg-white p-5" aria-labelledby="follow-up-title">
+      <h2 id="follow-up-title" class="font-display text-xl">Suivi</h2>
+      <div class="mt-3 flex items-start justify-between gap-4">
+        <span>
+          <span id="trust-label" class="block font-medium">Cliente de confiance</span>
+          <span id="trust-hint" class="block text-sm text-night/70">Elle peut réserver les séances en présentiel.</span>
+        </span>
+        <button type="button" role="switch" class="group relative h-7 w-12 shrink-0 rounded-full bg-night/50
+                       aria-checked:bg-night disabled:opacity-60
+                       focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-night"
+                aria-labelledby="trust-label" aria-describedby="trust-hint"
+                [attr.aria-checked]="client.trusted" [disabled]="busy()"
+                (click)="act(client.trusted ? 'distrust' : 'trust')">
+          <span class="absolute top-1 left-1 size-5 rounded-full bg-white shadow
+                       motion-safe:transition-transform group-aria-checked:translate-x-5"></span>
+        </button>
+      </div>
+      <div class="mt-4 flex items-start justify-between gap-4 border-t border-night/10 pt-4">
+        <span>
+          <span class="block font-medium">Annulations tardives</span>
+          <span class="block text-sm text-night/70">
+            À {{ current.lateCancellationsBeforeBlock }}, la réservation en ligne est bloquée automatiquement.
+            Débloquer remet le compte à zéro.
+          </span>
+        </span>
+        @let count = current.lateCancellations + ' sur ' + current.lateCancellationsBeforeBlock;
+        <span class="shrink-0 text-xl font-medium tabular-nums" [attr.aria-label]="count">
+          {{ current.lateCancellations }}<span class="text-night/50"> / {{ current.lateCancellationsBeforeBlock }}</span>
+        </span>
+      </div>
+      @if (!client.blocked) {
+      <div class="mt-4 border-t border-night/10 pt-4">
+        <button type="button" class="text-sm text-red-700 underline disabled:opacity-60" [disabled]="busy()"
+                (click)="block()">
+          Bloquer la réservation en ligne
+        </button>
+      </div>
+      }
+    </section>
+
+    <section class="mt-6 rounded-2xl bg-white p-5" aria-labelledby="details-title">
+      <div class="flex items-baseline justify-between gap-4">
+        <h2 id="details-title" class="font-display text-xl">Coordonnées</h2>
+        @if (!editing()) {
+        <button type="button" class="text-sm underline" (click)="startEditing()">Modifier</button>
+        }
+      </div>
+
+      @if (!editing()) {
+      <dl class="mt-3 grid gap-x-6 gap-y-3 sm:grid-cols-2">
+        <div>
+          <dt class="text-sm text-night/60">Téléphone</dt>
+          <dd>{{ client.phone }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm text-night/60">Email</dt>
+          <dd class="break-all">{{ client.email ?? 'Aucun' }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm text-night/60">Date de naissance</dt>
+          <dd>{{ client.birthDate ? formatBirthDate(client.birthDate) : 'Non renseignée' }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm text-night/60">Ville</dt>
+          <dd>{{ client.city ?? 'Non renseignée' }}</dd>
+        </div>
+      </dl>
+      } @else {
+      <form class="mt-4 space-y-4" [formRoot]="correctionForm">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label class="block text-sm font-medium" for="first-name">Prénom</label>
+            <input id="first-name" type="text" class="field-input" [formField]="correctionForm.firstName" />
+            <app-field-errors [state]="correctionForm.firstName()" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium" for="last-name">Nom</label>
+            <input id="last-name" type="text" class="field-input" [formField]="correctionForm.lastName" />
+            <app-field-errors [state]="correctionForm.lastName()" />
+          </div>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label class="block text-sm font-medium" for="phone">Téléphone</label>
+            <input id="phone" type="tel" class="field-input" [formField]="correctionForm.phone" />
+            <app-field-errors [state]="correctionForm.phone()" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium" for="birth-date">
+              Date de naissance <span class="text-night/60">(facultatif)</span>
+            </label>
+            <input id="birth-date" type="date" class="field-input" [formField]="correctionForm.birthDate" />
+            <app-field-errors [state]="correctionForm.birthDate()" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium" for="city">Ville <span class="text-night/60">(facultatif)</span></label>
+          <input id="city" type="text" class="field-input" [formField]="correctionForm.city" />
+          <app-field-errors [state]="correctionForm.city()" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium" for="email">Email</label>
+          <input id="email" type="email" class="field-input read-only:bg-sand read-only:text-night/70"
+                 aria-describedby="email-hint" [formField]="correctionForm.email" />
+          <p id="email-hint" class="mt-1 text-sm text-night/70">
+            @if (current.bookedOnline) {
+            Elle réserve en ligne : cette adresse lui sert à se connecter, elle ne peut pas être changée ici.
+            } @else {
+            Facultatif. Avec cette adresse, elle retrouvera ses rendez-vous si elle se connecte au site.
+            }
+          </p>
+          <app-field-errors [state]="correctionForm.email()" />
+        </div>
+        @for (error of correctionForm().errors(); track error.kind) {
+        <p class="text-sm text-red-700" role="alert">{{ error.message }}</p>
+        }
+        <div class="flex gap-3">
+          <button type="submit" class="btn-primary flex-1" [disabled]="correctionForm().submitting()">Enregistrer</button>
+          <button type="button" class="flex-1 rounded-full border border-night/30 px-5 py-2" (click)="editing.set(false)">
+            Annuler
+          </button>
+        </div>
+      </form>
+      }
+    </section>
+    }
+  </div>
+</main>

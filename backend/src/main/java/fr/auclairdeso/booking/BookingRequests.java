@@ -67,7 +67,8 @@ class BookingRequests {
         }
 
         var client = clients.findByEmail(email).orElseGet(() -> new Client(email));
-        if (client.isBlocked()) {
+        // The block also follows the phone number: a new email is no way back.
+        if (client.isBlocked() || clients.isPhoneOfAnotherBlockedClient(request.client().phone(), client.id())) {
             throw refused(HttpStatus.FORBIDDEN, "Merci de contacter directement Au clair de So pour prendre rendez-vous.");
         }
         if (request.mode() == ConsultationMode.IN_PERSON && !client.isTrusted()) {
@@ -116,9 +117,8 @@ class BookingRequests {
             .orElseThrow(() -> refused(HttpStatus.NOT_FOUND, "Rendez-vous introuvable."));
         var wasConfirmed = appointment.status() == AppointmentStatus.CONFIRMED;
         var late = appointment.cancelByClient(Instant.now(clock), rules.cancellationNotice());
-        if (late && appointments.countByClientAndLateCancellationTrue(appointment.client())
-            >= rules.lateCancellationsBeforeBlock()) {
-            appointment.client().block();
+        if (late) {
+            appointment.client().recordLateCancellation(rules.lateCancellationsBeforeBlock());
         }
         events.publishEvent(new AppointmentEvent.CancelledByClient(notice(appointment), wasConfirmed, late));
         return appointment.toView(rules.zone(), rules.cancellationNotice());
