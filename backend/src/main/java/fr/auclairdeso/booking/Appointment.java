@@ -82,6 +82,9 @@ class Appointment {
     @Column(name = "consented_at", updatable = false)
     private @Nullable Instant consentedAt;
 
+    @Column(name = "reminder_sent_at")
+    private @Nullable Instant reminderSentAt;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -170,6 +173,25 @@ class Appointment {
         this.status = AppointmentStatus.COMPLETED;
     }
 
+    /** Nobody answered the request in time (docs/specification.md, 5.5): its slot is released. */
+    void expire() {
+        requireStatus(AppointmentStatus.REQUESTED, "Seule une demande en attente peut expirer.");
+        this.status = AppointmentStatus.EXPIRED;
+    }
+
+    /**
+     * Records that the reminder of the day before has left.
+     *
+     * @return false if it had already been sent
+     */
+    boolean markReminderSent(Instant now) {
+        if (reminderSentAt != null) {
+            return false;
+        }
+        this.reminderSentAt = now;
+        return true;
+    }
+
     /** The client did not come: she is blocked at once (docs/specification.md, 6). */
     void markNoShow(Instant now) {
         requireStartedConfirmedSession(now, "Seule une séance confirmée et commencée peut être marquée comme absence.");
@@ -198,6 +220,15 @@ class Appointment {
         return new AppointmentView(id, offeringSlug, offeringName, mode,
             startsAt.atZone(zone).toOffsetDateTime(), endsAt.atZone(zone).toOffsetDateTime(),
             status, priceCents, startsAt.minus(notice).atZone(zone).toOffsetDateTime(), lateCancellation);
+    }
+
+    /** A snapshot for the other modules, published with each event. */
+    AppointmentNotice toNotice(ZoneId zone, Duration cancellationNotice) {
+        var who = client.toSummary();
+        return new AppointmentNotice(id, who.email(), who.firstName(), who.lastName(), who.phone(),
+            offeringName, mode, startsAt.atZone(zone).toLocalDateTime(),
+            startsAt.minus(cancellationNotice).atZone(zone).toLocalDateTime(),
+            priceCents, address, messengerName);
     }
 
     AdminAppointmentView toAdminView(ZoneId zone, boolean hasPhoto) {

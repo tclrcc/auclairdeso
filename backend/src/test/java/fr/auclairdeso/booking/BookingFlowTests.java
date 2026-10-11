@@ -24,7 +24,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -53,6 +55,9 @@ class BookingFlowTests {
 
     @Autowired
     private JdbcTemplate jdbc;
+
+    @MockitoBean
+    private JavaMailSender mailSender;
 
     @BeforeEach
     void anOfferingOfOneHourWithAQuarterHourBreak() {

@@ -95,6 +95,24 @@ class AppointmentTests {
         assertThat(appointment.status()).isEqualTo(AppointmentStatus.CONFIRMED);
     }
 
+    @Test
+    void anUnansweredRequestExpiresButAConfirmedSessionNever() {
+        var pending = request();
+        pending.expire();
+        assertThat(pending.status()).isEqualTo(AppointmentStatus.EXPIRED);
+
+        var confirmed = confirmed();
+        assertThatExceptionOfType(BookingRefusedException.class).isThrownBy(confirmed::expire);
+    }
+
+    @Test
+    void theReminderIsRecordedOnlyOnce() {
+        var appointment = confirmed();
+
+        assertThat(appointment.markReminderSent(Instant.parse("2026-10-11T10:00:00Z"))).isTrue();
+        assertThat(appointment.markReminderSent(Instant.parse("2026-10-11T10:15:00Z"))).isFalse();
+    }
+
     private static Appointment confirmed() {
         var appointment = request();
         appointment.confirm();

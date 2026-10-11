@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,17 +28,19 @@ class BookingRequests {
     private final AppointmentRepository appointments;
     private final AppointmentPhotoRepository photos;
     private final BookingRules rules;
+    private final ApplicationEventPublisher events;
     private final Clock clock;
 
     BookingRequests(OfferingCatalog catalog, Availability availability, ClientRepository clients,
                     AppointmentRepository appointments, AppointmentPhotoRepository photos,
-                    BookingRules rules, Clock clock) {
+                    BookingRules rules, ApplicationEventPublisher events, Clock clock) {
         this.catalog = catalog;
         this.availability = availability;
         this.clients = clients;
         this.appointments = appointments;
         this.photos = photos;
         this.rules = rules;
+        this.events = events;
         this.clock = clock;
     }
 
@@ -91,6 +94,7 @@ class BookingRequests {
         if (photo != null) {
             photos.save(new AppointmentPhoto(appointment.id(), photo));
         }
+        events.publishEvent(new AppointmentEvent.Requested(notice(appointment)));
         return appointment.toView(rules.zone(), rules.cancellationNotice());
     }
 
@@ -101,21 +105,27 @@ class BookingRequests {
             .toList();
     }
 
+    @Transactional(readOnly = true)
+    Optional<ClientProfile> profile(String email) {
+        return clients.findByEmail(email).map(Client::toProfile);
+    }
+
     @Transactional
     AppointmentView cancel(String email, long id) {
         var appointment = appointments.findByIdAndClientEmail(id, email)
             .orElseThrow(() -> refused(HttpStatus.NOT_FOUND, "Rendez-vous introuvable."));
+        var wasConfirmed = appointment.status() == AppointmentStatus.CONFIRMED;
         var late = appointment.cancelByClient(Instant.now(clock), rules.cancellationNotice());
         if (late && appointments.countByClientAndLateCancellationTrue(appointment.client())
             >= rules.lateCancellationsBeforeBlock()) {
             appointment.client().block();
         }
+        events.publishEvent(new AppointmentEvent.CancelledByClient(notice(appointment), wasConfirmed, late));
         return appointment.toView(rules.zone(), rules.cancellationNotice());
     }
 
-    @Transactional(readOnly = true)
-    Optional<ClientProfile> profile(String email) {
-        return clients.findByEmail(email).map(Client::toProfile);
+    private AppointmentNotice notice(Appointment appointment) {
+        return appointment.toNotice(rules.zone(), rules.cancellationNotice());
     }
 
     private static BookingRefusedException refused(HttpStatus status, String detail) {

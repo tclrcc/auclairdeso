@@ -22,6 +22,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -47,6 +49,9 @@ class AgendaFlowTests {
 
     @Autowired
     private JdbcTemplate jdbc;
+
+    @MockitoBean
+    private JavaMailSender mailSender;
 
     @BeforeEach
     void anOffering() {

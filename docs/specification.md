@@ -325,7 +325,7 @@ Plusieurs données sont **sensibles** : motifs de consultation (parfois liés à
 | 3A | Planning : plages, fermetures, calcul des créneaux | En cours |
 | 3B | Demande de réservation : API (3B-1), écrans (3B-2) | En cours |
 | 3C | Agenda et validation par la praticienne, saisie manuelle, annulations, absences, liste noire | À faire |
-| 3D | Notifications : emails, SMS, rappel de la veille, programme du soir, expiration | À faire |
+| 3D | Notifications : En partie (emails faits ; SMS et envoi réel par Gmail à faire)
 | 3E | Question ciblée, sans créneau | À faire |
 | 4 | Fiches clientes, notes privées, marquage « de confiance » | À faire |
 | 5 | Statistiques, encaissements, livre des recettes | À faire |

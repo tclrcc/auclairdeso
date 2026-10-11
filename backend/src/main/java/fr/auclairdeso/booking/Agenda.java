@@ -10,7 +10,9 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -28,15 +30,17 @@ class Agenda {
     private final AppointmentRepository appointments;
     private final AppointmentPhotoRepository photos;
     private final BookingRules rules;
+    private final ApplicationEventPublisher events;
     private final Clock clock;
 
     Agenda(OfferingCatalog catalog, ClientRepository clients, AppointmentRepository appointments,
-           AppointmentPhotoRepository photos, BookingRules rules, Clock clock) {
+           AppointmentPhotoRepository photos, BookingRules rules, ApplicationEventPublisher events, Clock clock) {
         this.catalog = catalog;
         this.clients = clients;
         this.appointments = appointments;
         this.photos = photos;
         this.rules = rules;
+        this.events = events;
         this.clock = clock;
     }
 
@@ -92,22 +96,24 @@ class Agenda {
             : clientFor(request.newClient());
         var start = request.start().atZone(rules.zone()).toInstant();
         try {
-            return view(appointments.saveAndFlush(Appointment.byPractitioner(client, offering, request, start)));
+            var appointment = appointments.saveAndFlush(Appointment.byPractitioner(client, offering, request, start));
+            events.publishEvent(new AppointmentEvent.Confirmed(notice(appointment)));
+            return view(appointment);
         } catch (DataIntegrityViolationException overlap) {
             throw refused(HttpStatus.CONFLICT, "Ce créneau chevauche un autre rendez-vous, pause comprise.");
         }
     }
 
     AdminAppointmentView confirm(long id) {
-        return change(id, Appointment::confirm);
+        return change(id, Appointment::confirm, AppointmentEvent.Confirmed::new);
     }
 
     AdminAppointmentView decline(long id) {
-        return change(id, Appointment::decline);
+        return change(id, Appointment::decline, AppointmentEvent.Declined::new);
     }
 
     AdminAppointmentView cancel(long id) {
-        return change(id, Appointment::cancelByPractitioner);
+        return change(id, Appointment::cancelByPractitioner, AppointmentEvent.CancelledByPractitioner::new);
     }
 
     AdminAppointmentView complete(long id) {
@@ -131,10 +137,23 @@ class Agenda {
     }
 
     private AdminAppointmentView change(long id, Consumer<Appointment> transition) {
+        return change(id, transition, null);
+    }
+
+    /** Applies the transition, then tells the other modules with the event made from the new state. */
+    private AdminAppointmentView change(long id, Consumer<Appointment> transition,
+                                        @Nullable Function<AppointmentNotice, AppointmentEvent> event) {
         var appointment = appointments.findWithClientById(id)
             .orElseThrow(() -> refused(HttpStatus.NOT_FOUND, "Rendez-vous introuvable."));
         transition.accept(appointment);
+        if (event != null) {
+            events.publishEvent(event.apply(notice(appointment)));
+        }
         return view(appointment);
+    }
+
+    private AppointmentNotice notice(Appointment appointment) {
+        return appointment.toNotice(rules.zone(), rules.cancellationNotice());
     }
 
     private List<AdminAppointmentView> views(List<Appointment> list) {

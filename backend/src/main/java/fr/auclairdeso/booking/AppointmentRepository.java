@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -35,4 +34,9 @@ interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
     @EntityGraph(attributePaths = "client")
     List<Appointment> findByStatusAndStartsAtBeforeOrderByStartsAtAsc(AppointmentStatus status, Instant before);
+
+    /** Sessions of a day [from, to) whose reminder has not left yet. */
+    @EntityGraph(attributePaths = "client")
+    List<Appointment> findByStatusAndStartsAtGreaterThanEqualAndStartsAtLessThanAndReminderSentAtIsNull(
+        AppointmentStatus status, Instant from, Instant to);
 }
