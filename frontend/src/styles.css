@@ -1,24 +1,29 @@
 @import "tailwindcss";
-@import "@fontsource/italiana";
-@import "@fontsource-variable/jost";
+@import "@fontsource/marcellus";
+@import "@fontsource-variable/figtree";
 
 /*
- * The palette comes from the logo: its plum night, the lilac of its line art, the pearl of its highlights.
- * "sand", "night" and "moon" keep their names so that every existing screen follows the new identity.
+ * The palette comes from the logo: its plum night, the cream of its line art, the lavender of its lettering.
+ * "sand", "night" and "moon" keep their names so that every existing screen follows the identity.
  */
 @theme {
-  --color-night: #2e1b33;
-  --color-night-deep: #1f1124;
-  --color-lilac: #a0919d;
-  --color-pearl: #f3eaec;
-  --color-sand: #f7f2f4;
-  --color-moon: #e6cf9c;
+  --color-night: #321d38;
+  --color-night-deep: #22122a;
+  --color-pearl: #f7efdf;
+  --color-lilac: #d9b2ea;
+  --color-sand: #f6f1f7;
+  --color-moon: #f3e2b4;
 
-  --font-sans: "Jost Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Italiana", ui-serif, Georgia, serif;
+  --font-sans: "Figtree Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Marcellus", ui-serif, Georgia, serif;
 }
 
 @layer base {
+  /* 17 px instead of 16 px: easier to read, and every size in rem grows with it. */
+  html {
+    font-size: 106.25%;
+  }
+
   body {
     @apply bg-sand text-night antialiased;
   }
@@ -36,7 +41,7 @@
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-full bg-night px-5 py-2 text-sand
+    @apply inline-flex items-center justify-center rounded-full bg-night px-5 py-2 font-medium text-pearl
     transition-opacity hover:opacity-90 disabled:opacity-60
     focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-night;
   }

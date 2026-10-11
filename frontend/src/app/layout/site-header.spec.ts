@@ -13,20 +13,33 @@ describe('SiteHeader', () => {
     });
   });
 
-  it('leads visitors to their appointments, and the staff to the administration', async () => {
+  async function headerFor(user: object) {
     const fixture = TestBed.createComponent(SiteHeader);
-    await fixture.whenStable();
-    const header: HTMLElement = fixture.nativeElement;
-    expect(header.textContent).toContain('Mes rendez-vous');
-
     const refreshed = TestBed.inject(AuthSession).refresh();
-    TestBed.inject(HttpTestingController)
-      .expectOne('/api/me')
-      .flush({ email: 'so@auclairdeso.test', roles: ['PRACTITIONER'], factors: [], passwordSet: true });
+    TestBed.inject(HttpTestingController).expectOne('/api/me').flush(user);
     await refreshed;
     await fixture.whenStable();
+    return fixture.nativeElement as HTMLElement;
+  }
 
-    expect(header.textContent).toContain('Administration');
-    expect(header.textContent).not.toContain('Mes rendez-vous');
+  it('invites a visitor to log in', async () => {
+    const fixture = TestBed.createComponent(SiteHeader);
+    await fixture.whenStable();
+
+    const link = fixture.nativeElement.querySelector('a[href="/connexion"]');
+    expect(link?.textContent).toContain('Se connecter');
+  });
+
+  it('leads a client to her appointments', async () => {
+    const header = await headerFor({ email: 'alice@example.com', roles: ['CLIENT'], factors: [], passwordSet: false });
+
+    expect(header.querySelector('a[href="/mon-espace"]')?.textContent).toContain('Mes rendez-vous');
+    expect(header.textContent).not.toContain('Se connecter');
+  });
+
+  it('leads the staff to the administration', async () => {
+    const header = await headerFor({ email: 'so@auclairdeso.test', roles: ['PRACTITIONER'], factors: [], passwordSet: true });
+
+    expect(header.querySelector('a[href="/admin"]')?.textContent).toContain('Administration');
   });
 });

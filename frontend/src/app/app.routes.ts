@@ -25,7 +25,7 @@ export const routes: Routes = [
       },
       {
         path: 'connexion',
-        title: 'Confirmer mon adresse email — Au clair de So',
+        title: 'Se connecter — Au clair de So',
         loadComponent: () => import('./public/login/login-page').then((m) => m.LoginPage),
       },
       {
