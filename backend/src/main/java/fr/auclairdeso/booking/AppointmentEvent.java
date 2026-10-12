@@ -1,10 +1,12 @@
 package fr.auclairdeso.booking;
 
 /**
- * What happens to an appointment, told to the other modules (the notifications today).
+ * What happens to an appointment, told to the other modules (notifications, billing).
  * <p>
- * Published inside the transaction of the change. Spring Modulith hands them to the listeners
- * after the commit, and keeps them in the event_publication table until each listener succeeded.
+ * Published inside the transaction of the change. Spring Modulith hands them to the
+ * {@code @ApplicationModuleListener}s after the commit, and keeps them in the event_publication table
+ * until each listener succeeded. A plain {@code @EventListener} runs at once, inside the transaction:
+ * billing issues the bill of a completed session that way.
  */
 public sealed interface AppointmentEvent {
 
@@ -39,5 +41,9 @@ public sealed interface AppointmentEvent {
 
     /** The day before a confirmed session. */
     record ReminderDue(AppointmentNotice appointment) implements AppointmentEvent {
+    }
+
+    /** The practitioner marked the session completed: it can be billed. */
+    record Completed(AppointmentNotice appointment) implements AppointmentEvent {
     }
 }

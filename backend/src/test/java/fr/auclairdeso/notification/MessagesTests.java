@@ -2,6 +2,7 @@ package fr.auclairdeso.notification;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import fr.auclairdeso.billing.BillNotice;
 import fr.auclairdeso.booking.AppointmentNotice;
 import fr.auclairdeso.booking.EveningProgram;
 import fr.auclairdeso.catalog.ConsultationMode;
@@ -64,6 +65,27 @@ class MessagesTests {
         assertThat(messages.cancelledByClient(notice(ConsultationMode.VIDEO), false, false).text())
             .contains("Votre demande pour le lundi 19 octobre à 14h00")
             .doesNotContain("tardive");
+    }
+
+    @Test
+    void theBillCarriesEveryMentionTheLawAsksFor() {
+        var bill = new BillNotice("2026-0007", LocalDate.of(2026, 10, 19), "Sophie Exemple EI",
+            "1 place de la Mairie, 01150 Chazey-sur-Ain", "123 456 789 00012", "Alice", "Alice Martin",
+            "alice@example.com", LocalDateTime.of(2026, 10, 19, 14, 0), "À distance, en visio",
+            "Consultation approfondie", 8_050, "TVA non applicable, article 293 B du CGI");
+
+        var message = messages.bill(bill);
+
+        assertThat(message.subject()).isEqualTo("Votre note n° 2026-0007 : séance du 19 octobre 2026");
+        assertThat(message.text())
+            .contains("Établie le 19 octobre 2026")
+            .contains("Sophie Exemple EI\n1 place de la Mairie, 01150 Chazey-sur-Ain\nSIRET : 123 456 789 00012")
+            .contains("Cliente : Alice Martin")
+            .contains("Séance du lundi 19 octobre 2026 à 14h00")
+            .contains("Lieu : À distance, en visio")
+            .contains("1 × Consultation approfondie : 80,50 €")
+            .contains("Total à payer : 80,50 €")
+            .contains("TVA non applicable, article 293 B du CGI");
     }
 
     private static AppointmentNotice notice(ConsultationMode mode) {

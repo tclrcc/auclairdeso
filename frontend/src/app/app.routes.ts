@@ -107,6 +107,18 @@ export const routes: Routes = [
     loadComponent: () => import('./admin/clients/client-file-page').then((m) => m.ClientFilePage),
   },
   {
+    path: 'admin/encaissements',
+    title: 'Encaissements — Administration',
+    canActivate: [staffGuard],
+    loadComponent: () => import('./admin/billing/receipts-page').then((m) => m.ReceiptsPage),
+  },
+  {
+    path: 'admin/notes/:id',
+    title: 'Note — Administration',
+    canActivate: [staffGuard],
+    loadComponent: () => import('./admin/billing/bill-page').then((m) => m.BillPage),
+  },
+  {
     path: 'admin/agenda/:id',
     title: 'Rendez-vous — Administration',
     canActivate: [staffGuard],

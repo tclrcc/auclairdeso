@@ -114,6 +114,9 @@
     </button>
     }
     }
+    @case ('COMPLETED') {
+    <app-bill-panel [appointmentId]="current.id" />
+    }
     @case ('CANCELLED') {
     <p class="mt-6 rounded-xl bg-white p-4 text-sm">
       Annulé par {{ current.cancelledBy === 'CLIENT' ? 'la cliente' : 'vous' }}

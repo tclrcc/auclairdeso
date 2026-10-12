@@ -1,0 +1,90 @@
+<main class="min-h-dvh bg-sand px-4 py-10 text-night print:bg-white print:p-0">
+  <div class="mx-auto max-w-3xl">
+    @if (bill.isLoading() && !bill.hasValue()) {
+    <p class="text-night/70">Chargement…</p>
+    } @else if (bill.error()) {
+    <p class="text-red-700" role="alert">Cette note est introuvable.</p>
+    } @else if (bill.hasValue()) {
+    @let current = bill.value();
+
+    <div class="flex flex-wrap items-center justify-between gap-4 print:hidden">
+      <a [routerLink]="['/admin/agenda', current.appointmentId]" class="text-sm text-night/70 hover:underline">
+        ← Rendez-vous
+      </a>
+      <button type="button" class="btn-primary" (click)="print()">Imprimer</button>
+    </div>
+
+    <article class="mt-6 rounded-2xl bg-white p-6 shadow-sm sm:p-10 print:mt-0 print:rounded-none print:p-0 print:shadow-none"
+             aria-labelledby="bill-title">
+      <header class="flex flex-wrap items-start justify-between gap-6 border-b border-night/15 pb-6">
+        <div class="flex items-center gap-3">
+          <img ngSrc="logo.webp" alt="" width="56" height="56" class="rounded-full" />
+          <span class="font-display text-2xl">Au clair de So</span>
+        </div>
+        <div class="sm:text-right">
+          <!-- The figures of Marcellus look like letters: a number to copy is set in Figtree. -->
+          <h1 id="bill-title" class="text-2xl font-semibold tabular-nums">Note n° {{ current.number }}</h1>
+          <p class="text-sm text-night/70">Établie le {{ formatLongDate(current.issuedOn) }}</p>
+        </div>
+      </header>
+
+      <div class="mt-6 grid gap-6 sm:grid-cols-2">
+        <section aria-labelledby="provider-title">
+          <h2 id="provider-title" class="text-sm text-night/60">Prestataire</h2>
+          <p class="mt-1 font-medium">{{ current.practitionerName }}</p>
+          <p>{{ current.practitionerAddress }}</p>
+          <p class="text-sm">SIRET : {{ current.siret }}</p>
+        </section>
+        <section aria-labelledby="client-title">
+          <h2 id="client-title" class="text-sm text-night/60">Cliente</h2>
+          <p class="mt-1 font-medium">{{ current.clientName }}</p>
+        </section>
+      </div>
+
+      <section class="mt-6" aria-labelledby="session-title">
+        <h2 id="session-title" class="text-sm text-night/60">Séance</h2>
+        <p class="mt-1 first-letter:uppercase">{{ formatSessionDate(current.serviceStart) }}</p>
+        <p>{{ current.servicePlace }}</p>
+      </section>
+
+      <table class="mt-8 w-full text-left text-sm sm:text-base">
+        <caption class="sr-only">Détail de la note</caption>
+        <thead class="border-b border-night/15 text-sm text-night/60">
+        <tr>
+          <th scope="col" class="py-2 font-normal">Désignation</th>
+          <th scope="col" class="py-2 pl-3 text-right font-normal">Quantité</th>
+          <th scope="col" class="py-2 pl-3 text-right font-normal">Prix unitaire</th>
+          <th scope="col" class="py-2 pl-3 text-right font-normal">Montant</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="border-b border-night/15">
+          <td class="py-3">{{ current.description }}</td>
+          <td class="py-3 pl-3 text-right tabular-nums whitespace-nowrap">1 séance</td>
+          <td class="py-3 pl-3 text-right tabular-nums whitespace-nowrap">{{ formatExactEuros(current.amountCents) }}</td>
+          <td class="py-3 pl-3 text-right tabular-nums whitespace-nowrap">{{ formatExactEuros(current.amountCents) }}</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <dl class="mt-4 ml-auto max-w-xs space-y-1">
+        <div class="flex justify-between gap-6">
+          <dt class="text-night/70">Total hors taxes</dt>
+          <dd class="tabular-nums">{{ formatExactEuros(current.amountCents) }}</dd>
+        </div>
+        <div class="flex justify-between gap-6 text-lg font-medium">
+          <dt>Total à payer</dt>
+          <dd class="tabular-nums">{{ formatExactEuros(current.amountCents) }}</dd>
+        </div>
+      </dl>
+      <p class="mt-2 text-right text-sm text-night/70">{{ current.vatMention }}</p>
+
+      @if (current.paidOn && current.paymentMethod) {
+      <p class="mt-8 border-t border-night/15 pt-4">
+        Réglée le {{ formatLongDate(current.paidOn) }} {{ methodPhrases[current.paymentMethod] }}.
+      </p>
+      }
+    </article>
+    }
+  </div>
+</main>

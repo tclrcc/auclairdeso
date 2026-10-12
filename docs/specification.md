@@ -91,10 +91,11 @@ Il n'y a **pas** de séance par écrit.
 ### 3.5 Paiement
 
 - **Aucun paiement en ligne** pour l'instant (pas de carte, pas d'acompte, pas de frais).
-- La cliente paie **après la séance**, par **virement** ou en **espèces**.
-- La praticienne marque chaque séance honorée comme **payée** (montant, moyen de paiement). Ces informations alimentent les bilans et le livre des recettes (voir 8 et 10).
+- La cliente paie **après la séance**, par **virement**, en **espèces** ou par **paiement mobile** (Wero, Lydia, PayPal…).
+- Quand la praticienne marque une séance comme effectuée, l'application établit sa **note** numérotée (`2026-0001`, `2026-0002`…, une série par année, sans trou) au prix de la séance, et l'envoie par email à la cliente (voir 10). Une séance gratuite n'en a pas.
+- La praticienne enregistre ensuite le **paiement** de la note : moyen de paiement et date d'encaissement, jamais dans le futur. Une erreur se corrige en annulant l'encaissement, puis en le saisissant de nouveau.
+- Les paiements alimentent les bilans et le livre des recettes (voir 8 et 10).
 - Le champ `payment_policy` du catalogue est conservé (valeur `ON_SITE`) en prévision d'un éventuel paiement en ligne.
-- Pas de factures automatiques (voir la vérification en 10).
 
 ---
 
@@ -230,13 +231,13 @@ Réservée au personnel, conçue pour mobile.
 
 | Écran | Contenu |
 | --- | --- |
-| Agenda | Demandes en attente en tête, puis séances à venir par jour. Actions : confirmer, refuser, annuler, marquer honorée / absente / payée. (**fait**, sauf « payée » : tranche 5) |
+| Agenda | Demandes en attente en tête, puis séances à venir par jour. Actions : confirmer, refuser, annuler, marquer honorée / absente / payée (**fait** ; le paiement s'enregistre sur la note de la séance) |
 | Saisie manuelle | Créer un rendez-vous pris par téléphone ou Messenger, y compris en dehors des plages (urgences) (**fait**) |
 | Fermetures | Ajouter et supprimer des jours de fermeture (**fait**) |
 | Clientes | Liste, fiche (coordonnées, historique), **notes privées**, marquage « de confiance », blocage et déblocage (**fait**) |
 | Séances | Créer, modifier, masquer les prestations (**fait**) |
 | Statistiques | Voir ci-dessous |
-| Encaissements | Séances payées, bilans, **livre des recettes** exportable |
+| Encaissements | Notes à encaisser, totaux de l'année par moyen de paiement et par mois, **livre des recettes** exportable pour Excel (**fait**) |
 | Équipe | Membres, réinitialisation des mots de passe par l'`ADMIN` (**fait**) |
 | Paramètres | Notifications de la praticienne : email, SMS |
 
@@ -276,6 +277,7 @@ Plusieurs données sont **sensibles** : motifs de consultation (parfois liés à
 | Photo | Praticienne et administrateur | Supprimée **7 jours après la séance [À confirmer]** |
 | Notes privées sur une cliente | Personnel | Tant que le compte existe |
 | Liste noire | Personnel | Tant que le compte existe |
+| Notes de séance et livre des recettes | Personnel | 10 ans (pièces comptables), même si la cliente supprime son compte |
 
 - Consentement explicite à la réservation pour le traitement des données sensibles.
 - Collecte minimale : rien de plus que le tableau 5.2.
@@ -294,8 +296,10 @@ Plusieurs données sont **sensibles** : motifs de consultation (parfois liés à
 | Politique de confidentialité | À rédiger |
 | Médiateur de la consommation | **Obligatoire** pour vendre à des particuliers ; à choisir |
 | Avertissement sur la nature des séances | « Accompagnement complémentaire, qui ne remplace pas un avis ni un traitement médical ». Aucune promesse de guérison pour le magnétisme (allégations thérapeutiques interdites). |
-| Livre des recettes | Obligatoire en micro-entreprise ; généré par l'application à partir des séances payées |
-| Note pour une prestation de 25 € ou plus | **[À vérifier auprès de l'URSSAF ou de la CCI]** |
+| Livre des recettes | Obligatoire en micro-entreprise : chronologique, avec date, identité de la cliente, montant, mode de règlement et numéro de la note. Généré par l'application à partir des notes encaissées, exportable en CSV (**fait**) |
+| Note pour une prestation de 25 € ou plus | **Obligatoire** (arrêté n° 83-50/A du 3 octobre 1983), remise dès la séance rendue et avant le paiement, double conservé deux ans au moins. Établie et envoyée par l'application à chaque séance effectuée, imprimable (**fait**). Mentions : date, nom (suivi de « EI ») et adresse de la praticienne, SIRET, nom de la cliente, date et lieu de la séance, décompte, total, « TVA non applicable, article 293 B du CGI » |
+| Rappel des conditions de délivrance de la note | Affichage prévu par l'article 2 de l'arrêté : à reprendre dans les conditions générales |
+| Adresse sur les notes | L'adresse professionnelle y figure obligatoirement : choisir la domiciliation avant la mise en production |
 | Nom de domaine | À acheter (par exemple `auclairdeso.fr`), indispensable pour le HTTPS |
 | Contenu de la vitrine (textes, photos, vidéos, témoignages) | Plus tard |
 
@@ -335,7 +339,8 @@ Plusieurs données sont **sensibles** : motifs de consultation (parfois liés à
 | 3D | Notifications | En partie : emails faits ; SMS et envoi réel par Gmail à faire |
 | 3E | Question ciblée, sans créneau | À faire |
 | 4 | Fiches clientes, notes privées, marquage « de confiance », déblocage | Fait |
-| 5 | Statistiques, encaissements, livre des recettes | À faire |
+| 5A | Notes, encaissements, livre des recettes | Fait |
+| 5B | Statistiques | À faire |
 | 6 | Vitrine : contenu, identité visuelle, vidéos, pages légales | À faire |
 | 7 | Mise en production : nom de domaine, HTTPS, Docker, sauvegardes, Ubuntu 26.04 | À faire |
 

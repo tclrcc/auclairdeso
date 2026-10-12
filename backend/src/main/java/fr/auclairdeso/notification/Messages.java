@@ -1,5 +1,6 @@
 package fr.auclairdeso.notification;
 
+import fr.auclairdeso.billing.BillNotice;
 import fr.auclairdeso.booking.AppointmentNotice;
 import fr.auclairdeso.booking.EveningProgram;
 import fr.auclairdeso.catalog.ConsultationMode;
@@ -17,6 +18,8 @@ final class Messages {
 
     private static final DateTimeFormatter DAY = DateTimeFormatter.ofPattern("EEEE d MMMM", Locale.FRANCE);
     private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("H'h'mm", Locale.FRANCE);
+    private static final DateTimeFormatter FULL_DAY = DateTimeFormatter.ofPattern("EEEE d MMMM yyyy", Locale.FRANCE);
+    private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.FRANCE);
     private static final String SIGNATURE = "Au clair de So";
 
     private final String site;
@@ -102,7 +105,7 @@ final class Messages {
 
             %s, %s
             %s
-            %s, à régler après la séance, par virement ou en espèces.
+            %s, à régler après la séance, par virement, en espèces ou par paiement mobile.
 
             %s
 
@@ -209,6 +212,45 @@ final class Messages {
                 signature()));
     }
 
+    /**
+     * The bill itself, with every mention the arrêté 83-50/A requires: date, provider with name and address,
+     * client, date and place of the session, detail and total. Plain text, so that it prints as it is.
+     */
+    Message bill(BillNotice bill) {
+        var amount = exactEuros(bill.amountCents());
+        return new Message(
+            "Votre note n° %s : séance du %s".formatted(bill.number(), DATE.format(bill.serviceStart())),
+            """
+            Bonjour %s,
+
+            Merci pour votre séance. Voici votre note, à garder.
+
+            NOTE N° %s
+            Établie le %s
+
+            %s
+            %s
+            SIRET : %s
+
+            Cliente : %s
+            Séance du %s
+            Lieu : %s
+
+            1 × %s : %s
+            Total hors taxes : %s
+            Total à payer : %s
+            %s
+
+            Règlement par virement, en espèces ou par paiement mobile.
+
+            À bientôt,
+            %s
+            """.formatted(bill.clientFirstName(), bill.number(), DATE.format(bill.issuedOn()),
+                bill.practitionerName(), bill.practitionerAddress(), bill.siret(), bill.clientName(),
+                when(bill.serviceStart(), FULL_DAY), bill.servicePlace(), bill.description(),
+                amount, amount, amount, bill.vatMention(), signature()));
+    }
+
     // ---- Shared pieces
 
     /** Where the session takes place, or who calls whom: it depends on the mode. */
@@ -245,7 +287,11 @@ final class Messages {
 
     /** "lundi 19 octobre à 14h00" */
     private static String when(LocalDateTime time) {
-        return DAY.format(time) + " à " + TIME.format(time);
+        return when(time, DAY);
+    }
+
+    private static String when(LocalDateTime time, DateTimeFormatter day) {
+        return day.format(time) + " à " + TIME.format(time);
     }
 
     private static String name(AppointmentNotice appointment) {
@@ -257,6 +303,11 @@ final class Messages {
         return cents % 100 == 0
             ? (cents / 100) + " €"
             : String.format(Locale.FRANCE, "%.2f €", cents / 100.0);
+    }
+
+    /** "80,00 €": a bill always shows the cents. */
+    private static String exactEuros(int cents) {
+        return String.format(Locale.FRANCE, "%d,%02d €", cents / 100, cents % 100);
     }
 
     private static String capitalize(String text) {

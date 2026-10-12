@@ -10,9 +10,7 @@
       <legend class="sr-only">Afficher</legend>
       <div class="flex flex-wrap gap-2">
         @for (option of filters; track option) {
-        <label class="cursor-pointer rounded-full border border-night/20 bg-white px-4 py-1.5 text-sm
-                      has-checked:border-night has-checked:bg-night has-checked:text-pearl
-                      has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-night">
+        <label class="choice-pill">
           <input type="radio" name="filter" class="sr-only" [value]="option" [checked]="filter() === option"
                  (change)="filter.set(option)" />
           {{ filterLabels[option] }}

@@ -26,6 +26,7 @@ export class AdminHomePage {
   protected readonly pending = httpResource<unknown[]>(() => '/api/admin/appointments/pending', {
     defaultValue: [],
   });
+  protected readonly unpaid = httpResource<unknown[]>(() => '/api/admin/bills/unpaid', { defaultValue: [] });
 
   protected async resetPassword(member: StaffMember): Promise<void> {
     const confirmed = confirm(

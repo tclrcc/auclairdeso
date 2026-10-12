@@ -1,5 +1,6 @@
 package fr.auclairdeso.notification;
 
+import fr.auclairdeso.billing.BillIssued;
 import fr.auclairdeso.booking.AppointmentEvent;
 import fr.auclairdeso.booking.AppointmentNotice;
 import fr.auclairdeso.booking.EveningProgram;
@@ -11,10 +12,11 @@ import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Component;
 
 /**
- * Emails sent when an appointment changes (docs/specification.md, 7).
+ * Emails sent when an appointment changes, and the bill of each completed session (docs/specification.md, 7).
  * <p>
  * An {@code @ApplicationModuleListener} runs after the commit, in another thread: a slow mail server
  * never delays the page. If sending fails, the event stays in the event_publication table and is
+ * sent again later (FailedNotificationRetries).
  */
 @Component
 class BookingNotifications {
@@ -46,6 +48,18 @@ class BookingNotifications {
             }
             case AppointmentEvent.Expired(var appointment) -> toClient(appointment, messages.expired(appointment));
             case AppointmentEvent.ReminderDue(var appointment) -> toClient(appointment, messages.reminder(appointment));
+            // The email of a completed session is its bill: see on(BillIssued).
+            case AppointmentEvent.Completed _ -> {
+            }
+        }
+    }
+
+    /** The bill of a completed session (arrêté 83-50/A). A client without email gets it on paper. */
+    @ApplicationModuleListener
+    void on(BillIssued issued) {
+        var bill = issued.bill();
+        if (bill.clientEmail() != null) {
+            send(bill.clientEmail(), messages.bill(bill));
         }
     }
 

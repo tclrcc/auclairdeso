@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { STATUS_LABELS } from '../../booking/booking';
 import { MODE_LABELS } from '../../public/offerings/offering';
 import { EurosPipe } from '../../shared/euros-pipe';
+import { BillPanel } from '../billing/bill-panel';
 import { formatDayOf, formatTime, todayInParis } from '../../shared/paris-time';
 import { problemMessage } from '../../shared/problem-message';
 import { AdminAppointment, ageOn } from './admin-appointment';
@@ -11,7 +12,7 @@ import { AgendaAction, AgendaApi } from './agenda-api';
 
 @Component({
   selector: 'app-appointment-detail-page',
-  imports: [RouterLink, EurosPipe],
+  imports: [RouterLink, EurosPipe, BillPanel],
   templateUrl: './appointment-detail-page.html',
 })
 export class AppointmentDetailPage {

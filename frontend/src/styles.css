@@ -53,6 +53,13 @@
     focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-pearl;
   }
 
+  /* A radio button drawn as a pill: the input stays in the label, hidden, for the keyboard and screen readers. */
+  .choice-pill {
+    @apply cursor-pointer rounded-full border border-night/20 bg-white px-4 py-1.5 text-sm
+    has-checked:border-night has-checked:bg-night has-checked:text-pearl
+    has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-night;
+  }
+
   .field-input {
     @apply mt-1 w-full rounded-lg border border-night/20 bg-white px-4 py-2
     focus-visible:outline-2 focus-visible:outline-night;

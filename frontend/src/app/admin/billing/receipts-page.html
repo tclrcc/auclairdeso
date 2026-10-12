@@ -1,0 +1,110 @@
+<main class="min-h-dvh bg-sand px-4 py-10 text-night">
+  <div class="mx-auto max-w-2xl">
+    <a routerLink="/admin" class="text-sm text-night/70 hover:underline">← Administration</a>
+    <h1 class="mt-4 font-display text-4xl tracking-tight">Encaissements</h1>
+
+    <section class="mt-8" aria-labelledby="unpaid-title">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4">
+        <h2 id="unpaid-title" class="font-display text-2xl">À encaisser</h2>
+        @if (unpaid.value().length > 0) {
+        <p class="tabular-nums">{{ formatExactEuros(unpaidTotal()) }}</p>
+        }
+      </div>
+      @if (unpaid.error()) {
+      <p class="mt-3 text-red-700" role="alert">Les notes à encaisser ne peuvent pas être affichées.</p>
+      } @else {
+      <ul class="mt-3 space-y-2">
+        @for (bill of unpaid.value(); track bill.id) {
+        <li>
+          <a [routerLink]="['/admin/agenda', bill.appointmentId]"
+             class="flex items-center justify-between gap-4 rounded-xl border-l-4 border-amber-400 bg-white p-4 hover:bg-white/70">
+            <span class="min-w-0">
+              <span class="block truncate font-medium">{{ bill.clientName }}</span>
+              <span class="block text-sm text-night/70">
+                Séance du {{ formatDayOf(bill.serviceStart) }}, note n° {{ bill.number }}
+              </span>
+            </span>
+            <span class="shrink-0 tabular-nums">{{ formatExactEuros(bill.amountCents) }}</span>
+          </a>
+        </li>
+        } @empty {
+        <li class="text-night/70">
+          @if (unpaid.isLoading()) {
+          Chargement…
+          } @else {
+          Toutes les notes sont encaissées.
+          }
+        </li>
+        }
+      </ul>
+      }
+    </section>
+
+    <section class="mt-12" aria-labelledby="book-title">
+      <div class="flex items-center justify-between gap-4">
+        <h2 id="book-title" class="font-display text-2xl">Livre des recettes</h2>
+        <div class="flex items-center gap-1">
+          <button type="button" class="rounded-full px-3 py-1 hover:bg-white" aria-label="Année précédente"
+                  (click)="previousYear()">‹</button>
+          <span class="min-w-14 text-center font-medium tabular-nums" aria-live="polite">{{ year() }}</span>
+          <button type="button" class="rounded-full px-3 py-1 hover:bg-white disabled:opacity-30"
+                  aria-label="Année suivante" [disabled]="isCurrentYear()" (click)="nextYear()">›</button>
+        </div>
+      </div>
+
+      @if (book.error()) {
+      <p class="mt-4 text-red-700" role="alert">Le livre des recettes ne peut pas être affiché.</p>
+      } @else if (book.hasValue()) {
+      @let current = book.value();
+
+      <div class="mt-4 rounded-2xl bg-white p-5">
+        <p class="text-sm text-night/70">Encaissé en {{ current.year }}</p>
+        <p class="mt-1 text-4xl font-medium tabular-nums">{{ formatExactEuros(current.totalCents) }}</p>
+        <dl class="mt-4 grid gap-2 border-t border-night/10 pt-4 sm:grid-cols-3">
+          @for (method of methods; track method) {
+          <div>
+            <dt class="text-sm text-night/60">{{ methodLabels[method] }}</dt>
+            <dd class="tabular-nums">{{ formatExactEuros(current.totalsByMethod[method]) }}</dd>
+          </div>
+          }
+        </dl>
+        @if (months().length > 0) {
+        <dl class="mt-4 space-y-1 border-t border-night/10 pt-4">
+          @for (month of months(); track month.month) {
+          <div class="flex justify-between gap-4">
+            <dt class="first-letter:uppercase">{{ month.label }}</dt>
+            <dd class="tabular-nums">{{ formatExactEuros(month.totalCents) }}</dd>
+          </div>
+          }
+        </dl>
+        }
+      </div>
+
+      <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+        <p class="text-sm text-night/70">Chaque paiement, par date d’encaissement.</p>
+        <a class="rounded-full border border-night/30 px-5 py-2 text-sm" [href]="exportUrl()" download>
+          Télécharger pour Excel
+        </a>
+      </div>
+      <ul class="mt-3 divide-y divide-night/10 overflow-hidden rounded-2xl bg-white">
+        @for (entry of current.entries; track entry.billId) {
+        <li class="px-4 py-3">
+          <div class="flex items-baseline justify-between gap-4">
+            <span class="font-medium first-letter:uppercase">{{ formatDay(entry.paidOn) }}</span>
+            <span class="tabular-nums">{{ formatExactEuros(entry.amountCents) }}</span>
+          </div>
+          <p class="text-sm text-night/70">
+            {{ entry.clientName }}, {{ entry.description }}, note n° {{ entry.number }}
+          </p>
+          <p class="text-sm text-night/70">{{ methodLabels[entry.method] }}</p>
+        </li>
+        } @empty {
+        <li class="px-4 py-6 text-night/70">Aucun encaissement en {{ current.year }}.</li>
+        }
+      </ul>
+      } @else {
+      <p class="mt-4 text-night/70">Chargement…</p>
+      }
+    </section>
+  </div>
+</main>

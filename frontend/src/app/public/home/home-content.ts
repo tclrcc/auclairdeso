@@ -44,7 +44,7 @@ export const BOOKING_STEPS: readonly BookingStep[] = [
   {
     illuminated: 1,
     title: 'La séance',
-    text: 'Vous réglez après la séance, par virement ou en espèces.',
+    text: 'Vous réglez après la séance, par virement, en espèces ou par paiement mobile.',
   },
 ];
 

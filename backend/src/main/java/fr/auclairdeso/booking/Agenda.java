@@ -117,7 +117,7 @@ class Agenda {
     }
 
     AdminAppointmentView complete(long id) {
-        return change(id, appointment -> appointment.complete(Instant.now(clock)));
+        return change(id, appointment -> appointment.complete(Instant.now(clock)), AppointmentEvent.Completed::new);
     }
 
     AdminAppointmentView noShow(long id) {

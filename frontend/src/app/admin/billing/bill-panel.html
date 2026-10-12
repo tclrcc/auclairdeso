@@ -1,0 +1,62 @@
+<section class="mt-6 rounded-2xl bg-white p-5" aria-labelledby="bill-title">
+  <h2 id="bill-title" class="font-display text-xl">Note et paiement</h2>
+
+  @if (bills.isLoading() && !bill()) {
+  <p class="mt-2 text-night/70">Chargement…</p>
+  } @else if (bills.error()) {
+  <p class="mt-2 text-red-700" role="alert">La note ne peut pas être affichée.</p>
+  } @else if (bill(); as current) {
+  <div class="mt-3 flex flex-wrap items-baseline justify-between gap-x-4">
+    <p class="font-medium">Note n° {{ current.number }}</p>
+    <p class="text-xl font-medium tabular-nums">{{ formatExactEuros(current.amountCents) }}</p>
+  </div>
+  <p class="text-sm text-night/70">
+    @if (current.clientEmail) {
+    Envoyée à {{ current.clientEmail }} le {{ formatLongDate(current.issuedOn) }}.
+    } @else {
+    Pas d’adresse email : remettez-lui la note imprimée, ou montrez-la depuis cet écran.
+    }
+  </p>
+  <a [routerLink]="['/admin/notes', current.id]" class="mt-2 inline-block text-sm underline">Voir et imprimer la note</a>
+
+  @if (current.paidOn && current.paymentMethod) {
+  <div class="mt-4 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-900">
+    <p class="font-medium">
+      Encaissée le {{ formatLongDate(current.paidOn) }} {{ methodPhrases[current.paymentMethod] }}.
+    </p>
+    <button type="button" class="mt-2 underline" (click)="cancelPayment(current)">Annuler l’encaissement</button>
+  </div>
+  @if (cancelError(); as message) {
+  <p class="mt-2 text-sm text-red-700" role="alert">{{ message }}</p>
+  }
+  } @else {
+  <form class="mt-4 space-y-4 border-t border-night/10 pt-4" [formRoot]="paymentForm">
+    <fieldset>
+      <legend class="text-sm font-medium">Moyen de paiement</legend>
+      <div class="mt-2 flex flex-wrap gap-2">
+        @for (method of methods; track method) {
+        <label class="choice-pill">
+          <input type="radio" class="sr-only" [value]="method" [formField]="paymentForm.method" />
+          {{ methodLabels[method] }}
+        </label>
+        }
+      </div>
+      <app-field-errors [state]="paymentForm.method()" />
+    </fieldset>
+    <div>
+      <label class="block text-sm font-medium" for="paid-on">Encaissé le</label>
+      <input id="paid-on" type="date" class="field-input" [formField]="paymentForm.paidOn" />
+      <app-field-errors [state]="paymentForm.paidOn()" />
+    </div>
+    @for (error of paymentForm().errors(); track error.kind) {
+    <p class="text-sm text-red-700" role="alert">{{ error.message }}</p>
+    }
+    <button type="submit" class="btn-primary w-full" [disabled]="paymentForm().submitting()">
+      Enregistrer le paiement
+    </button>
+  </form>
+  }
+  } @else {
+  <p class="mt-2 text-sm text-night/70">Aucune note pour cette séance.</p>
+  }
+</section>
