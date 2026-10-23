@@ -1,0 +1,148 @@
+<app-legal-page heading="Politique de confidentialité">
+  <p>
+    Vos informations servent à prendre et à tenir vos rendez-vous, rien d’autre. Elles ne sont ni
+    vendues, ni transmises à des tiers à des fins commerciales. Cette page dit lesquelles, pourquoi,
+    combien de temps, et ce que vous pouvez demander.
+  </p>
+
+  <h2>Qui est responsable</h2>
+  @if (legal.hasValue()) {
+  @let publisher = legal.value();
+  <p>
+    {{ publisher.publisherName }}, {{ publisher.address }}, SIRET {{ publisher.siret }}.
+    Pour toute question sur vos données :
+    <a [href]="'mailto:' + publisher.contactEmail">{{ publisher.contactEmail }}</a>.
+  </p>
+  } @else {
+  <p class="text-night/70">Chargement…</p>
+  }
+
+  <h2>Ce qui est enregistré, et pourquoi</h2>
+  <dl>
+    <dt>Votre adresse électronique</dt>
+    <dd>Elle sert à vous connecter, sans mot de passe, et à vous envoyer les messages liés à vos rendez-vous.</dd>
+
+    <dt>Vos coordonnées : prénom, nom, date de naissance, téléphone, ville</dt>
+    <dd>
+      Pour vous reconnaître, vous joindre, et vérifier que vous êtes majeure. La ville est facultative.
+    </dd>
+
+    <dt>La raison de votre demande et, pour une séance de voyance, votre photo</dt>
+    <dd>
+      Pour préparer la séance. Ces informations peuvent toucher à votre santé ou à votre vie privée :
+      elles ne sont enregistrées qu’avec votre accord explicite, demandé au moment de la réservation.
+      Vous pouvez retirer cet accord à tout moment.
+    </dd>
+
+    <dt>Vos rendez-vous et leurs notes de séance</dt>
+    <dd>Pour tenir l’agenda, et parce que la comptabilité d’une micro-entreprise l’exige.</dd>
+
+    <dt>Les notes privées de la praticienne</dt>
+    <dd>Ce qu’elle retient d’une séance pour la suivante. Vous pouvez en demander une copie.</dd>
+
+    <dt>La liste des personnes bloquées</dt>
+    <dd>
+      Adresse de connexion et numéro de téléphone des personnes qui ne peuvent plus réserver en ligne,
+      après deux annulations tardives ou une absence. C’est l’intérêt légitime de la praticienne à ne
+      pas voir son agenda bloqué sans raison.
+    </dd>
+
+    <dt>La fréquentation du site</dt>
+    <dd>
+      Deux nombres par jour : les pages vues et les visiteurs. Votre adresse réseau sert seulement à ne
+      pas vous compter deux fois dans la journée ; elle n’est pas enregistrée, et le lien est oublié
+      chaque nuit. Aucun profil, aucun suivi d’un jour sur l’autre.
+    </dd>
+  </dl>
+
+  <h2>Combien de temps</h2>
+  <table>
+    <caption class="sr-only">Durées de conservation</caption>
+    <thead>
+    <tr>
+      <th scope="col">Donnée</th>
+      <th scope="col">Conservation</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>Compte, coordonnées, notes privées</td>
+      <td>Tant que votre compte existe</td>
+    </tr>
+    <tr>
+      <td>Photo envoyée pour une séance</td>
+      <td>Supprimée 7 jours après la séance, automatiquement</td>
+    </tr>
+    <tr>
+      <td>Rendez-vous et notes de séance</td>
+      <td>10 ans : ce sont des pièces comptables</td>
+    </tr>
+    <tr>
+      <td>Liste des personnes bloquées</td>
+      <td>Jusqu’au déblocage par la praticienne</td>
+    </tr>
+    <tr>
+      <td>Fréquentation du site</td>
+      <td>Deux totaux par jour, sans donnée personnelle</td>
+    </tr>
+    </tbody>
+  </table>
+
+  <h2>Qui y a accès</h2>
+  <p>
+    La praticienne, et l’administrateur du site pour la maintenance. Le site et la base de données sont
+    hébergés en France
+    @if (legal.hasValue()) {
+    par {{ legal.value().host }}
+    }
+    ; les courriels passent par le service de messagerie de la praticienne. Les photos sont stockées
+    dans la base, jamais dans un dossier public, et ne s’affichent qu’après connexion.
+  </p>
+
+  <h2>Cookies</h2>
+  <p>
+    Aucun cookie publicitaire, aucun traceur, aucune mesure d’audience par cookie : c’est pourquoi ce
+    site n’affiche pas de bandeau. Deux cookies techniques seulement, nécessaires au fonctionnement :
+    celui qui garde votre session une fois connectée, et celui qui protège les formulaires contre les
+    envois frauduleux.
+  </p>
+
+  <h2>Vos droits</h2>
+  <p>
+    Vous pouvez demander l’accès à vos données, leur correction, leur effacement, la limitation de leur
+    usage, leur portabilité, et vous opposer à leur traitement. Écrivez
+    @if (legal.hasValue()) {
+    à <a [href]="'mailto:' + legal.value().contactEmail">{{ legal.value().contactEmail }}</a>
+    }
+    : la réponse vous parvient dans un délai d’un mois. Si la réponse ne vous convient pas, vous pouvez
+    saisir la CNIL,
+    <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">cnil.fr<span
+      class="sr-only"> (nouvel onglet)</span></a>.
+  </p>
+
+  <h3>Supprimer votre compte vous-même</h3>
+  <p>
+    Depuis <a routerLink="/mon-espace">Mon espace</a>, le bouton « Supprimer mon compte » efface, tout de
+    suite et sans intervention de la praticienne :
+  </p>
+  <ul>
+    <li>votre connexion au site, vos coordonnées, votre date de naissance et votre ville ;</li>
+    <li>les textes que vous avez écrits : raison de la demande, adresse de séance, nom sur Messenger ;</li>
+    <li>vos photos et les notes privées de la praticienne.</li>
+  </ul>
+  <p>
+    Restent vos séances passées et leurs notes de séance, que la loi oblige à garder dix ans : elles
+    gardent la date, la prestation, le montant et le nom qui figurait sur la note, parce que l’arrêté
+    sur les notes l’exige. Votre adresse électronique en est retirée. Si votre réservation en ligne est
+    bloquée, votre numéro de téléphone reste lui aussi, le temps du blocage, et il disparaît dès que la
+    praticienne vous débloque. Annulez d’abord vos rendez-vous à venir : la suppression est refusée tant
+    qu’il en reste un.
+  </p>
+
+  <h2>Sécurité</h2>
+  <p>
+    Le site n’est accessible qu’en HTTPS. La connexion se fait par lien à usage unique envoyé par
+    courriel, et l’espace d’administration demande en plus un mot de passe. Aucune donnée de carte
+    bancaire n’est demandée ni enregistrée, puisqu’il n’y a pas de paiement en ligne.
+  </p>
+</app-legal-page>

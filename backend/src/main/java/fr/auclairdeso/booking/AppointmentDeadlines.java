@@ -8,8 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * What time does to the appointments (docs/specification.md, 5.5 and 7): unanswered requests expire,
- * reminders leave the day before, and the practitioner receives her program every evening.
+ * What time does to the appointments (docs/specification.md, 5.5, 7 and 9): unanswered requests expire,
+ * reminders leave the day before, the practitioner receives her program every evening, and the portraits
+ * are deleted once their session is old enough.
  * <p>
  * Each method finds by itself what is due at the time of the clock: calling it twice, or late after
  * a restart, never sends anything twice and never misses anything.
@@ -19,18 +20,30 @@ import org.springframework.transaction.annotation.Transactional;
 class AppointmentDeadlines {
 
     private final AppointmentRepository appointments;
+    private final AppointmentPhotoRepository photos;
     private final BookingRules rules;
     private final BookingDeadlines deadlines;
     private final ApplicationEventPublisher events;
     private final Clock clock;
 
-    AppointmentDeadlines(AppointmentRepository appointments, BookingRules rules, BookingDeadlines deadlines,
-                         ApplicationEventPublisher events, Clock clock) {
+    AppointmentDeadlines(AppointmentRepository appointments, AppointmentPhotoRepository photos, BookingRules rules,
+                         BookingDeadlines deadlines, ApplicationEventPublisher events, Clock clock) {
         this.appointments = appointments;
+        this.photos = photos;
         this.rules = rules;
         this.deadlines = deadlines;
         this.events = events;
         this.clock = clock;
+    }
+
+    /**
+     * A portrait is only needed for its session: once it is old enough, it is deleted, whatever happened
+     * to the appointment (docs/specification.md, 9). The appointment itself stays.
+     *
+     * @return how many portraits were deleted
+     */
+    int deleteExpiredPhotos() {
+        return photos.deleteBySessionEndedBefore(Instant.now(clock).minus(rules.photoRetention()));
     }
 
     /**

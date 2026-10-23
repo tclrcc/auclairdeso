@@ -7,7 +7,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
 /**
- * Booking rules of the practitioner, bound from "auclairdeso.booking" (docs/specification.md, 4.3 and 6).
+ * Booking rules of the practitioner, bound from "auclairdeso.booking" (docs/specification.md, 4.3, 6 and 9).
+ *
+ * @param photoRetention how long a portrait is kept after its session, before the nightly purge
  */
 @ConfigurationProperties("auclairdeso.booking")
 record BookingRules(
@@ -16,5 +18,6 @@ record BookingRules(
     @DefaultValue("1") int minDaysAhead,
     @DefaultValue("2m") Period horizon,
     @DefaultValue("48h") Duration cancellationNotice,
-    @DefaultValue("2") int lateCancellationsBeforeBlock) {
+    @DefaultValue("2") int lateCancellationsBeforeBlock,
+    @DefaultValue("7d") Duration photoRetention) {
 }

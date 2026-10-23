@@ -12,6 +12,8 @@ export interface ClientSummary {
   readonly city: string | null;
   readonly trusted: boolean;
   readonly blocked: boolean;
+  /** She erased her account: her name and her phone number mean nothing any more. */
+  readonly erased: boolean;
 }
 
 /** Mirror of the backend AdminAppointmentView record. */

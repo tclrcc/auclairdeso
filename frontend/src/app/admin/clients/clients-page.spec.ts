@@ -15,6 +15,7 @@ const ALICE: ClientSummary = {
   city: 'Lyon',
   trusted: true,
   blocked: false,
+  erased: false,
 };
 const DORA: ClientSummary = { ...ALICE, id: 2, firstName: 'Dora', trusted: false, blocked: true };
 

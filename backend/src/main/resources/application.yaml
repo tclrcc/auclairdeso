@@ -71,3 +71,12 @@ auclairdeso:
     practitioner-name: "${BILLING_PRACTITIONER_NAME:Nom de la praticienne EI}"
     address: "${BILLING_ADDRESS:Adresse professionnelle à configurer}"
     siret: "${BILLING_SIRET:SIRET à configurer}"
+  # Shown on the legal pages (10). The identity is the one of the bills: a single place to fill in.
+  legal:
+    publisher-name: ${auclairdeso.billing.practitioner-name}
+    address: ${auclairdeso.billing.address}
+    siret: ${auclairdeso.billing.siret}
+    contact-email: "${LEGAL_CONTACT_EMAIL:contact@auclairdeso.local}"
+    host: "${LEGAL_HOST:OVH SAS, 2 rue Kellermann, 59100 Roubaix, France — ovhcloud.com}"
+    mediator-name: "${LEGAL_MEDIATOR_NAME:}"
+    mediator-url: "${LEGAL_MEDIATOR_URL:}"

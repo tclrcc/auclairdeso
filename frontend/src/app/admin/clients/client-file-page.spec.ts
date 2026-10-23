@@ -19,6 +19,7 @@ const FILE: ClientFile = {
     city: 'Lyon',
     trusted: false,
     blocked: true,
+    erased: false,
   },
   bookedOnline: true,
   phoneBlocked: false,

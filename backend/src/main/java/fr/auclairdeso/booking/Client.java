@@ -17,6 +17,9 @@ import org.jspecify.annotations.Nullable;
 @Table(name = "client")
 class Client {
 
+    /** A number that belongs to nobody, for an erased client: the column cannot be empty. */
+    private static final String ERASED_PHONE = "0000000000";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -47,6 +50,9 @@ class Client {
 
     @Column(name = "late_cancellations", nullable = false)
     private int lateCancellations;
+
+    @Column(name = "erased_at")
+    private @Nullable Instant erasedAt;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -119,10 +125,32 @@ class Client {
         this.blocked = true;
     }
 
+    /**
+     * The client erased her account (docs/specification.md, 9): nothing identifies her any more.
+     * Her phone number stays only while she is blocked, so that the block list keeps working (6);
+     * otherwise it becomes a number that belongs to nobody.
+     */
+    void erase(Instant now) {
+        this.erasedAt = now;
+        this.email = null;
+        this.firstName = "Compte";
+        this.lastName = "supprimé";
+        this.birthDate = null;
+        this.city = null;
+        this.trusted = false;
+        if (!blocked) {
+            this.phone = ERASED_PHONE;
+        }
+    }
+
     /** The practitioner lifts the block: the late cancellations of the past no longer count. */
     void unblock() {
         this.blocked = false;
         this.lateCancellations = 0;
+        if (isErased()) {
+            // The number was only kept to hold the block: it has no reason to stay.
+            this.phone = ERASED_PHONE;
+        }
     }
 
     @Nullable Long id() {
@@ -149,12 +177,17 @@ class Client {
         return lateCancellations;
     }
 
+    boolean isErased() {
+        return erasedAt != null;
+    }
+
     ClientProfile toProfile() {
         return new ClientProfile(firstName, lastName, birthDate, phone, city, trusted);
     }
 
     ClientSummary toSummary() {
-        return new ClientSummary(id, email, firstName, lastName, birthDate, phone, city, trusted, blocked);
+        return new ClientSummary(id, email, firstName, lastName, birthDate, phone, city, trusted, blocked,
+            isErased());
     }
 
     private static @Nullable String blankToNull(@Nullable String value) {

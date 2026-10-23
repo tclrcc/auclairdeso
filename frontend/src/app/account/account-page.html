@@ -35,6 +35,31 @@
     </ul>
     }
 
+    @if (erased(); as summary) {
+    <section class="mt-10 rounded-2xl bg-white p-5" aria-labelledby="erased-title">
+      <h2 id="erased-title" class="font-display text-2xl">Compte supprimé</h2>
+      <p class="mt-2">{{ summary }}</p>
+      <a routerLink="/" class="btn-primary mt-4">Revenir à l’accueil</a>
+    </section>
+    } @else if (!auth.isStaff()) {
+    <section class="mt-12 border-t border-night/10 pt-6" aria-labelledby="erasure-title">
+      <h2 id="erasure-title" class="font-display text-2xl">Supprimer mon compte</h2>
+      <p class="mt-2 text-night/80">
+        Vos coordonnées, vos photos, les textes que vous avez écrits et les notes de la praticienne sont
+        effacés tout de suite. Vos séances passées restent, sans votre nom :
+        <a routerLink="/confidentialite" class="underline">la politique de confidentialité</a> explique
+        pourquoi.
+      </p>
+      @if (erasureError(); as message) {
+      <p class="mt-3 text-sm text-red-700" role="alert">{{ message }}</p>
+      }
+      <button type="button" class="mt-4 rounded-full border border-red-700 px-5 py-2 text-red-700 disabled:opacity-60"
+              [disabled]="erasing()" (click)="erase()">
+        Supprimer mon compte
+      </button>
+    </section>
+    }
+
     <div class="mt-10 flex flex-wrap gap-4">
       @if (auth.isStaff()) {
       <a routerLink="/admin" class="btn-primary">Administration</a>

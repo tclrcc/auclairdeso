@@ -274,7 +274,7 @@ Plusieurs données sont **sensibles** : motifs de consultation (parfois liés à
 | Compte (email, rôle, dates de connexion) | Personnel | Tant que le compte existe |
 | Coordonnées et date de naissance | Personnel | Tant que le compte existe |
 | Motif de consultation | Personnel | Avec le rendez-vous |
-| Photo | Praticienne et administrateur | Supprimée **7 jours après la séance [À confirmer]** |
+| Photo | Praticienne et administrateur | Supprimée **7 jours après la séance**, par une purge chaque nuit (**fait**) ; délai réglable : `auclairdeso.booking.photo-retention` |
 | Notes privées sur une cliente | Personnel | Tant que le compte existe |
 | Liste noire | Personnel | Tant que le compte existe |
 | Notes de séance et livre des recettes | Personnel | 10 ans (pièces comptables), même si la cliente supprime son compte |
@@ -282,7 +282,11 @@ Plusieurs données sont **sensibles** : motifs de consultation (parfois liés à
 - Consentement explicite à la réservation pour le traitement des données sensibles.
 - Collecte minimale : rien de plus que le tableau 5.2.
 - Photos stockées hors de toute zone publique, jamais servies sans authentification.
-- La cliente peut demander la suppression de son compte et de ses données.
+- La cliente supprime elle-même son compte depuis « Mon espace » (**fait**). Sont effacés : la connexion, les coordonnées, la date de naissance, la ville, les textes qu'elle a écrits (motif, adresse de séance, nom Messenger), les photos et les notes privées. Sont conservés : les séances passées et leurs notes de séance, pièces comptables gardées 10 ans, avec le nom qui figurait sur la note.
+- La suppression est refusée tant qu'un rendez-vous à venir existe : la cliente l'annule d'abord.
+- Le numéro de téléphone d'une cliente **bloquée** est conservé malgré la suppression, le temps du blocage, au titre de l'intérêt légitime : sinon le blocage par téléphone (6) ne tiendrait plus. Il disparaît dès le déblocage. C'est écrit dans la politique de confidentialité.
+- La fiche d'une cliente supprimée ne peut plus être modifiée dans l'administration : ni coordonnées, ni marquage « de confiance », ni note. Seuls le blocage et le déblocage restent possibles.
+- Les notes de séance gardent le nom imprimé dessus, exigé par l'arrêté sur les notes ; l'adresse email en est retirée. Les liens magiques encore valides sont supprimés.
 - Les photos sont stockées dans la base (table `appointment_photo`), jamais sur le disque ni dans une zone publique.
 
 ---
@@ -291,14 +295,14 @@ Plusieurs données sont **sensibles** : motifs de consultation (parfois liés à
 
 | Sujet | État |
 | --- | --- |
-| Mentions légales (SIRET, adresse professionnelle, hébergeur OVH) | À rédiger ; l'adresse du domicile ne doit pas apparaître (domiciliation à envisager) |
-| Conditions générales (annulation 48 h, liste noire, majorité, paiement après séance) | À rédiger |
-| Politique de confidentialité | À rédiger |
-| Médiateur de la consommation | **Obligatoire** pour vendre à des particuliers ; à choisir |
+| Mentions légales (SIRET, adresse professionnelle, hébergeur OVH) | **Fait** : page `/mentions-legales`, alimentée par `auclairdeso.legal` (donc par `deploy/.env`). L'adresse du domicile ne doit pas y apparaître : domiciliation à arrêter avant l'ouverture |
+| Conditions générales (annulation 48 h, liste noire, majorité, paiement après séance) | **Fait** : page `/conditions-generales`, liée depuis la case à cocher de la réservation. Contient aussi le droit de rétractation de 14 jours et son formulaire type |
+| Politique de confidentialité | **Fait** : page `/confidentialite` |
+| Médiateur de la consommation | **Obligatoire** pour vendre à des particuliers ; à choisir. Tant que `LEGAL_MEDIATOR_NAME` est vide, les conditions générales affichent qu'il sera indiqué avant l'ouverture |
+| Rappel des conditions de délivrance de la note | **Fait** : article 4 des conditions générales |
 | Avertissement sur la nature des séances | « Accompagnement complémentaire, qui ne remplace pas un avis ni un traitement médical ». Aucune promesse de guérison pour le magnétisme (allégations thérapeutiques interdites). |
 | Livre des recettes | Obligatoire en micro-entreprise : chronologique, avec date, identité de la cliente, montant, mode de règlement et numéro de la note. Généré par l'application à partir des notes encaissées, exportable en CSV (**fait**) |
 | Note pour une prestation de 25 € ou plus | **Obligatoire** (arrêté n° 83-50/A du 3 octobre 1983), remise dès la séance rendue et avant le paiement, double conservé deux ans au moins. Établie et envoyée par l'application à chaque séance effectuée, imprimable (**fait**). Mentions : date, nom (suivi de « EI ») et adresse de la praticienne, SIRET, nom de la cliente, date et lieu de la séance, décompte, total, « TVA non applicable, article 293 B du CGI » |
-| Rappel des conditions de délivrance de la note | Affichage prévu par l'article 2 de l'arrêté : à reprendre dans les conditions générales |
 | Adresse sur les notes | L'adresse professionnelle y figure obligatoirement : choisir la domiciliation avant la mise en production |
 | Nom de domaine | À acheter (par exemple `auclairdeso.fr`), indispensable pour le HTTPS |
 | Contenu de la vitrine (textes, photos, vidéos, témoignages) | Plus tard |
@@ -322,6 +326,7 @@ Plusieurs données sont **sensibles** : motifs de consultation (parfois liés à
 | 11 | Opérateur mobile de la praticienne (pour les SMS) | Inconnu |
 | 12 | Rendez-vous visibles aussi dans Google Agenda | Non ; lien d'abonnement iCal possible plus tard |
 | 13 | Définition d'un rendez-vous « abandonné » | Refusé, expiré ou annulé |
+| 15 | Que garder quand une cliente supprime son compte | Les séances et leurs notes, 10 ans (obligation comptable), sans rien qui la nomme |
 | 14 | Statistiques visibles par qui | Tout le personnel (praticienne et administrateur) |
 
 ---
@@ -341,7 +346,8 @@ Plusieurs données sont **sensibles** : motifs de consultation (parfois liés à
 | 4 | Fiches clientes, notes privées, marquage « de confiance », déblocage | Fait |
 | 5A | Notes, encaissements, livre des recettes | Fait |
 | 5B | Statistiques | À faire |
-| 6 | Vitrine : contenu, identité visuelle, vidéos, pages légales | À faire |
+| 6A | Pages légales, suppression du compte, purge des photos | Fait |
+| 6B | Vitrine : contenu, identité visuelle, vidéos, page « À propos » | À faire |
 | 7 | Mise en production : nom de domaine, HTTPS, Docker, sauvegardes, Ubuntu 26.04 | À faire |
 
 ## 13. Hors périmètre pour l'instant

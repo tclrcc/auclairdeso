@@ -34,6 +34,22 @@ export const routes: Routes = [
         loadComponent: () => import('./public/login/verify-page').then((m) => m.VerifyPage),
       },
       {
+        path: 'mentions-legales',
+        title: 'Mentions légales — Au clair de So',
+        loadComponent: () => import('./public/legal/mentions-legales-page').then((m) => m.MentionsLegalesPage),
+      },
+      {
+        path: 'conditions-generales',
+        title: 'Conditions générales — Au clair de So',
+        loadComponent: () =>
+          import('./public/legal/conditions-generales-page').then((m) => m.ConditionsGeneralesPage),
+      },
+      {
+        path: 'confidentialite',
+        title: 'Politique de confidentialité — Au clair de So',
+        loadComponent: () => import('./public/legal/confidentialite-page').then((m) => m.ConfidentialitePage),
+      },
+      {
         path: 'mon-espace',
         title: 'Mes rendez-vous — Au clair de So',
         canActivate: [authGuard],
@@ -125,5 +141,15 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./admin/agenda/appointment-detail-page').then((m) => m.AppointmentDetailPage),
   },
-  { path: '**', redirectTo: '' },
+  {
+    path: '',
+    component: PublicLayout,
+    children: [
+      {
+        path: '**',
+        title: 'Page introuvable — Au clair de So',
+        loadComponent: () => import('./public/not-found/not-found-page').then((m) => m.NotFoundPage),
+      },
+    ],
+  },
 ];

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 interface BillRepository extends JpaRepository<Bill, Long> {
 
@@ -22,6 +24,11 @@ interface BillRepository extends JpaRepository<Bill, Long> {
 
     /** Bills waiting for their payment, the oldest first. */
     List<Bill> findByPaidOnIsNullOrderByIssuedOnAscNumberAsc();
+
+    /** The email leaves the bills of a client who erased her account; her name stays (9). */
+    @Modifying(clearAutomatically = true)
+    @Query("update Bill b set b.clientEmail = null where b.clientEmail = :email")
+    int clearEmail(String email);
 
     /** Payments of a period, in the order of the receipt book. */
     List<Bill> findByPaidOnBetweenOrderByPaidOnAscNumberAsc(LocalDate from, LocalDate to);

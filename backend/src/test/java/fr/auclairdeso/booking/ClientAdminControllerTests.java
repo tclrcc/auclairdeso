@@ -41,7 +41,7 @@ class ClientAdminControllerTests {
     @Test
     void theListShowsOnlyTheBlockedClientsOnDemand() {
         given(directory.search("", ClientFilter.BLOCKED)).willReturn(List.of(new ClientSummary(7L,
-            "dora@example.com", "Dora", "Martin", null, "06 12 34 56 78", null, false, true)));
+            "dora@example.com", "Dora", "Martin", null, "06 12 34 56 78", null, false, true, false)));
 
         assertThat(mvc.get().uri("/api/admin/clients?filter=BLOCKED").with(practitioner()))
             .hasStatusOk()

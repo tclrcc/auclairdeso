@@ -29,6 +29,15 @@ class BookingSchedule {
         }
     }
 
+    /** At night, when nobody books: the portraits whose session is older than the retention are deleted. */
+    @Scheduled(cron = "0 30 3 * * *", zone = "Europe/Paris")
+    void everyNight() {
+        var deleted = deadlines.deleteExpiredPhotos();
+        if (deleted > 0) {
+            log.info("{} portrait(s) deleted after their session", deleted);
+        }
+    }
+
     @Scheduled(cron = "${auclairdeso.booking.deadlines.evening-program-cron:0 0 19 * * *}", zone = "Europe/Paris")
     void everyEvening() {
         if (deadlines.publishEveningProgram()) {

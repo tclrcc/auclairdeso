@@ -150,7 +150,12 @@
         <div class="space-y-3 border-t border-night/10 pt-5">
           <label class="flex gap-3 text-sm">
             <input type="checkbox" class="mt-1" [formField]="bookingForm.acceptedTerms" />
-            <span>J'ai 18 ans ou plus, et j'accepte les conditions générales (annulation au moins 48 h avant).</span>
+            <span>
+              J'ai 18 ans ou plus, et j'accepte les
+              <a routerLink="/conditions-generales" target="_blank" class="underline">conditions générales<span
+                class="sr-only"> (nouvel onglet)</span></a>
+              (annulation au moins 48 h avant).
+            </span>
           </label>
           <app-field-errors [state]="bookingForm.acceptedTerms()" />
           <label class="flex gap-3 text-sm">

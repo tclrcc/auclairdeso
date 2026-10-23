@@ -1,0 +1,140 @@
+<app-legal-page heading="Conditions générales">
+  <p>
+    Ces conditions s’appliquent à toute séance réservée sur ce site. En envoyant une demande de
+    rendez-vous, vous les acceptez.
+  </p>
+
+  <h2>1. Qui propose les séances</h2>
+  @if (legal.hasValue()) {
+  @let publisher = legal.value();
+  <p>
+    {{ publisher.publisherName }}, entrepreneur individuel sous le régime de la micro-entreprise,
+    {{ publisher.address }}, SIRET {{ publisher.siret }}.
+    Contact : <a [href]="'mailto:' + publisher.contactEmail">{{ publisher.contactEmail }}</a>.
+  </p>
+  } @else {
+  <p class="text-night/70">Chargement…</p>
+  }
+
+  <h2>2. Les séances</h2>
+  <p>
+    Les séances de voyance, de magnétisme et de rééquilibrage énergétique sont un accompagnement de
+    bien-être. Elles <strong>ne remplacent ni un avis ni un traitement médical</strong>, et aucun
+    résultat n’est promis. Elles sont réservées aux personnes majeures.
+  </p>
+  <p>
+    Selon la séance, elle a lieu au cabinet, chez vous dans un rayon de 20 km autour de
+    Chazey-sur-Ain, en visio par Messenger, ou par téléphone. La durée et le prix de chaque séance
+    sont indiqués sur la page <a routerLink="/seances">Séances et tarifs</a>.
+  </p>
+
+  <h2>3. Réserver</h2>
+  <ol>
+    <li>Vous choisissez une séance, un mode et un créneau, puis vous envoyez votre demande.</li>
+    <li>Le créneau vous est réservé en attendant la réponse.</li>
+    <li>
+      La praticienne confirme ou refuse la demande. Vous recevez sa réponse par courriel. Une demande
+      restée sans réponse expire la veille de la séance au soir, et le créneau est libéré.
+    </li>
+  </ol>
+  <p>
+    Un seul rendez-vous à venir à la fois. Les séances au cabinet sont réservées aux personnes déjà
+    suivies : pour une première séance sur place, contactez directement la praticienne.
+  </p>
+
+  <h2>4. Prix et paiement</h2>
+  <p>
+    Les prix sont en euros, TVA non applicable (article 293 B du code général des impôts). Il n’y a
+    <strong>aucun paiement en ligne</strong> : vous réglez après la séance, par virement, en espèces ou
+    par paiement mobile.
+  </p>
+  <p>
+    Une note vous est remise pour chaque séance, dès qu’elle a eu lieu et avant le paiement, comme le
+    prévoit l’arrêté n° 83-50/A du 3 octobre 1983. Elle vous est envoyée par courriel.
+  </p>
+
+  <h2>5. Annuler ou ne pas venir</h2>
+  <table>
+    <caption class="sr-only">Conséquences d’une annulation</caption>
+    <tbody>
+    <tr>
+      <th scope="row">Vous annulez 48 h ou plus avant</th>
+      <td>Annulation libre, sans conséquence.</td>
+    </tr>
+    <tr>
+      <th scope="row">Vous annulez moins de 48 h avant</th>
+      <td>Possible depuis votre espace. L’annulation est comptée comme un manquement.</td>
+    </tr>
+    <tr>
+      <th scope="row">Deux manquements</th>
+      <td>La réservation en ligne est bloquée. Vous pouvez encore joindre la praticienne directement.</td>
+    </tr>
+    <tr>
+      <th scope="row">Vous ne venez pas</th>
+      <td>La réservation en ligne est bloquée immédiatement.</td>
+    </tr>
+    <tr>
+      <th scope="row">La praticienne annule</th>
+      <td>Elle vous prévient par téléphone et par courriel, et vous proposez un autre créneau.</td>
+    </tr>
+    </tbody>
+  </table>
+  <p>
+    Retirer une demande encore en attente n’est jamais un manquement. Le blocage s’appuie sur votre
+    adresse de connexion et sur votre numéro de téléphone ; la praticienne peut le lever.
+  </p>
+
+  <h2>6. Droit de rétractation</h2>
+  <p>
+    Vous disposez de quatorze jours à compter de la confirmation de votre rendez-vous pour vous
+    rétracter, sans avoir à vous justifier (articles L221-18 et suivants du code de la consommation).
+  </p>
+  <p>
+    Si vous demandez que la séance ait lieu avant la fin de ces quatorze jours — ce que vous faites en
+    choisissant un créneau plus proche —, vous pouvez toujours vous rétracter avant la séance, mais vous
+    perdez ce droit une fois la séance entièrement réalisée. Pour vous rétracter, il suffit de l’écrire,
+    par exemple avec ces mots :
+  </p>
+  <blockquote class="mt-3 border-l-2 border-night/20 pl-4 text-night/80">
+    « Je vous notifie ma rétractation du contrat portant sur la séance du [date], commandée le [date].
+    Nom, adresse, date. »
+  </blockquote>
+
+  <h2>7. Réclamation et médiation</h2>
+  <p>
+    Pour toute réclamation, écrivez d’abord à la praticienne : une solution se trouve presque toujours
+    directement.
+  </p>
+  @if (legal.hasValue() && legal.value().mediator; as mediator) {
+  <p>
+    Si le désaccord persiste, vous pouvez saisir gratuitement le médiateur de la consommation
+    {{ mediator }}
+    @if (legal.value().mediatorUrl; as url) {
+    (<a [href]="url" target="_blank" rel="noopener noreferrer">site du médiateur<span
+    class="sr-only"> (nouvel onglet)</span></a>)
+    }
+    , dans un délai d’un an à compter de votre réclamation écrite.
+  </p>
+  } @else {
+  <p class="rounded-xl bg-moon/30 p-4">
+    Le médiateur de la consommation sera indiqué ici avant l’ouverture du site au public.
+  </p>
+  }
+  <p>
+    La plateforme européenne de règlement en ligne des litiges est accessible à l’adresse
+    <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer"
+    >ec.europa.eu/consumers/odr<span class="sr-only"> (nouvel onglet)</span></a>.
+  </p>
+
+  <h2>8. Vos données</h2>
+  <p>
+    Ce que la praticienne enregistre, pourquoi, combien de temps, et comment supprimer votre compte :
+    voir la <a routerLink="/confidentialite">politique de confidentialité</a>.
+  </p>
+
+  <h2>9. Droit applicable</h2>
+  <p>
+    Ces conditions sont soumises au droit français. En cas de litige, et après avoir cherché une
+    solution amiable, les tribunaux français sont compétents.
+  </p>
+</app-legal-page>

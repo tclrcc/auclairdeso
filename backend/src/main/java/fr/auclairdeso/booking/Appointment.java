@@ -25,6 +25,9 @@ import org.springframework.http.HttpStatus;
 @Table(name = "appointment")
 class Appointment {
 
+    /** What is left of a text the client wrote, once she has erased her account. */
+    private static final String ERASED = "Effacé à la demande de la cliente.";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -229,6 +232,16 @@ class Appointment {
             offeringName, mode, startsAt.atZone(zone).toLocalDateTime(),
             startsAt.minus(cancellationNotice).atZone(zone).toLocalDateTime(),
             priceCents, address, messengerName);
+    }
+
+    /**
+     * Keeps the session but forgets what the client told about it (docs/specification.md, 9).
+     * A text that was there stays a text, so that the constraints of the table still hold.
+     */
+    void anonymise() {
+        this.reason = reason == null ? null : ERASED;
+        this.address = address == null ? null : ERASED;
+        this.messengerName = messengerName == null ? null : ERASED;
     }
 
     ClientHistoryEntry toHistoryEntry(ZoneId zone) {

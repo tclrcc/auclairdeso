@@ -1,0 +1,45 @@
+<app-legal-page heading="Mentions légales">
+  <h2>Éditrice du site</h2>
+  @if (legal.hasValue()) {
+  @let publisher = legal.value();
+  <p>
+    Le site <strong>Au clair de So</strong> est édité par {{ publisher.publisherName }},
+    entrepreneur individuel sous le régime de la micro-entreprise.
+  </p>
+  <ul>
+    <li>Adresse : {{ publisher.address }}</li>
+    <li>SIRET : {{ publisher.siret }}</li>
+    <li>Courriel : <a [href]="'mailto:' + publisher.contactEmail">{{ publisher.contactEmail }}</a></li>
+    <li>TVA non applicable, article 293 B du code général des impôts</li>
+    <li>Directrice de la publication : {{ publisher.publisherName }}</li>
+  </ul>
+
+  <h2>Hébergement</h2>
+  <p>Le site et ses données sont hébergés en France par {{ publisher.host }}.</p>
+  } @else {
+  <p class="text-night/70">Chargement…</p>
+  }
+
+  <h2>Nature des séances</h2>
+  <p>
+    Les séances proposées sont un accompagnement de bien-être. Elles ne remplacent ni un avis, ni un
+    diagnostic, ni un traitement médical, et ne constituent ni un conseil juridique, ni un conseil
+    financier. Elles sont réservées aux personnes majeures. En cas de problème de santé, consultez un
+    professionnel de santé.
+  </p>
+
+  <h2>Propriété intellectuelle</h2>
+  <p>
+    Les textes, le logo et les images de ce site appartiennent à l’éditrice. Toute reproduction, même
+    partielle, sans son accord écrit est interdite. Les photographies que vous envoyez lors d’une
+    réservation restent les vôtres : elles servent uniquement à la séance et sont supprimées ensuite.
+  </p>
+
+  <h2>Vos données</h2>
+  <p>
+    La manière dont vos informations sont utilisées et conservées est détaillée dans la
+    <a routerLink="/confidentialite">politique de confidentialité</a>. Les règles des séances, du paiement
+    et de l’annulation figurent dans les
+    <a routerLink="/conditions-generales">conditions générales</a>.
+  </p>
+</app-legal-page>

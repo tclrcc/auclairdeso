@@ -39,14 +39,16 @@ class ClientFiles {
     }
 
     ClientFile correct(long id, ClientCorrection correction) {
-        var client = find(id);
+        var client = erasable(id);
         changeEmail(client, correction.email());
         client.correct(correction);
         return fileOf(client);
     }
 
     ClientFile trust(long id, boolean trusted) {
-        return change(id, client -> client.markTrusted(trusted));
+        var client = erasable(id);
+        client.markTrusted(trusted);
+        return fileOf(client);
     }
 
     ClientFile block(long id) {
@@ -58,7 +60,7 @@ class ClientFiles {
     }
 
     ClientNoteView addNote(long id, NoteRequest note) {
-        var client = find(id);
+        var client = erasable(id);
         return notes.save(new ClientNote(client, note.text(), Instant.now(clock))).toView(rules.zone());
     }
 
@@ -107,6 +109,19 @@ class ClientFiles {
 
     private boolean bookedOnline(Client client) {
         return appointments.existsByClientAndSource(client, AppointmentSource.ONLINE);
+    }
+
+    /**
+     * A client who erased her account keeps no details, no trust and no notes (docs/specification.md, 9):
+     * writing any of them back would undo her erasure, so the screens that do are refused.
+     */
+    private Client erasable(long id) {
+        var client = find(id);
+        if (client.isErased()) {
+            throw refused(HttpStatus.CONFLICT,
+                "Cette cliente a supprimé son compte : sa fiche ne peut plus être modifiée.");
+        }
+        return client;
     }
 
     private Client find(long id) {
