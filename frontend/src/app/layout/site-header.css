@@ -6,6 +6,7 @@
   border-radius: 9999px;
   padding: 0.4rem 1rem;
   font-weight: 500;
+  white-space: nowrap;
   transition: background-color 150ms, color 150ms;
 }
 

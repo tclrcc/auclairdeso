@@ -1,0 +1,32 @@
+<div class="mx-auto w-full max-w-[21rem]">
+  <div class="relative overflow-hidden rounded-3xl bg-night shadow-lg shadow-night/10">
+    <!-- 480 × 854 : the portrait of a phone. The ratio is held by the cover as well, so the
+         layout does not jump when one replaces the other. -->
+    <video #player class="block aspect-9/16 w-full" [src]="video().src" [attr.aria-label]="video().title"
+           preload="none" playsinline controls (error)="failed.set(true)"></video>
+
+    @if (!playing()) {
+    <button type="button" (click)="play()"
+            class="group absolute inset-0 flex flex-col items-center justify-center gap-5 bg-night px-6 text-center text-pearl focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-pearl">
+      <img src="logo.webp" alt="" width="88" height="88" class="size-22 rounded-full" />
+      <span class="font-display text-3xl">{{ video().title }}</span>
+      <span aria-hidden="true"
+            class="flex size-16 items-center justify-center rounded-full border border-pearl/40 transition-colors group-hover:bg-pearl/10">
+        <svg viewBox="0 0 24 24" class="ml-1 size-7 fill-pearl"><path d="M5 3l16 9-16 9z" /></svg>
+      </span>
+      <span class="text-sm text-pearl/70">{{ video().durationLabel }} · avec le son</span>
+    </button>
+    }
+  </div>
+
+  @if (failed()) {
+  <p role="alert" class="mt-3 text-sm text-night/70">La vidéo ne peut pas être lue pour le moment.</p>
+  }
+
+  @if (video().transcript) {
+  <details class="mt-3">
+    <summary class="cursor-pointer text-sm underline underline-offset-4">Ce qui est dit dans la vidéo</summary>
+    <p class="mt-2 text-sm leading-relaxed text-night/80">{{ video().transcript }}</p>
+  </details>
+  }
+</div>

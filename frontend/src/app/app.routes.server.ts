@@ -2,6 +2,7 @@ import { RenderMode, ServerRoute } from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
   { path: 'seances', renderMode: RenderMode.Server },
+  { path: 'a-propos', renderMode: RenderMode.Server },
   { path: 'mentions-legales', renderMode: RenderMode.Server },
   { path: 'conditions-generales', renderMode: RenderMode.Server },
   { path: 'confidentialite', renderMode: RenderMode.Server },

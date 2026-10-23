@@ -305,7 +305,7 @@ Plusieurs données sont **sensibles** : motifs de consultation (parfois liés à
 | Note pour une prestation de 25 € ou plus | **Obligatoire** (arrêté n° 83-50/A du 3 octobre 1983), remise dès la séance rendue et avant le paiement, double conservé deux ans au moins. Établie et envoyée par l'application à chaque séance effectuée, imprimable (**fait**). Mentions : date, nom (suivi de « EI ») et adresse de la praticienne, SIRET, nom de la cliente, date et lieu de la séance, décompte, total, « TVA non applicable, article 293 B du CGI » |
 | Adresse sur les notes | L'adresse professionnelle y figure obligatoirement : choisir la domiciliation avant la mise en production |
 | Nom de domaine | À acheter (par exemple `auclairdeso.fr`), indispensable pour le HTTPS |
-| Contenu de la vitrine (textes, photos, vidéos, témoignages) | Plus tard |
+| Contenu de la vitrine (textes, photos, vidéos, témoignages) | **En partie** : page `/a-propos` avec la vidéo de présentation et le cadre des séances. Les mots de la praticienne sur son parcours (`JOURNEY`) et la transcription de la vidéo restent à écrire avec elle ; tant qu'ils sont vides, leur section n'apparaît pas |
 
 ---
 
@@ -326,6 +326,7 @@ Plusieurs données sont **sensibles** : motifs de consultation (parfois liés à
 | 11 | Opérateur mobile de la praticienne (pour les SMS) | Inconnu |
 | 12 | Rendez-vous visibles aussi dans Google Agenda | Non ; lien d'abonnement iCal possible plus tard |
 | 13 | Définition d'un rendez-vous « abandonné » | Refusé, expiré ou annulé |
+| 16 | Où vivent les vidéos et les photos de la vitrine | Dans un dossier du VPS (`MEDIA_DIR`), servi par nginx sous `/contenus/` ; jamais dans le dépôt, qui est public |
 | 15 | Que garder quand une cliente supprime son compte | Les séances et leurs notes, 10 ans (obligation comptable), sans rien qui la nomme |
 | 14 | Statistiques visibles par qui | Tout le personnel (praticienne et administrateur) |
 
@@ -347,7 +348,7 @@ Plusieurs données sont **sensibles** : motifs de consultation (parfois liés à
 | 5A | Notes, encaissements, livre des recettes | Fait |
 | 5B | Statistiques | À faire |
 | 6A | Pages légales, suppression du compte, purge des photos | Fait |
-| 6B | Vitrine : contenu, identité visuelle, vidéos, page « À propos » | À faire |
+| 6B | Vitrine : page « À propos », vidéo de présentation, navigation sur téléphone | **Fait** : reste le contenu de la praticienne (parcours, transcription, photos) et les témoignages |
 | 7 | Mise en production : nom de domaine, HTTPS, Docker, sauvegardes, Ubuntu 26.04 | À faire |
 
 ## 13. Hors périmètre pour l'instant

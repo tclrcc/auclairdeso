@@ -66,3 +66,12 @@ export const GOOD_TO_KNOW: readonly string[] = [
   'Vous pouvez annuler librement jusqu’à 48 h avant la séance.',
   'Les séances sont réservées aux personnes majeures.',
 ];
+
+/** The band that sends to the "À propos" page, at the foot of the home page. */
+export const ABOUT_TEASER = {
+  title: 'Faire connaissance',
+  text:
+    'So se présente en vidéo, et dit dans quel cadre elle reçoit : ce qu’une séance est, ' +
+    'et ce qu’elle n’est pas.',
+  link: 'À propos de So',
+};

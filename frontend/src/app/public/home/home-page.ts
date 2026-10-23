@@ -6,6 +6,7 @@ import { formatDuration } from '../../shared/duration';
 import { EurosPipe } from '../../shared/euros-pipe';
 import { CATEGORY_LABELS, Offering } from '../offerings/offering';
 import {
+  ABOUT_TEASER,
   BOOKING_STEPS,
   CATEGORY_INTROS,
   CATEGORY_ORDER,
@@ -38,6 +39,7 @@ export class HomePage {
   protected readonly steps = BOOKING_STEPS;
   protected readonly places = CONSULTATION_PLACES;
   protected readonly goodToKnow = GOOD_TO_KNOW;
+  protected readonly about = ABOUT_TEASER;
   protected readonly crescent = CRESCENT_PATH;
   protected readonly sparkle = SPARKLE_PATH;
   protected readonly formatDuration = formatDuration;

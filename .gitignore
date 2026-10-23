@@ -32,3 +32,8 @@ backend/config/
 
 # Secrets of the acceptance environment, on the VPS only
 deploy/.env
+
+# Videos and photos of the vitrine: copied onto the VPS, served at /contenus/ (deploy/nginx.conf).
+# In development the same files go to frontend/public/contenus/, where ng serve publishes them.
+frontend/public/contenus/
+deploy/contenus/

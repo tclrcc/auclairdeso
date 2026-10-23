@@ -19,6 +19,11 @@ export const routes: Routes = [
         loadComponent: () => import('./public/offerings/offerings-page').then((m) => m.OfferingsPage),
       },
       {
+        path: 'a-propos',
+        title: 'À propos — Au clair de So',
+        loadComponent: () => import('./public/about/about-page').then((m) => m.AboutPage),
+      },
+      {
         path: 'reserver/:slug',
         title: 'Réserver une séance — Au clair de So',
         loadComponent: () => import('./booking/booking-page').then((m) => m.BookingPage),
