@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mockingDetails;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static fr.auclairdeso.TestcontainersConfiguration.NO_MAIL_HEALTH_CHECK;
 
 import com.jayway.jsonpath.JsonPath;
 import fr.auclairdeso.TestcontainersConfiguration;
@@ -36,6 +37,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * The scheduling is off: the test calls the deadlines itself, after moving its clock.
  */
 @SpringBootTest(properties = {
+    NO_MAIL_HEALTH_CHECK,
     "auclairdeso.identity.practitioners=so@example.com",
     "auclairdeso.notification.practitioner-phone=06 00 00 00 00",
     "auclairdeso.scheduling.enabled=false"})

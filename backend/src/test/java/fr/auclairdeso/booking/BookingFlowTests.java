@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static fr.auclairdeso.TestcontainersConfiguration.NO_MAIL_HEALTH_CHECK;
 
 import fr.auclairdeso.TestcontainersConfiguration;
 import java.nio.charset.StandardCharsets;
@@ -31,7 +32,7 @@ import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-@SpringBootTest
+@SpringBootTest(properties = NO_MAIL_HEALTH_CHECK)
 @AutoConfigureMockMvc
 @Import({TestcontainersConfiguration.class, BookingFlowTests.FrozenClock.class})
 @Testcontainers(disabledWithoutDocker = true)

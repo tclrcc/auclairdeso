@@ -4,6 +4,7 @@ import static fr.auclairdeso.TestUsers.practitioner;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static fr.auclairdeso.TestcontainersConfiguration.NO_MAIL_HEALTH_CHECK;
 
 import com.jayway.jsonpath.JsonPath;
 import fr.auclairdeso.TestcontainersConfiguration;
@@ -30,7 +31,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 /**
  * The right to erasure (docs/specification.md, 9), and the nightly deletion of the portraits.
  */
-@SpringBootTest
+@SpringBootTest(properties = NO_MAIL_HEALTH_CHECK)
 @AutoConfigureMockMvc
 @Import({TestcontainersConfiguration.class, AccountErasureFlowTests.FrozenClock.class})
 @Testcontainers(disabledWithoutDocker = true)

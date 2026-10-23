@@ -4,6 +4,7 @@ import static fr.auclairdeso.TestUsers.practitioner;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static fr.auclairdeso.TestcontainersConfiguration.NO_MAIL_HEALTH_CHECK;
 
 import com.jayway.jsonpath.JsonPath;
 import fr.auclairdeso.TestcontainersConfiguration;
@@ -27,7 +28,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-@SpringBootTest
+@SpringBootTest(properties = NO_MAIL_HEALTH_CHECK)
 @AutoConfigureMockMvc
 @Import({TestcontainersConfiguration.class, AgendaFlowTests.FrozenClock.class})
 @Testcontainers(disabledWithoutDocker = true)

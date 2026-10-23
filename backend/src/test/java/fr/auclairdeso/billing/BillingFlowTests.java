@@ -4,6 +4,7 @@ import static fr.auclairdeso.TestUsers.practitioner;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mockingDetails;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static fr.auclairdeso.TestcontainersConfiguration.NO_MAIL_HEALTH_CHECK;
 
 import com.jayway.jsonpath.JsonPath;
 import fr.auclairdeso.TestcontainersConfiguration;
@@ -35,6 +36,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * From a completed session to the receipt book: the bill is issued, numbered, emailed, then paid.
  */
 @SpringBootTest(properties = {
+    NO_MAIL_HEALTH_CHECK,
     "auclairdeso.billing.practitioner-name=Sophie Exemple EI",
     "auclairdeso.billing.address=1 place de la Mairie, 01150 Chazey-sur-Ain",
     "auclairdeso.billing.siret=123 456 789 00012"})
