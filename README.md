@@ -15,7 +15,7 @@ Site vitrine et prise de rendez-vous en ligne pour une praticienne médium.
 |-------------|--------------------------------------|
 | `backend/`  | API Spring Boot (Maven)              |
 | `frontend/` | Application Angular                  |
-| `infra/`    | Docker Compose, configuration nginx, scripts |
+| `deploy/`   | Docker Compose, configuration nginx, scripts |
 
 ## Statut
 

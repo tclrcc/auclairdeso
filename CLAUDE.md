@@ -1,7 +1,7 @@
 # CLAUDE.md — Au clair de So
 
 Site vitrine + prise de rendez-vous en ligne pour une médium en micro-entreprise.
-Monorepo : `backend/` (Spring Boot), `frontend/` (Angular SSR), `infra/` (Docker Compose, nginx).
+Monorepo : `backend/` (Spring Boot), `frontend/` (Angular SSR), `deploy/` (Docker Compose, nginx, script de déploiement).
 Le document de cadrage fait référence pour le périmètre, l'architecture et la roadmap.
 
 ## Mode de travail
@@ -13,24 +13,32 @@ Le document de cadrage fait référence pour le périmètre, l'architecture et l
 ## Stack
 - Java 25, Spring Boot 4.1.x, Spring Modulith 2.1, Spring Security 7.1, Spring Data JPA (Hibernate 7), PostgreSQL 17, Flyway, Maven wrapper.
 - Angular 22 : standalone, zoneless, signals, Signal Forms, httpResource, @Service, OnPush par défaut, @angular/ssr, Angular CDK/Aria, Tailwind CSS, Vitest, Playwright.
-- Intégrations : Stripe Checkout, Google Calendar API v3, Brevo (SMTP), iCal4j.
+- Intégrations : envoi d'e-mails par le SMTP de Gmail (mot de passe d'application, en attendant un nom de domaine). Pas de paiement en ligne ni de synchronisation d'agenda (spec, 13) ; fournisseur de SMS à choisir.
 - Infra : Docker Compose sur VPS OVH, nginx existant comme reverse proxy, GitHub Actions.
 
-## Commandes (à ajuster une fois le dépôt créé)
-- Backend : `.\mvnw.cmd verify` (Windows) ou `./mvnw verify` (Linux/CI), `.\mvnw.cmd spring-boot:run`
-- Frontend : `npm ci`, `ng serve`, `ng test`, `ng build` (SSR + prérendu)
+## Commandes
+- Backend (dans `backend/`) : `./mvnw verify` (Linux/CI) ou `.\mvnw.cmd verify` (Windows), `./mvnw spring-boot:run`
+  - Un seul test : `./mvnw test -Dtest=ModularityTests` (ou `Classe#méthode`)
+- Frontend (dans `frontend/`) : `npm ci`, `ng serve` (proxy API : `proxy.conf.json`), `ng build` (SSR + prérendu)
+  - Tests : `npx ng test --watch=false` (comme la CI) ; un seul fichier : `npx ng test --watch=false --include=src/app/booking/booking-form-model.spec.ts`
+- CI (`.github/workflows/ci.yml`) : `./mvnw -B verify` (Java 25) ; `ng test` puis `ng build` (Node 24).
 
 ## Architecture backend
-- Package racine `fr.auclairdeso`, un sous-package par module : identity, catalog, scheduling, booking, payment, calendar, notification, content, shared.
+- Package racine `fr.auclairdeso`, un sous-package par module : identity, catalog, booking, billing, legal, notification, shared. La spec (`docs/specification.md`, 12) ne prévoit aucun module de plus : le planning (plages, fermetures, créneaux) vit dans `booking`, le paiement en ligne et la synchronisation Google Agenda sont hors périmètre (13), et le contenu de la vitrine est dans le frontend, les médias dans `MEDIA_DIR` (décision 16). Les tranches à venir (SMS, question ciblée, statistiques) s'ajoutent aux modules existants.
+  - `booking` : rendez-vous, fiches clients, notes privées, fermetures, et l'effacement de compte (`AccountErasureController`, `ClientErasure`, événement `ClientErased`). Il porte aussi les tâches planifiées (`BookingSchedule`), dont la purge nocturne des photos après la séance.
+  - `billing` : une note par séance réalisée (`Bill`, numérotation `BillNumbers`), encaissements, et livre des recettes (`ReceiptBook`, export CSV). Identité de la praticienne via `auclairdeso.billing.*` (`BILLING_*` dans `deploy/.env`).
+  - `legal` : alimente les pages légales à partir de `auclairdeso.legal.*` (`LEGAL_*` dans `deploy/.env`) ; le médiateur reste vide tant qu'il n'est pas choisi.
+  - Effacement de compte : `booking` publie `ClientErased` ; `identity` supprime la connexion et les sessions, `billing` retire l'e-mail des notes. Les notes et le livre des recettes sont conservés 10 ans, avec le nom (arrêté 83-50/A).
+- Les migrations sont dans `backend/src/main/resources/db/migration` (`V<n>__description.sql`) ; prendre le numéro suivant.
 - Un module n'utilise que l'API publique d'un autre (package racine du module) ou ses événements ; `ApplicationModules.of(...).verify()` en test.
 - Records pour DTO et value objects ; erreurs HTTP en ProblemDetail.
 - Dates en `Instant` / `timestamptz` ; conversion Europe/Paris uniquement à l'affichage.
 - Une migration Flyway mergée ne se modifie jamais : on en ajoute une nouvelle.
 
 ## Règles non négociables
-- Pas de double réservation : contrainte d'exclusion PostgreSQL sur (practitioner_id, slot) pour les statuts PENDING_PAYMENT et CONFIRMED.
-- Webhooks Stripe idempotents (identifiant d'événement stocké).
+- Pas de double réservation : contrainte d'exclusion PostgreSQL `appointment_no_overlap` (plage `starts_at`–`occupied_until`) ; seuls les statuts REQUESTED et CONFIRMED gardent le créneau (`AppointmentStatus.HOLDING_SLOT`).
 - Consentements horodatés : version des CGV, majorité, demande d'exécution anticipée sous 14 jours.
+  - À vérifier (audit) : écart avec `docs/specification.md`, qui ne prévoit que les consentements à la majorité, aux conditions générales et au traitement des données et traite le droit de rétractation de 14 jours dans les conditions générales ; aucune « demande d'exécution anticipée » n'y figure. Règle conservée telle quelle en attendant la décision.
 - Aucune donnée carte stockée, aucun secret dans le dépôt (`.env` hors Git).
 - Textes du site : ton moderne et sobre, aucune promesse de résultat, aucun conseil médical, juridique ou financier.
 
@@ -42,13 +50,14 @@ Le document de cadrage fait référence pour le périmètre, l'architecture et l
 | Créneau | Slot |
 | Plage récurrente / exception | RecurringWindow / AvailabilityException |
 | Rendez-vous | Appointment |
-| Acompte | Deposit |
 | Cabinet, visio, téléphone, écrit | IN_PERSON, VIDEO, PHONE, WRITTEN |
 
 ## Frontend
-- Routes publiques prérendues ; `account/` et `admin/` en rendu client, protégées par des guards.
+- Rendu défini dans `app.routes.server.ts` : `account/` (route `mon-espace`), `admin/`, `reserver/:slug` et `connexion` en rendu client (guards) ; `''`, `seances`, `a-propos` et les pages légales (`mentions-legales`, `conditions-generales`, `confidentialite`) en rendu serveur (`RenderMode.Server`) ; le reste est prérendu. Toute nouvelle route doit y être déclarée.
+- Pages publiques dans `public/` (dont `about/` et `legal/`, ce dernier lit l'identité légale depuis l'API) ; facturation côté praticienne dans `admin/billing/` (note de séance, encaissements, livre des recettes) ; suppression de compte dans `account/account-erasure.ts`.
 - Jamais `window` ou `document` sans vérifier la plateforme (compatibilité SSR).
-- Le client API est généré depuis l'OpenAPI du backend : ne pas l'éditer à la main.
+- Le client API doit être généré depuis l'OpenAPI du backend (springdoc) : ne pas l'éditer à la main. Pas encore en place : les appels passent pour l'instant par des fichiers `*-api.ts` écrits à la main (ex. `booking/booking-api.ts`).
+- Les règles Angular détaillées (signals, Signal Forms, pas de `standalone: true`, pas d'`OnPush` explicite, a11y) sont dans `frontend/CLAUDE.md`.
 - Accessibilité visée : WCAG AA. Mobile d'abord, surtout pour l'admin.
 
 ## Déploiement (recette)
