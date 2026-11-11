@@ -64,8 +64,8 @@ export class AccountPage {
   protected async erase(): Promise<void> {
     const sure = confirm(
       'Supprimer définitivement votre compte et vos informations ?\n\n'
-      + 'Vos séances passées sont conservées sans votre nom, avec leurs notes, que la loi impose de '
-      + 'garder dix ans. Cette action ne peut pas être annulée.',
+      + 'Vos séances passées sont conservées, avec leurs notes et votre nom : la loi impose de garder '
+      + 'ces notes dix ans, pour des raisons comptables. Cette action ne peut pas être annulée.',
     );
     if (!sure) {
       return;
