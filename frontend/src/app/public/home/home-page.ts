@@ -1,47 +1,46 @@
 import { Component, computed, inject } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 import { httpResource } from '@angular/common/http';
 import { Meta } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { formatDuration } from '../../shared/duration';
 import { EurosPipe } from '../../shared/euros-pipe';
+import { JOURNEY, PORTRAIT } from '../about/about-content';
 import { CATEGORY_LABELS, Offering } from '../offerings/offering';
-import {
-  ABOUT_TEASER,
-  BOOKING_STEPS,
-  CATEGORY_INTROS,
-  CATEGORY_ORDER,
-  CONSULTATION_PLACES,
-  GOOD_TO_KNOW,
-} from './home-content';
-import { CRESCENT_PATH, SPARKLE_PATH } from './crescent';
-import { MoonPhase } from './moon-phase';
-import { OpeningEye } from './opening-eye';
+import { ABOUT_PREVIEW, BOOKING_STEPS, CATEGORY_ORDER, HERO } from './home-content';
+import { HeroIllustration } from './hero-illustration';
+
+/** What the "Faire connaissance avec So" card needs; null hides it. */
+export interface AboutPreview {
+  readonly portrait: string;
+  readonly excerpt: string;
+}
+
+/** The card shows real content only: no portrait or no written path, no card. */
+export function aboutPreviewOf(portrait: string | null, journey: readonly string[]): AboutPreview | null {
+  return portrait && journey.length > 0 ? { portrait, excerpt: journey[0] } : null;
+}
 
 @Component({
   selector: 'app-home-page',
-  imports: [RouterLink, EurosPipe, MoonPhase, OpeningEye],
+  imports: [RouterLink, NgOptimizedImage, EurosPipe, HeroIllustration],
   templateUrl: './home-page.html',
-  styleUrl: './home-page.css',
 })
 export class HomePage {
   protected readonly offerings = httpResource<Offering[]>(() => '/api/offerings', { defaultValue: [] });
 
-  /** The offerings by category, clairvoyance first; an empty category is not shown. */
-  protected readonly groups = computed(() =>
-    CATEGORY_ORDER.map((category) => ({
-      category,
-      label: CATEGORY_LABELS[category],
-      intro: CATEGORY_INTROS[category],
-      offerings: this.offerings.value().filter((offering) => offering.category === category),
-    })).filter((group) => group.offerings.length > 0),
+  /** Clairvoyance first, then magnetism, then energy rebalancing; the order of the API within each. */
+  protected readonly sortedOfferings = computed(() =>
+    [...this.offerings.value()].sort(
+      (a, b) => CATEGORY_ORDER.indexOf(a.category) - CATEGORY_ORDER.indexOf(b.category),
+    ),
   );
 
+  protected readonly hero = HERO;
   protected readonly steps = BOOKING_STEPS;
-  protected readonly places = CONSULTATION_PLACES;
-  protected readonly goodToKnow = GOOD_TO_KNOW;
-  protected readonly about = ABOUT_TEASER;
-  protected readonly crescent = CRESCENT_PATH;
-  protected readonly sparkle = SPARKLE_PATH;
+  protected readonly about = ABOUT_PREVIEW;
+  protected readonly aboutPreview = aboutPreviewOf(PORTRAIT, JOURNEY);
+  protected readonly categoryLabels = CATEGORY_LABELS;
   protected readonly formatDuration = formatDuration;
 
   constructor() {

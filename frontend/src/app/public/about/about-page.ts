@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { Meta } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
-// The sparkle is the mark of the lists of the site: the home page already draws it.
-import { SPARKLE_PATH } from '../home/crescent';
+// The four-pointed sparkle of the logo marks the lists of the site.
+import { SPARKLE_PATH } from '../home/sparkle';
 import { COMMITMENTS, INTRO, JOURNEY, PRESENTATION } from './about-content';
 import { PresentationVideo } from './presentation-video';
 

@@ -5,73 +5,42 @@ import { OfferingCategory } from '../offerings/offering';
  * Rule for every text: describe the session, never promise a result.
  */
 
-/** The order of the categories on the page: clairvoyance first. */
-export const CATEGORY_ORDER: readonly OfferingCategory[] = ['CLAIRVOYANCE', 'MAGNETISM', 'ENERGY_REBALANCING'];
-
-export const CATEGORY_INTROS: Record<OfferingCategory, string> = {
-  CLAIRVOYANCE:
-    'Un échange autour de ce qui vous occupe : vie sentimentale, famille, travail, un choix à faire. ' +
-    'La séance part de votre question et de votre photo.',
-  MAGNETISM:
-    'Un accompagnement par le magnétisme, en présence ou à distance. ' +
-    'Il vient en complément d’un suivi médical, jamais à sa place.',
-  ENERGY_REBALANCING: 'Un temps calme pour faire le point sur votre énergie, en présence ou à distance.',
+export const HERO = {
+  eyebrow: 'Voyance · Magnétisme · Rééquilibrage énergétique',
+  title: 'Une présence à l’écoute, pour y voir plus clair',
+  text:
+    'Des séances sur rendez-vous, autour de Chazey-sur-Ain et à distance. ' +
+    'Choisissez votre séance, demandez un créneau, So vous confirme.',
+  offeringsLink: 'Voir les séances',
+  aboutLink: 'Découvrir So',
 };
 
+/** The order of the offerings on the page: clairvoyance first. */
+export const CATEGORY_ORDER: readonly OfferingCategory[] = ['CLAIRVOYANCE', 'MAGNETISM', 'ENERGY_REBALANCING'];
+
 export interface BookingStep {
-  /** The lit part of the moon drawn next to the step, from 0 (new moon) to 1 (full moon). */
-  readonly illuminated: number;
   readonly title: string;
   readonly text: string;
 }
 
 export const BOOKING_STEPS: readonly BookingStep[] = [
   {
-    illuminated: 0.15,
     title: 'Choisissez votre séance',
-    text: 'Puis la façon de consulter et un créneau libre, du lendemain jusqu’à deux mois à l’avance.',
+    text: 'Chaque séance indique son format, sa durée et son tarif.',
   },
   {
-    illuminated: 0.5,
-    title: 'Confirmez votre adresse email',
-    text: 'Vous recevez un lien qui vous ramène à votre demande. Pas de compte à créer, pas de mot de passe.',
+    title: 'Demandez un créneau',
+    text: 'Chaque demande est validée à la main par So, qui garde la main sur son agenda.',
   },
   {
-    illuminated: 0.8,
-    title: 'So valide votre demande',
-    text: 'Chaque demande est lue personnellement. Le créneau vous est réservé en attendant sa réponse par email.',
-  },
-  {
-    illuminated: 1,
-    title: 'La séance',
-    text: 'Vous réglez après la séance, par virement, en espèces ou par paiement mobile.',
+    title: 'Recevez la confirmation',
+    text:
+      'Un e-mail vous prévient. Le règlement se fait après la séance : virement, espèces ou paiement mobile.',
   },
 ];
 
-export interface PracticalInfo {
-  readonly title: string;
-  readonly text: string;
-}
-
-export const CONSULTATION_PLACES: readonly PracticalInfo[] = [
-  { title: 'À domicile', text: 'Chez vous, dans un rayon de 20 km autour de Chazey-sur-Ain.' },
-  { title: 'En visio', text: 'Par Messenger, à l’heure du rendez-vous.' },
-  { title: 'Par téléphone', text: 'Vous appelez le numéro indiqué dans l’email de confirmation.' },
-  { title: 'En présentiel', text: 'Réservé aux personnes déjà suivies.' },
-];
-
-export const GOOD_TO_KNOW: readonly string[] = [
-  'Le prix est le même, quelle que soit la façon de consulter.',
-  'Rien n’est payé en ligne : vous réglez après la séance.',
-  'Vous pouvez annuler librement jusqu’à 48 h avant la séance.',
-  'Les séances sont réservées aux personnes majeures.',
-];
-
-/** The band that sends to the "À propos" page, at the foot of the home page. */
-export const ABOUT_TEASER = {
-  title: 'Faire connaissance',
-  text:
-    'So se présente en vidéo, et dit dans quel cadre elle reçoit : ce qu’une séance est, ' +
-    'et ce qu’elle n’est pas.',
-  link: 'À propos de So',
+/** The card that introduces So, shown only once her portrait and her path are written (about-content.ts). */
+export const ABOUT_PREVIEW = {
+  title: 'Faire connaissance avec So',
+  link: 'Découvrir So',
 };

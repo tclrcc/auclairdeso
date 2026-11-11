@@ -38,6 +38,13 @@ export const INTRO: readonly string[] = [
  */
 export const JOURNEY: readonly string[] = [];
 
+/**
+ * Her portrait, round, for the "Faire connaissance avec So" card of the home page: a path under
+ * /contenus/ (MEDIA_DIR), as the video. Null as long as there is none: the card is not shown, neither
+ * is it while JOURNEY is empty, since its text is the start of her path.
+ */
+export const PORTRAIT: string | null = null;
+
 export interface Commitment {
   readonly title: string;
   readonly text: string;

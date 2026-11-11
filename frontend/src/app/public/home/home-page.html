@@ -1,138 +1,93 @@
-<main>
-  <!-- The night: the logo, opened up to the size of the page -->
-  <section class="relative isolate overflow-hidden bg-night text-pearl">
-    <div class="relative mx-auto flex max-w-3xl flex-col items-center px-5 pb-32 pt-12 text-center sm:pb-44 sm:pt-16">
-      <div aria-hidden="true"
-           class="absolute left-1/2 top-4 -z-10 aspect-square w-[min(120vw,44rem)] -translate-x-1/2 rounded-full border border-lilac/30 sm:top-0">
-        <div class="absolute inset-0 rotate-[38deg]">
-          <svg viewBox="-30 -30 60 60" class="moonlight absolute left-1/2 top-0 size-16 -translate-x-1/2 -translate-y-1/2 -rotate-[38deg] sm:size-20">
-            <path [attr.d]="crescent" class="fill-pearl" />
-          </svg>
-        </div>
-        <svg viewBox="-10 -10 20 20" class="absolute left-[6%] top-[30%] size-4 fill-pearl/70"><path [attr.d]="sparkle" /></svg>
-        <svg viewBox="-10 -10 20 20" class="absolute right-[9%] top-[64%] size-3 fill-pearl/60"><path [attr.d]="sparkle" /></svg>
-        <svg viewBox="-10 -10 20 20" class="absolute left-[22%] top-[3%] size-2.5 fill-pearl/50"><path [attr.d]="sparkle" /></svg>
+<main class="pb-section">
+  <section class="night-container grid items-center gap-12 pt-10 md:grid-cols-[1.15fr_0.85fr] md:pt-16">
+    <div>
+      <p class="night-eyebrow">{{ hero.eyebrow }}</p>
+      <h1 class="night-h1 mt-5">{{ hero.title }}</h1>
+      <p class="night-lead mt-6 max-w-xl">{{ hero.text }}</p>
+      <div class="mt-9 flex flex-wrap items-center gap-x-8 gap-y-4">
+        <a routerLink="/seances" class="btn-gold">{{ hero.offeringsLink }}</a>
+        <a routerLink="/a-propos" class="night-link inline-flex min-h-11 items-center font-medium">
+          {{ hero.aboutLink }}<span aria-hidden="true">&nbsp;→</span>
+        </a>
       </div>
-
-      <app-opening-eye class="block w-72 text-pearl sm:w-96" />
-
-      <h1 class="mt-6 text-balance font-display text-6xl leading-none sm:text-8xl">Au clair de So</h1>
-      <p class="mt-6 max-w-xl text-balance text-lg leading-relaxed text-pearl/80">
-        Voyance, magnétisme et rééquilibrage énergétique.
-        <span class="block">À domicile autour de <span class="whitespace-nowrap">Chazey-sur-Ain</span>, en visio ou par téléphone.</span>
-      </p>
-      <a href="#seances" class="btn-pearl mt-10">Réserver une séance</a>
     </div>
 
-    <!-- The horizon: the daylight of the next section rises like the edge of the moon -->
-    <div aria-hidden="true"
-         class="absolute -bottom-16 left-1/2 h-32 w-[180%] -translate-x-1/2 rounded-[50%] bg-sand sm:-bottom-24 sm:h-48">
-    </div>
+    <app-hero-illustration class="mx-auto w-full max-w-72 md:max-w-110" />
   </section>
 
-  <section id="seances" aria-labelledby="seances-title" class="bg-sand px-5 pb-20 pt-8 sm:pb-28">
-    <div class="mx-auto max-w-5xl">
-      <h2 id="seances-title" class="font-display text-5xl sm:text-6xl">Les séances</h2>
-
-      @if (offerings.error()) {
-      <p class="mt-8" role="alert">
-        Les séances ne peuvent pas être affichées pour le moment.
-        <a routerLink="/seances" class="underline">Voir la page des séances</a>
-      </p>
-      } @else if (offerings.isLoading()) {
-      <p class="mt-8 text-night/70">Chargement…</p>
-      } @else {
-      @for (group of groups(); track group.category) {
-      <div class="mt-12 grid gap-6 border-t border-night/15 pt-8 md:grid-cols-[17rem_1fr] md:gap-14">
-        <div>
-          <h3 class="font-display text-4xl">{{ group.label }}</h3>
-          <p class="mt-3 leading-relaxed text-night/70">{{ group.intro }}</p>
-        </div>
-
-        <ul class="divide-y divide-night/10">
-          @for (offering of group.offerings; track offering.slug) {
-          <li>
-            <a [routerLink]="['/reserver', offering.slug]"
-               class="group -mx-3 flex items-center gap-4 rounded-xl px-3 py-4 transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-night">
-                    <span class="min-w-0 flex-1">
-                      <span class="block text-lg font-medium">{{ offering.name }}</span>
-                      <span class="mt-0.5 block text-sm text-night/70">{{ formatDuration(offering.durationMinutes) }}</span>
-                    </span>
-              <span class="text-right">
-                      <span class="block text-lg tabular-nums">{{ offering.priceCents | euros }}</span>
-                      <span class="block text-sm underline decoration-night/30 underline-offset-4 group-hover:decoration-night">Réserver</span>
-                    </span>
-            </a>
-          </li>
-          }
-        </ul>
+  <section id="seances" aria-labelledby="seances-title" class="night-container pt-section">
+    <div class="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+      <div>
+        <p class="night-eyebrow">Les séances</p>
+        <h2 id="seances-title" class="night-h2 mt-3">Un format pour chaque besoin</h2>
       </div>
+      <a routerLink="/seances" class="night-link inline-flex min-h-11 items-center font-medium">
+        Tous les tarifs<span aria-hidden="true">&nbsp;→</span>
+      </a>
+    </div>
+
+    @if (offerings.error()) {
+    <p class="night-card mt-10 p-6" role="alert">
+      Les séances ne peuvent pas être affichées pour le moment.
+      <a routerLink="/seances" class="night-link underline">Voir la page des séances</a>
+    </p>
+    } @else if (offerings.isLoading()) {
+    <p class="mt-10 text-ink-muted">Chargement…</p>
+    } @else {
+    <ul class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      @for (offering of sortedOfferings(); track offering.slug) {
+      <li class="night-card relative flex flex-col p-6">
+        <div class="flex-1 pb-6">
+          <p class="night-eyebrow text-ink-faint">{{ categoryLabels[offering.category] }}</p>
+          <h3 class="night-card-title mt-3">
+            <a [routerLink]="['/reserver', offering.slug]" class="night-card-link">{{ offering.name }}</a>
+          </h3>
+          @if (offering.description) {
+          <p class="mt-3 text-ink-soft">{{ offering.description }}</p>
+          }
+        </div>
+        <div class="flex items-end justify-between gap-4 border-t border-gold/15 pt-4">
+          <span class="text-sm text-ink-muted">{{ formatDuration(offering.durationMinutes) }}</span>
+          <span class="font-display text-card font-semibold leading-none text-price">{{ offering.priceCents | euros }}</span>
+        </div>
+      </li>
       } @empty {
-      <p class="mt-8 text-night/70">Les séances seront bientôt proposées ici.</p>
+      <li class="text-ink-muted">Les séances seront bientôt proposées ici.</li>
       }
+    </ul>
+    }
+  </section>
 
-      <p class="mt-12 border-t border-night/15 pt-8">
-        <a routerLink="/seances" class="underline underline-offset-4 hover:text-night/70">Le détail de chaque séance</a>
-      </p>
+  <section aria-labelledby="steps-title" class="night-container pt-section">
+    <p class="night-eyebrow">Comment ça se passe</p>
+    <h2 id="steps-title" class="night-h2 mt-3">Trois étapes, sans paiement en ligne</h2>
+
+    <ol class="mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
+      @for (step of steps; track step.title; let number = $index) {
+      <li class="border-t border-gold/20 pt-6">
+        <!-- The list already numbers the steps for a screen reader: the big number is only drawn. -->
+        <span aria-hidden="true" class="block font-display text-numeral font-medium leading-none text-gold">{{ number + 1 }}</span>
+        <h3 class="mt-4 font-display text-2xl font-semibold text-cream">{{ step.title }}</h3>
+        <p class="mt-2 max-w-sm text-ink-soft">{{ step.text }}</p>
+      </li>
       }
-    </div>
+    </ol>
   </section>
 
-  <section aria-labelledby="steps-title" class="bg-night px-5 py-20 text-pearl sm:py-28">
-    <div class="mx-auto max-w-5xl">
-      <h2 id="steps-title" class="font-display text-5xl sm:text-6xl">Comment réserver</h2>
-
-      <ol class="mt-14 grid gap-10 lg:grid-cols-4 lg:gap-8">
-        @for (step of steps; track step.title) {
-        <li class="step relative flex gap-5 lg:block">
-          <app-moon-phase [illuminated]="step.illuminated" class="block size-12 shrink-0 text-pearl" />
-          <div>
-            <h3 class="pt-2.5 text-lg font-medium lg:mt-5 lg:pt-0">{{ step.title }}</h3>
-            <p class="mt-2 max-w-md leading-relaxed text-pearl/75">{{ step.text }}</p>
-          </div>
-        </li>
-        }
-      </ol>
-    </div>
-  </section>
-
-  <section aria-label="Informations pratiques" class="bg-sand px-5 py-20 sm:py-28">
-    <div class="mx-auto grid max-w-5xl gap-14 md:grid-cols-2 md:gap-20">
+  @if (aboutPreview; as preview) {
+  <section aria-labelledby="about-title" class="night-container pt-section">
+    <div class="night-card flex flex-col items-center gap-8 p-8 text-center sm:flex-row sm:text-left md:p-12">
+      <img [ngSrc]="preview.portrait" alt="Portrait de So" width="176" height="176"
+           class="size-40 shrink-0 rounded-full object-cover ring-1 ring-gold/45" />
       <div>
-        <h2 class="font-display text-5xl">Où consulter</h2>
-        <dl class="mt-8 space-y-5">
-          @for (place of places; track place.title) {
-          <div>
-            <dt class="text-lg font-medium">{{ place.title }}</dt>
-            <dd class="mt-0.5 leading-relaxed text-night/70">{{ place.text }}</dd>
-          </div>
-          }
-        </dl>
-        <p class="mt-6 text-sm text-night/70">Les façons de consulter proposées dépendent de la séance.</p>
-      </div>
-
-      <div>
-        <h2 class="font-display text-5xl">Bon à savoir</h2>
-        <ul class="mt-8 space-y-5">
-          @for (item of goodToKnow; track item) {
-          <li class="flex gap-4 leading-relaxed">
-            <svg viewBox="-10 -10 20 20" aria-hidden="true" class="mt-1.5 size-3.5 shrink-0 fill-lilac"><path [attr.d]="sparkle" /></svg>
-            <span>{{ item }}</span>
-          </li>
-          }
-        </ul>
-        <a href="#seances" class="btn-primary mt-10 px-6 py-3">Réserver une séance</a>
+        <p class="night-eyebrow">À propos</p>
+        <h2 id="about-title" class="night-h2 mt-3">{{ about.title }}</h2>
+        <p class="mt-4 max-w-2xl text-ink-soft">{{ preview.excerpt }}</p>
+        <a routerLink="/a-propos" class="night-link mt-4 inline-flex min-h-11 items-center font-medium">
+          {{ about.link }}<span aria-hidden="true">&nbsp;→</span>
+        </a>
       </div>
     </div>
   </section>
-
-  <section aria-labelledby="about-title" class="bg-night px-5 py-16 text-pearl sm:py-20">
-    <div class="mx-auto flex max-w-5xl flex-col items-start gap-8 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h2 id="about-title" class="font-display text-4xl sm:text-5xl">{{ about.title }}</h2>
-        <p class="mt-3 max-w-xl leading-relaxed text-pearl/75">{{ about.text }}</p>
-      </div>
-      <a routerLink="/a-propos" class="btn-pearl shrink-0">{{ about.link }}</a>
-    </div>
-  </section>
+  }
 </main>
