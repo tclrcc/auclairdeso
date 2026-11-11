@@ -53,24 +53,6 @@
         </div>
       </div>
 
-      <div>
-        <label class="block text-sm font-medium" for="policy">Paiement</label>
-        <select id="policy" class="field-input" [formField]="offeringForm.paymentPolicy">
-          @for (policy of policies; track policy) {
-          <option [value]="policy">{{ policyLabels[policy] }}</option>
-          }
-        </select>
-      </div>
-
-      @if (offeringForm.paymentPolicy().value() === 'DEPOSIT_ONLINE') {
-      <div>
-        <label class="block text-sm font-medium" for="deposit">Acompte (€)</label>
-        <input id="deposit" type="number" step="0.01" class="field-input"
-               [formField]="offeringForm.depositEuros" />
-        <app-field-errors [state]="offeringForm.depositEuros()" />
-      </div>
-      }
-
       <fieldset>
         <legend class="text-sm font-medium">Modes de consultation</legend>
         <div class="mt-2 flex flex-wrap gap-4">

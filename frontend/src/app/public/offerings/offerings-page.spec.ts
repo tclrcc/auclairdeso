@@ -14,7 +14,7 @@ const GUIDANCE: Offering = {
   priceCents: 8000,
   paymentPolicy: 'DEPOSIT_ONLINE',
   depositCents: 3000,
-  modes: ['VIDEO', 'PHONE'],
+  modes: ['IN_PERSON', 'VIDEO', 'PHONE'],
   category: 'CLAIRVOYANCE'
 };
 
@@ -31,7 +31,7 @@ describe('OfferingsPage', () => {
 
   afterEach(() => httpTesting.verify());
 
-  it('should list offerings with their modes and deposit', async () => {
+  it('should list offerings with their remote modes, and never the premises or an online payment', async () => {
     const fixture = TestBed.createComponent(OfferingsPage);
     fixture.detectChanges();
 
@@ -42,7 +42,20 @@ describe('OfferingsPage', () => {
     expect(page.querySelectorAll('article')).toHaveLength(1);
     expect(page.querySelector('h2')?.textContent).toContain('Guidance — 1 h');
     expect(page.textContent).toContain('Par téléphone');
-    expect(page.textContent).toContain('Acompte de 30');
+    expect(page.textContent).not.toContain('En présentiel');
+    expect(page.textContent).toContain('Réglé après la séance');
+    expect(page.textContent).not.toContain('Acompte');
+    expect(page.textContent).not.toContain('en ligne à la réservation');
+  });
+
+  it('should not draw an empty list of modes when only the premises are offered', async () => {
+    const fixture = TestBed.createComponent(OfferingsPage);
+    fixture.detectChanges();
+
+    httpTesting.expectOne('/api/offerings').flush([{ ...GUIDANCE, modes: ['IN_PERSON'] }]);
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.querySelector('[aria-label="Modes de consultation"]')).toBeNull();
   });
 
   it('should show an alert when the API fails', async () => {

@@ -2,10 +2,10 @@ import { Component, computed, inject, input, linkedSignal } from '@angular/core'
 import { httpResource } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { form, FormField, FormRoot, maxLength, required, validate } from '@angular/forms/signals';
-import {CATEGORY_LABELS, MODE_LABELS, OfferingCategory, PaymentPolicy} from '../../public/offerings/offering';
+import {CATEGORY_LABELS, MODE_LABELS, OfferingCategory} from '../../public/offerings/offering';
 import { FieldErrors } from '../../shared/field-errors';
 import { problemMessage } from '../../shared/problem-message';
-import { AdminOffering, POLICY_LABELS } from './admin-offering';
+import { AdminOffering } from './admin-offering';
 import { OfferingAdmin } from './offering-admin';
 import { ALL_MODES, OfferingFormModel, emptyOfferingForm, toDraft, toFormModel } from './offering-form-model';
 
@@ -24,8 +24,6 @@ export class OfferingEditorPage {
   protected readonly isEditing = computed(() => this.slug() != null);
   protected readonly modes = ALL_MODES;
   protected readonly modeLabels = MODE_LABELS;
-  protected readonly policies = Object.keys(POLICY_LABELS) as PaymentPolicy[];
-  protected readonly policyLabels = POLICY_LABELS;
   protected readonly categories = Object.keys(CATEGORY_LABELS) as OfferingCategory[];
   protected readonly categoryLabels = CATEGORY_LABELS;
 
@@ -59,14 +57,6 @@ export class OfferingEditorPage {
       validate(path.priceEuros, ({ value }) =>
         isBetween(value(), 0, 10_000) ? null : { kind: 'price', message: 'Un prix entre 0 et 10 000 €.' },
       );
-      validate(path.depositEuros, ({ value, valueOf }) => {
-        if (valueOf(path.paymentPolicy) !== 'DEPOSIT_ONLINE') {
-          return null;
-        }
-        return isBetween(value(), 0.01, valueOf(path.priceEuros))
-          ? null
-          : { kind: 'deposit', message: "L'acompte doit être compris entre 0,01 € et le prix de la séance." };
-      });
       validate(path.modes, ({ value }) =>
         Object.values(value()).some(Boolean)
           ? null

@@ -18,26 +18,17 @@
           <p class="mt-1 text-sm text-night/70">{{ offering.durationMinutes }} min</p>
           <p class="mt-4 flex-1 leading-relaxed">{{ offering.description }}</p>
 
+          @let publicModes = publicModesOf(offering);
+          @if (publicModes.length > 0) {
           <ul class="mt-4 flex flex-wrap gap-2" aria-label="Modes de consultation">
-            @for (mode of offering.modes; track mode) {
+            @for (mode of publicModes; track mode) {
             <li class="rounded-full bg-sand px-3 py-1 text-sm">{{ modeLabels[mode] }}</li>
             }
           </ul>
+          }
 
           <p class="mt-6 text-2xl font-semibold">{{ offering.priceCents | euros }}</p>
-          @switch (offering.paymentPolicy) {
-          @case ('FULL_ONLINE') {
-          <p class="text-sm text-night/70">Réglé en ligne à la réservation</p>
-          }
-          @case ('DEPOSIT_ONLINE') {
-          <p class="text-sm text-night/70">
-            Acompte de {{ offering.depositCents | euros }} à la réservation
-          </p>
-          }
-          @case ('ON_SITE') {
           <p class="text-sm text-night/70">Réglé après la séance, par virement, en espèces ou par paiement mobile</p>
-          }
-          }
 
           <a [routerLink]="['/reserver', offering.slug]" class="btn-primary mt-6 self-start">Réserver</a>
         </article>

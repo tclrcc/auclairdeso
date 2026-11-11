@@ -18,9 +18,3 @@ export interface AdminOffering {
 
 /** Body sent to create or update an offering: mirror of the backend OfferingDraft record. */
 export type OfferingDraft = Omit<AdminOffering, 'slug'>;
-
-export const POLICY_LABELS: Record<PaymentPolicy, string> = {
-  FULL_ONLINE: 'Paiement complet en ligne',
-  DEPOSIT_ONLINE: 'Acompte en ligne, solde le jour de la séance',
-  ON_SITE: 'Réglé après la séance, par virement, en espèces ou par paiement mobile',
-};

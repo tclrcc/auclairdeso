@@ -1,4 +1,4 @@
-import {ConsultationMode, MODE_LABELS, OfferingCategory, PaymentPolicy} from '../../public/offerings/offering';
+import {ConsultationMode, MODE_LABELS, OfferingCategory} from '../../public/offerings/offering';
 import { AdminOffering, OfferingDraft } from './admin-offering';
 
 /** What the editor manipulates: euros instead of cents, one checkbox per mode. */
@@ -8,8 +8,6 @@ export interface OfferingFormModel {
   durationMinutes: number;
   bufferMinutes: number;
   priceEuros: number;
-  paymentPolicy: PaymentPolicy;
-  depositEuros: number;
   displayOrder: number;
   active: boolean;
   modes: Record<ConsultationMode, boolean>;
@@ -25,8 +23,6 @@ export function emptyOfferingForm(): OfferingFormModel {
     durationMinutes: 60,
     bufferMinutes: 15,
     priceEuros: 0,
-    paymentPolicy: 'ON_SITE',
-    depositEuros: 0,
     displayOrder: 0,
     active: false,
     modes: modesRecord([]),
@@ -41,8 +37,6 @@ export function toFormModel(offering: AdminOffering): OfferingFormModel {
     durationMinutes: offering.durationMinutes,
     bufferMinutes: offering.bufferMinutes,
     priceEuros: offering.priceCents / 100,
-    paymentPolicy: offering.paymentPolicy,
-    depositEuros: (offering.depositCents ?? 0) / 100,
     displayOrder: offering.displayOrder,
     active: offering.active,
     modes: modesRecord(offering.modes),
@@ -50,6 +44,11 @@ export function toFormModel(offering: AdminOffering): OfferingFormModel {
   };
 }
 
+/**
+ * The site takes no online payment: whatever an offering carried before, saving it sets the only
+ * policy that is true (paid after the session) and drops any deposit. The backend still requires
+ * both fields, so they are sent rather than omitted.
+ */
 export function toDraft(model: OfferingFormModel): OfferingDraft {
   return {
     name: model.name.trim(),
@@ -57,8 +56,8 @@ export function toDraft(model: OfferingFormModel): OfferingDraft {
     durationMinutes: model.durationMinutes,
     bufferMinutes: model.bufferMinutes,
     priceCents: toCents(model.priceEuros),
-    paymentPolicy: model.paymentPolicy,
-    depositCents: model.paymentPolicy === 'DEPOSIT_ONLINE' ? toCents(model.depositEuros) : null,
+    paymentPolicy: 'ON_SITE',
+    depositCents: null,
     displayOrder: model.displayOrder,
     active: model.active,
     modes: ALL_MODES.filter((mode) => model.modes[mode]),
