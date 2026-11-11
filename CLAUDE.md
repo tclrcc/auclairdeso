@@ -50,7 +50,7 @@ Le document de cadrage fait référence pour le périmètre, l'architecture et l
 | Créneau | Slot |
 | Plage récurrente / exception | RecurringWindow / AvailabilityException |
 | Rendez-vous | Appointment |
-| Cabinet, visio, téléphone, écrit | IN_PERSON, VIDEO, PHONE, WRITTEN |
+| Chez la praticienne, chez la cliente, visio, téléphone | IN_PERSON, CLIENT_HOME, VIDEO, PHONE |
 
 ## Frontend
 - Rendu défini dans `app.routes.server.ts` : `account/` (route `mon-espace`), `admin/`, `reserver/:slug` et `connexion` en rendu client (guards) ; `''`, `seances`, `a-propos` et les pages légales (`mentions-legales`, `conditions-generales`, `confidentialite`) en rendu serveur (`RenderMode.Server`) ; le reste est prérendu. Toute nouvelle route doit y être déclarée.

@@ -55,17 +55,17 @@ Objectifs du site : vitrine, prise de rendez-vous en ligne, vidéos de présenta
 
 ### 3.2 Prestations connues
 
-La liste complète (noms, durées, prix, descriptions) sera fournie par la praticienne et saisie depuis l'administration.
+Le catalogue arrêté avec la praticienne compte **cinq prestations**, saisies depuis l'administration :
 
-| Prestation | Catégorie | Prix | Particularités |
-| --- | --- | --- | --- |
-| Question ciblée | Voyance | 15 € | **Sans créneau horaire**, réponse via Messenger ou SMS |
-| Consultation complète 30 min | Voyance | 50 € | |
-| Consultation approfondie 1 h | Voyance | 80 € | |
-| Tirage de cartes | Voyance | à préciser | Toujours à distance |
-| Coupage de feu | Magnétisme | à préciser | À distance ou en présence (surtout en présence) |
-| Tendinite, eczéma / urticaire, zona, hernie discale / lombalgie, abcès dentaires | Magnétisme | à préciser | À distance ou en présence |
-| Rééquilibrage énergétique | Rééquilibrage | à préciser | Forfaits à définir plus tard |
+| Prestation | Catégorie | Prix | Durée | Particularités |
+| --- | --- | --- | --- | --- |
+| Guidance 1 h | Voyance | 80 € | 1 h | |
+| Guidance 30 min | Voyance | 50 € | 30 min | |
+| Question ciblée | Voyance | 15 € | Sans créneau | **Sans créneau horaire**, réponse via Messenger ou SMS (voir 5.4) |
+| Magnétisme | Magnétisme | 60 € | 30 à 45 min selon la difficulté | À distance ou en présence |
+| Rééquilibrage énergétique | Rééquilibrage | 70 € | 45 min à 1 h selon le besoin | |
+
+Une prestation décrit une **pratique**, jamais un motif de consultation ni un état de santé : le site ne présente aucune liste de maux ou de pathologies, ne promet aucun résultat et ne donne aucun conseil médical. Les textes de description suivent la même règle.
 
 ### 3.3 Règles
 
@@ -90,12 +90,12 @@ Il n'y a **pas** de séance par écrit.
 
 ### 3.5 Paiement
 
-- **Aucun paiement en ligne** pour l'instant (pas de carte, pas d'acompte, pas de frais).
+- Le site **ne prend aucun paiement** : ni carte, ni acompte, ni frais.
 - La cliente paie **après la séance**, par **virement**, en **espèces** ou par **paiement mobile** (Wero, Lydia, PayPal…).
 - Quand la praticienne marque une séance comme effectuée, l'application établit sa **note** numérotée (`2026-0001`, `2026-0002`…, une série par année, sans trou) au prix de la séance, et l'envoie par email à la cliente (voir 10). Une séance gratuite n'en a pas.
 - La praticienne enregistre ensuite le **paiement** de la note : moyen de paiement et date d'encaissement, jamais dans le futur. Une erreur se corrige en annulant l'encaissement, puis en le saisissant de nouveau.
 - Les paiements alimentent les bilans et le livre des recettes (voir 8 et 10).
-- Le champ `payment_policy` du catalogue est conservé (valeur `ON_SITE`) en prévision d'un éventuel paiement en ligne.
+- Le champ `payment_policy` du catalogue reste en base, toujours à `ON_SITE` ; l'éditeur d'administration ne le propose plus.
 
 ---
 
@@ -327,7 +327,7 @@ Plusieurs données sont **sensibles** : motifs de consultation (parfois liés à
 | 12 | Rendez-vous visibles aussi dans Google Agenda | Non ; lien d'abonnement iCal possible plus tard |
 | 13 | Définition d'un rendez-vous « abandonné » | Refusé, expiré ou annulé |
 | 16 | Où vivent les vidéos et les photos de la vitrine | Dans un dossier du VPS (`MEDIA_DIR`), servi par nginx sous `/contenus/` ; jamais dans le dépôt, qui est public |
-| 15 | Que garder quand une cliente supprime son compte | Les séances et leurs notes, 10 ans (obligation comptable), sans rien qui la nomme |
+| 15 | Que garder quand une cliente supprime son compte | Les séances et leurs notes, 10 ans (obligation comptable, arrêté 83-50/A), **avec le nom qui figure sur la note** ; seuls l'adresse e-mail, les accès et les photos sont supprimés |
 | 14 | Statistiques visibles par qui | Tout le personnel (praticienne et administrateur) |
 
 ---
