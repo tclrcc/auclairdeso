@@ -99,6 +99,16 @@ Il n'y a **pas** de séance par écrit.
 
 ---
 
+### 3.6 Vidéo de présentation
+
+Chaque prestation peut avoir une **vidéo de présentation**, facultative, avec sa **transcription**.
+
+- Le fichier vidéo n'est **jamais dans le dépôt** (public) ni en base : la praticienne le dépose dans le dossier des vidéos du serveur (`MEDIA_DIR`, décision 16), qui nginx sert sous `/contenus/`. La prestation ne garde que le **nom du fichier** (`videoPath`) et le texte de la transcription (`videoTranscript`).
+- Le nom du fichier est un **nom simple** : minuscules, chiffres et tirets, terminé par `.mp4` ou `.webm` (par exemple `guidance-30-min.mp4`). Aucun dossier, aucun `..`, 100 caractères au maximum. La transcription fait 4 000 caractères au maximum. Un champ vide signifie « pas de vidéo » / « pas de transcription ».
+- Elle se saisit dans l'éditeur de prestation de l'administration (deux champs facultatifs) et apparaît sur « Séances et tarifs » et sur la page de réservation, avec le **même lecteur** que la page « À propos » : commandes visibles, aucune lecture automatique, rien de téléchargé avant le clic hormis les métadonnées.
+- La transcription s'affiche sous la vidéo, dans un bloc repliable « Lire la transcription » : elle rend la vidéo accessible aux personnes qui ne peuvent pas l'écouter. Sans vidéo, rien ne change.
+- Les mêmes règles de ton s'appliquent à ce qui est dit et transcrit : on décrit la séance, aucune promesse de résultat, aucun conseil médical, juridique ou financier.
+
 ## 4. Planning
 
 ### 4.1 Plages d'ouverture
