@@ -1,0 +1,334 @@
+/*
+ * The "starry night" theme of the public site.
+ *
+ * Everything here applies under ".night-theme", the class PublicLayout puts on its host: the public pages
+ * get it, the administration (outside that layout) keeps the light theme of styles.css untouched.
+ *
+ * Sizes are written as "calc(N rem / 17)": N px at our 17 px root (styles.css), and they still grow when
+ * a reader raises the font size of the browser.
+ *
+ * Every text colour holds at least 4.5:1 on every background of the theme, including a card lying on the
+ * violet halo, the lightest case (from 5.6:1 for #b9a9d6 to 17:1 for the cream of the titles).
+ */
+
+@theme {
+  /* Backgrounds */
+  --color-abyss: #160d28;
+  --color-abyss-top: #1d1033;
+  --color-abyss-bottom: #110a20;
+  --color-abyss-foot: #0f0820;
+  --color-halo: #3b1f69;
+
+  /* Gold */
+  --color-gold: #e8c872;
+  --color-gold-bright: #f6dd9a;
+  --color-cream: #fbf3dd;
+  --color-price: #f3e7c3;
+  --color-on-gold: #1d1233;
+
+  /* Texts, from the body text to the small print */
+  --color-ink: #e2d8f4;
+  --color-ink-soft: #d9cdf0;
+  --color-ink-muted: #cdbdf0;
+  --color-ink-faint: #b9a9d6;
+
+  /* Errors: a light coral, 10:1 on the page and 7:1 on a card */
+  --color-alert: #ffb4a6;
+
+  /* Sizes: the small print (13 px), a card title or a price (30 px), the numbers of the steps (56 px) */
+  --text-mention: calc(13rem / 17);
+  --text-card: calc(30rem / 17);
+  --text-numeral: calc(56rem / 17);
+
+  /* The space between two sections of a page: 96 px ("pt-section") */
+  --spacing-section: calc(96rem / 17);
+}
+
+@layer base {
+  .night-theme {
+    /* "font-sans" and "font-display" in a public page pick the fonts of the theme. */
+    --font-sans: var(--font-night-sans);
+    --font-display: var(--font-night-serif);
+
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+    font-family: var(--font-night-sans);
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--color-ink);
+    /* Native controls (date picker, file input, select, scroll bars) follow the dark background. */
+    color-scheme: dark;
+    accent-color: var(--color-gold);
+    /* Cormorant draws old-style figures by default: its "1" would read as an "I" in "1 h" or a price. */
+    font-variant-numeric: lining-nums;
+
+    /*
+     * From the top layer down: three tiles of stars of different sizes (so that the pattern does not show
+     * its repetition), the violet halo at the top right, then the night itself, a little lighter at the top.
+     * Static: no animation, no script.
+     */
+    background-color: var(--color-abyss);
+    background-image:
+      radial-gradient(circle at 37px 61px, #f3e7c3 0 0.6px, transparent 0.9px),
+      radial-gradient(circle at 211px 23px, #cdbdf0 0 0.5px, transparent 0.8px),
+      radial-gradient(circle at 143px 197px, #cdbdf0 0 0.6px, transparent 0.9px),
+      radial-gradient(circle at 262px 251px, #f3e7c3 0 0.5px, transparent 0.8px),
+      radial-gradient(circle at 92px 318px, #f3e7c3 0 0.75px, transparent 1px),
+      radial-gradient(circle at 301px 128px, #cdbdf0 0 0.5px, transparent 0.8px),
+      radial-gradient(circle at 18px 409px, #cdbdf0 0 0.6px, transparent 0.9px),
+      radial-gradient(circle at 377px 352px, #f3e7c3 0 0.6px, transparent 0.9px),
+      radial-gradient(circle at 451px 86px, #f3e7c3 0 0.75px, transparent 1px),
+      radial-gradient(circle at 520px 470px, #cdbdf0 0 0.75px, transparent 1px),
+      radial-gradient(circle at 100% 0, var(--color-halo) 0, transparent min(48rem, 90vw)),
+      linear-gradient(to bottom, var(--color-abyss-top), var(--color-abyss-bottom));
+    background-size:
+      330px 330px, 330px 330px, 330px 330px,
+      430px 430px, 430px 430px, 430px 430px, 430px 430px,
+      560px 560px, 560px 560px, 560px 560px,
+      100% 100%, 100% 100%;
+    background-repeat: repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat,
+      no-repeat, no-repeat;
+  }
+
+  /* The page behind the layout, seen when a phone scrolls past the top or the bottom. */
+  body:has(.night-theme) {
+    background-color: var(--color-abyss-foot);
+  }
+
+  .night-theme ::selection {
+    background-color: var(--color-gold);
+    color: var(--color-on-gold);
+  }
+
+  /* One keyboard focus for the whole public site: gold, 2 px, 3 px away from the element. */
+  .night-theme :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+  }
+
+  .night-theme a:not([class]) {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .night-theme *,
+    .night-theme *::before,
+    .night-theme *::after {
+      transition: none !important;
+    }
+  }
+}
+
+@layer components {
+  /* Layout */
+  .night-container {
+    width: 100%;
+    max-width: calc((1160rem + 2 * 32rem) / 17);
+    margin-inline: auto;
+    padding-inline: calc(20rem / 17);
+
+    @media (width >= 40rem) {
+      padding-inline: calc(32rem / 17);
+    }
+  }
+
+  /* Typography */
+  .night-eyebrow {
+    font-size: calc(13rem / 17);
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+  }
+
+  .night-h1 {
+    font-family: var(--font-night-serif);
+    font-size: calc(44rem / 17);
+    font-weight: 500;
+    line-height: 1.02;
+    color: var(--color-cream);
+    text-wrap: balance;
+
+    @media (width >= 48rem) {
+      font-size: calc(72rem / 17);
+    }
+  }
+
+  .night-h2 {
+    font-family: var(--font-night-serif);
+    font-size: calc(34rem / 17);
+    font-weight: 500;
+    line-height: 1.1;
+    color: var(--color-cream);
+    text-wrap: balance;
+
+    @media (width >= 48rem) {
+      font-size: calc(44rem / 17);
+    }
+  }
+
+  .night-card-title {
+    font-family: var(--font-night-serif);
+    font-size: var(--text-card);
+    font-weight: 600;
+    line-height: 1.15;
+    color: var(--color-cream);
+  }
+
+  .night-lead {
+    font-size: calc(18rem / 17);
+    line-height: 1.65;
+    color: var(--color-ink-soft);
+  }
+
+  /* Surfaces */
+  .night-card {
+    border: 1px solid rgb(232 200 114 / 0.28);
+    border-radius: calc(22rem / 17);
+    background-image: linear-gradient(to bottom, rgb(74 42 128 / 0.45), rgb(34 19 60 / 0.55));
+  }
+
+  /*
+   * The whole card is clickable, but the link holds only the title: a screen reader announces the name
+   * of the offering, not its whole description. The pseudo-element stretches the link over the card.
+   */
+  .night-card-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: calc(22rem / 17);
+  }
+
+  .night-card-link:focus-visible {
+    outline: none;
+  }
+
+  .night-card-link:focus-visible::after {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+  }
+
+  .night-card:has(.night-card-link:hover) {
+    border-color: rgb(232 200 114 / 0.6);
+  }
+
+  /* Buttons: the gold one leads, the outlined one follows. */
+  .btn-gold,
+  .night-theme .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: calc(52rem / 17);
+    padding-inline: calc(28rem / 17);
+    border-radius: 999px;
+    background-color: var(--color-gold);
+    color: var(--color-on-gold);
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    transition: background-color 150ms;
+
+    &:hover {
+      background-color: var(--color-gold-bright);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-gold-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: calc(44rem / 17);
+    padding-inline: calc(20rem / 17);
+    border: 1px solid var(--color-gold);
+    border-radius: 999px;
+    color: var(--color-gold);
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+    transition: background-color 150ms, color 150ms;
+
+    &:hover {
+      background-color: rgb(232 200 114 / 0.12);
+      color: var(--color-gold-bright);
+    }
+  }
+
+  /* A link in gold, underlined on hover. */
+  .night-link {
+    color: var(--color-gold);
+    text-underline-offset: 5px;
+
+    &:hover {
+      color: var(--color-gold-bright);
+      text-decoration: underline;
+    }
+  }
+
+  /*
+   * The other classes shared with the administration (.btn-primary is drawn with .btn-gold above), redrawn for the night. Their light version, in
+   * styles.css, keeps applying everywhere else.
+   */
+  .night-theme .field-input {
+    min-height: calc(44rem / 17);
+    border-color: rgb(185 169 214 / 0.7);
+    border-radius: 0.75rem;
+    background-color: rgb(15 8 32 / 0.55);
+    color: var(--color-ink);
+
+    &::placeholder {
+      color: var(--color-ink-faint);
+    }
+
+    &:focus-visible {
+      outline-color: var(--color-gold);
+      outline-offset: 2px;
+    }
+
+    &[aria-invalid='true'] {
+      border-color: var(--color-alert);
+    }
+  }
+
+  .night-theme .field-error {
+    color: var(--color-alert);
+  }
+
+  .night-theme .legal-prose {
+    color: var(--color-ink);
+
+    & h2,
+    & h3 {
+      color: var(--color-cream);
+    }
+
+    & h3 {
+      font-weight: 600;
+    }
+
+    & a {
+      color: var(--color-gold);
+    }
+
+    & a:hover {
+      color: var(--color-gold-bright);
+    }
+
+    & th {
+      border-color: rgb(185 169 214 / 0.35);
+    }
+
+    & td {
+      border-color: rgb(185 169 214 / 0.2);
+    }
+  }
+}

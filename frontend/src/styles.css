@@ -11,6 +11,7 @@
 @import "@fontsource/inter/latin-400.css";
 @import "@fontsource/inter/latin-500.css";
 @import "@fontsource/inter/latin-600.css";
+@import "./night-theme.css";
 
 /*
  * The palette comes from the logo: its plum night, the cream of its line art, the lavender of its lettering.
@@ -123,6 +124,11 @@
 
   .legal-prose dt {
     @apply mt-4 font-medium;
+  }
+
+  /* A validation message under a field (shared/field-errors.ts). */
+  .field-error {
+    @apply text-red-700;
   }
 
   .field-input {

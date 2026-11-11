@@ -1,28 +1,30 @@
 <div>
   <div class="flex items-center justify-between gap-2">
-    <button type="button" class="text-sm underline disabled:opacity-40" [disabled]="!canGoBack()"
+    <button type="button" class="min-h-11 text-sm text-gold underline underline-offset-4 hover:text-gold-bright disabled:opacity-40" [disabled]="!canGoBack()"
             (click)="previousWeek()">
       ← Semaine précédente
     </button>
-    <button type="button" class="text-sm underline disabled:opacity-40" [disabled]="!canGoForward()"
+    <button type="button" class="min-h-11 text-sm text-gold underline underline-offset-4 hover:text-gold-bright disabled:opacity-40" [disabled]="!canGoForward()"
             (click)="nextWeek()">
       Semaine suivante →
     </button>
   </div>
-  <p class="mt-2 text-sm text-night/70">{{ weekLabel() }}</p>
+  <p class="mt-2 text-sm text-ink-muted">{{ weekLabel() }}</p>
 
   @if (slots.isLoading()) {
-  <p class="mt-4 text-night/70" aria-live="polite">Recherche des créneaux…</p>
+  <p class="mt-4 text-ink-muted" aria-live="polite">Recherche des créneaux…</p>
   } @else if (slots.error()) {
-  <p class="mt-4 text-red-700" role="alert">Les créneaux ne peuvent pas être affichés pour le moment.</p>
+  <p class="mt-4 text-alert" role="alert">Les créneaux ne peuvent pas être affichés pour le moment.</p>
   } @else {
   @for (day of days(); track day.date) {
   <div class="mt-5">
     <p class="text-sm font-medium first-letter:uppercase">{{ day.label }}</p>
     <div class="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
       @for (slot of day.slots; track slot.start) {
-      <button type="button" class="rounded-lg border border-night/20 bg-white px-3 py-2 text-sm"
-              [class.bg-night]="isSelected(slot)" [class.text-sand]="isSelected(slot)"
+      <button type="button" class="min-h-11 rounded-lg border px-3 py-2 text-sm"
+              [class.border-ink-faint/70]="!isSelected(slot)" [class.bg-abyss/60]="!isSelected(slot)"
+              [class.border-gold]="isSelected(slot)" [class.bg-gold]="isSelected(slot)"
+              [class.text-on-gold]="isSelected(slot)" [class.font-semibold]="isSelected(slot)"
               [attr.aria-pressed]="isSelected(slot)" (click)="selected.set(slot.start)">
         {{ formatTime(slot.start) }}
       </button>
@@ -30,7 +32,7 @@
     </div>
   </div>
   } @empty {
-  <p class="mt-4 text-night/70">Aucun créneau libre cette semaine.</p>
+  <p class="mt-4 text-ink-muted">Aucun créneau libre cette semaine.</p>
   }
   }
 </div>

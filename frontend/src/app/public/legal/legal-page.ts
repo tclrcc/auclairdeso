@@ -5,10 +5,10 @@ import { LEGAL_UPDATED_ON } from './legal-identity';
 @Component({
   selector: 'app-legal-page',
   template: `
-    <main class="bg-sand px-5 py-16 text-night sm:px-6 sm:py-24">
+    <main class="flex-1 px-5 py-16 sm:px-6 sm:py-24">
       <div class="mx-auto max-w-2xl">
-        <h1 class="font-display text-4xl tracking-tight sm:text-5xl">{{ heading() }}</h1>
-        <p class="mt-3 text-sm text-night/60">Dernière mise à jour : {{ updatedOn }}</p>
+        <h1 class="font-display text-5xl text-cream sm:text-6xl">{{ heading() }}</h1>
+        <p class="mt-3 text-sm text-ink-faint">Dernière mise à jour : {{ updatedOn }}</p>
         <div class="legal-prose mt-10">
           <ng-content />
         </div>

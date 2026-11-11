@@ -12,7 +12,7 @@ interface FieldStateLike {
   template: `
     @if (state().touched() && state().invalid()) {
       @for (error of state().errors(); track error.kind) {
-        <p class="mt-1 text-sm text-red-700" role="alert">{{ error.message }}</p>
+        <p class="field-error mt-1 text-sm" role="alert">{{ error.message }}</p>
       }
     }
   `,
