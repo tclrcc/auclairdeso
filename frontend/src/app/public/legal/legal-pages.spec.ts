@@ -76,4 +76,24 @@ describe('legal pages', () => {
     expect(text).toContain('10 ans');
     expect(text).toContain('n’affiche pas de bandeau');
   });
+
+  it('describes only what exists: no audience measurement, no promised withdrawal, no HTTPS claim', async () => {
+    const fixture = await open(ConfidentialitePage);
+
+    const text = (fixture.nativeElement.textContent as string).replace(/\s+/g, ' ');
+    expect(text).not.toContain('fréquentation');
+    expect(text).not.toContain('pages vues');
+    expect(text).not.toContain('retirer cet accord');
+    expect(text).not.toContain('HTTPS');
+  });
+
+  it('names Gmail, the server access logs and the home address printed on the bill', async () => {
+    const fixture = await open(ConfidentialitePage);
+
+    const text = (fixture.nativeElement.textContent as string).replace(/\s+/g, ' ');
+    expect(text).toContain('Gmail');
+    expect(text).toContain('Google');
+    expect(text).toContain('journaux d’accès du serveur');
+    expect(text).toContain('imprimée sur la note');
+  });
 });

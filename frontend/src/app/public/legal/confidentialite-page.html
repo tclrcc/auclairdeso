@@ -31,11 +31,14 @@
     <dd>
       Pour préparer la séance. Ces informations peuvent toucher à votre santé ou à votre vie privée :
       elles ne sont enregistrées qu’avec votre accord explicite, demandé au moment de la réservation.
-      Vous pouvez retirer cet accord à tout moment.
+      Pour toute demande à leur sujet, écrivez par courriel à l’adresse indiquée plus haut.
     </dd>
 
     <dt>Vos rendez-vous et leurs notes de séance</dt>
-    <dd>Pour tenir l’agenda, et parce que la comptabilité d’une micro-entreprise l’exige.</dd>
+    <dd>
+      Pour tenir l’agenda, et parce que la comptabilité d’une micro-entreprise l’exige. Pour une séance à
+      votre domicile, l’adresse où elle a lieu est imprimée sur la note et conservée avec elle.
+    </dd>
 
     <dt>Les notes privées de la praticienne</dt>
     <dd>Ce qu’elle retient d’une séance pour la suivante. Vous pouvez en demander une copie.</dd>
@@ -47,11 +50,11 @@
       pas voir son agenda bloqué sans raison.
     </dd>
 
-    <dt>La fréquentation du site</dt>
+    <dt>Les journaux d’accès du serveur</dt>
     <dd>
-      Deux nombres par jour : les pages vues et les visiteurs. Votre adresse réseau sert seulement à ne
-      pas vous compter deux fois dans la journée ; elle n’est pas enregistrée, et le lien est oublié
-      chaque nuit. Aucun profil, aucun suivi d’un jour sur l’autre.
+      Comme tout serveur web (ici nginx), il note pour chaque page demandée l’adresse réseau, l’heure et
+      la page. Ces journaux servent à la sécurité et au dépannage du site ; ils ne servent pas à vous
+      suivre et ne sont pas utilisés pour mesurer l’audience.
     </dd>
   </dl>
 
@@ -82,8 +85,8 @@
       <td>Jusqu’au déblocage par la praticienne</td>
     </tr>
     <tr>
-      <td>Fréquentation du site</td>
-      <td>Deux totaux par jour, sans donnée personnelle</td>
+      <td>Journaux d’accès du serveur</td>
+      <td>Le temps nécessaire à la sécurité et au dépannage, puis effacés</td>
     </tr>
     </tbody>
   </table>
@@ -95,7 +98,10 @@
     @if (legal.hasValue()) {
     par {{ legal.value().host }}
     }
-    ; les courriels passent par le service de messagerie de la praticienne. Les photos sont stockées
+    ; les courriels (confirmations, rappels, lien de connexion) sont envoyés par Gmail, le service de
+    messagerie de Google, qui intervient comme prestataire d’envoi : ils peuvent mentionner votre nom, la
+    date et la prestation, le montant et, selon le mode de séance, l’adresse ou le nom Messenger que vous
+    avez indiqués. Les photos sont stockées
     dans la base, jamais dans un dossier public, et ne s’affichent qu’après connexion.
   </p>
 
@@ -127,13 +133,16 @@
   </p>
   <ul>
     <li>votre connexion au site, vos coordonnées, votre date de naissance et votre ville ;</li>
-    <li>les textes que vous avez écrits : raison de la demande, adresse de séance, nom sur Messenger ;</li>
+    <li>
+      les textes que vous avez écrits : raison de la demande, adresse de séance, nom sur Messenger (hors
+      l’adresse imprimée sur la note, voir ci-dessous) ;
+    </li>
     <li>vos photos et les notes privées de la praticienne.</li>
   </ul>
   <p>
     Restent vos séances passées et leurs notes de séance, que la loi oblige à garder dix ans : elles
-    gardent la date, la prestation, le montant et le nom qui figurait sur la note, parce que l’arrêté
-    sur les notes l’exige. Votre adresse électronique en est retirée. Si votre réservation en ligne est
+    gardent la date, la prestation, le montant, le nom qui figurait sur la note et, pour une séance à
+    votre domicile, l’adresse où elle a eu lieu, parce que l’arrêté sur les notes l’exige. Votre adresse électronique en est retirée. Si votre réservation en ligne est
     bloquée, votre numéro de téléphone reste lui aussi, le temps du blocage, et il disparaît dès que la
     praticienne vous débloque. Annulez d’abord vos rendez-vous à venir : la suppression est refusée tant
     qu’il en reste un.
@@ -141,8 +150,7 @@
 
   <h2>Sécurité</h2>
   <p>
-    Le site n’est accessible qu’en HTTPS. La connexion se fait par lien à usage unique envoyé par
-    courriel, et l’espace d’administration demande en plus un mot de passe. Aucune donnée de carte
+    La connexion se fait par lien à usage unique envoyé par courriel, et l’espace d’administration demande en plus un mot de passe. Aucune donnée de carte
     bancaire n’est demandée ni enregistrée, puisqu’il n’y a pas de paiement en ligne.
   </p>
 </app-legal-page>
