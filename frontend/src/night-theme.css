@@ -240,6 +240,15 @@
       opacity: 0.6;
       cursor: not-allowed;
     }
+
+    /*
+     * The light .btn-primary of styles.css draws its focus ring in plum, in the same layer: without this,
+     * it would win over the gold ring of the theme (layer "base") and vanish on the night.
+     */
+    &:focus-visible {
+      outline: 2px solid var(--color-gold);
+      outline-offset: 3px;
+    }
   }
 
   .btn-gold-outline {

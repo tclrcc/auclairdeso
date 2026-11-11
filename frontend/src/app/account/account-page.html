@@ -1,7 +1,21 @@
 <main class="flex-1 px-6 py-16">
   <div class="mx-auto max-w-xl">
     <h1 class="font-display text-5xl text-cream">Mon espace</h1>
-    <p class="mt-4">Connecté avec <strong>{{ auth.currentUser()?.email }}</strong>.</p>
+
+    <!--
+      The target of "Mon compte" in the header: who is signed in, and the logout. At the top of the page,
+      above the appointments, so that their loading never pushes it away once the browser has scrolled to it.
+    -->
+    <section id="compte" class="night-card mt-8 scroll-mt-6 p-5" aria-labelledby="account-title">
+      <h2 id="account-title" class="font-display text-3xl text-cream">Mon compte</h2>
+      <p class="mt-2">Connecté avec <strong>{{ auth.currentUser()?.email }}</strong>.</p>
+      <div class="mt-4 flex flex-wrap gap-4">
+        @if (auth.isStaff()) {
+        <a routerLink="/admin" class="btn-primary">Administration</a>
+        }
+        <button type="button" class="btn-gold-outline" (click)="logout()">Se déconnecter</button>
+      </div>
+    </section>
 
     <h2 class="mt-10 font-display text-3xl text-cream">Mes rendez-vous</h2>
     @if (notice(); as message) {
@@ -59,12 +73,5 @@
       </button>
     </section>
     }
-
-    <div class="mt-10 flex flex-wrap gap-4">
-      @if (auth.isStaff()) {
-      <a routerLink="/admin" class="btn-primary">Administration</a>
-      }
-      <button type="button" class="btn-gold-outline" (click)="logout()">Se déconnecter</button>
-    </div>
   </div>
 </main>

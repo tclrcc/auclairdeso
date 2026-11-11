@@ -37,6 +37,14 @@ describe('SiteHeader', () => {
     expect(header.textContent).not.toContain('Se connecter');
   });
 
+  it('gives a signed-in client a way to her account, where she logs out', async () => {
+    const header = await headerFor({ email: 'alice@example.com', roles: ['CLIENT'], factors: [], passwordSet: false });
+
+    const account = header.querySelector('a[href="/mon-espace#compte"]');
+    expect(account?.textContent).toContain('Mon compte');
+    expect(header.textContent).not.toContain('Administration');
+  });
+
   it('leads the staff to the administration', async () => {
     const header = await headerFor({ email: 'so@auclairdeso.test', roles: ['PRACTITIONER'], factors: [], passwordSet: true });
 

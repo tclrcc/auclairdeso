@@ -28,9 +28,12 @@
       </li>
     </ul>
 
+    <!-- A signed-in client reaches her account (and its logout) from here; staff members reach the administration. -->
     @if (auth.isStaff()) {
     <a routerLink="/admin" class="btn-gold-outline">Administration</a>
-    } @else if (!auth.isAuthenticated()) {
+    } @else if (auth.isAuthenticated()) {
+    <a routerLink="/mon-espace" fragment="compte" class="btn-gold-outline">Mon compte</a>
+    } @else {
     <a routerLink="/connexion" class="btn-gold-outline">Se connecter</a>
     }
   </nav>
