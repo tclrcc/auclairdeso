@@ -15,6 +15,10 @@ export interface Offering {
   readonly depositCents: number | null;
   readonly modes: readonly ConsultationMode[];
   readonly category: OfferingCategory;
+  /** File name under /contenus/ (MEDIA_DIR on the server), or null when the offering has no video. */
+  readonly videoPath: string | null;
+  /** What is said in the video: it makes the video usable without sound. Null when not written. */
+  readonly videoTranscript: string | null;
 }
 
 export const MODE_LABELS: Record<ConsultationMode, string> = {

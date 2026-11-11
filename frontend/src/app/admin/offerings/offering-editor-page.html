@@ -71,6 +71,31 @@
         <app-field-errors [state]="offeringForm.modes()" />
       </fieldset>
 
+      <fieldset class="space-y-6">
+        <legend class="text-sm font-medium">Vidéo de présentation (facultative)</legend>
+        <div>
+          <label class="block text-sm font-medium" for="video-path">Nom du fichier vidéo</label>
+          <p id="video-path-hint" class="mt-1 text-sm text-night/70">
+            Le fichier doit d'abord être déposé dans le dossier des vidéos du serveur ; saisissez ici son nom
+            seulement, par exemple « guidance-30-min.mp4 » (.mp4 ou .webm). Laissez vide pour ne pas afficher
+            de vidéo.
+          </p>
+          <input id="video-path" type="text" autocomplete="off" spellcheck="false" class="field-input"
+                 aria-describedby="video-path-hint" [formField]="offeringForm.videoPath" />
+          <app-field-errors [state]="offeringForm.videoPath()" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium" for="video-transcript">Transcription de la vidéo</label>
+          <p id="video-transcript-hint" class="mt-1 text-sm text-night/70">
+            Le texte dit dans la vidéo, mot pour mot : il rend la vidéo accessible aux personnes qui ne
+            peuvent pas l'écouter. Il s'affiche sous la vidéo, dans un bloc repliable.
+          </p>
+          <textarea id="video-transcript" rows="6" class="field-input" aria-describedby="video-transcript-hint"
+                    [formField]="offeringForm.videoTranscript"></textarea>
+          <app-field-errors [state]="offeringForm.videoTranscript()" />
+        </div>
+      </fieldset>
+
       <div class="grid gap-6 sm:grid-cols-2">
         <div>
           <label class="block text-sm font-medium" for="order">Ordre d'affichage</label>

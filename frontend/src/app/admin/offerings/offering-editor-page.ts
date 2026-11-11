@@ -1,13 +1,20 @@
 import { Component, computed, inject, input, linkedSignal } from '@angular/core';
 import { httpResource } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
-import { form, FormField, FormRoot, maxLength, required, validate } from '@angular/forms/signals';
+import { form, FormField, FormRoot, maxLength, pattern, required, validate } from '@angular/forms/signals';
 import {CATEGORY_LABELS, MODE_LABELS, OfferingCategory} from '../../public/offerings/offering';
 import { FieldErrors } from '../../shared/field-errors';
 import { problemMessage } from '../../shared/problem-message';
 import { AdminOffering } from './admin-offering';
 import { OfferingAdmin } from './offering-admin';
-import { ALL_MODES, OfferingFormModel, emptyOfferingForm, toDraft, toFormModel } from './offering-form-model';
+import {
+  ALL_MODES,
+  OfferingFormModel,
+  VIDEO_PATH_PATTERN,
+  emptyOfferingForm,
+  toDraft,
+  toFormModel,
+} from './offering-form-model';
 
 @Component({
   selector: 'app-offering-editor-page',
@@ -57,6 +64,11 @@ export class OfferingEditorPage {
       validate(path.priceEuros, ({ value }) =>
         isBetween(value(), 0, 10_000) ? null : { kind: 'price', message: 'Un prix entre 0 et 10 000 €.' },
       );
+      pattern(path.videoPath, VIDEO_PATH_PATTERN, {
+        message: 'Un nom de fichier simple, en minuscules, chiffres et tirets, terminé par .mp4 ou .webm.',
+      });
+      maxLength(path.videoPath, 100, { message: '100 caractères au maximum.' });
+      maxLength(path.videoTranscript, 4000, { message: '4000 caractères au maximum.' });
       validate(path.modes, ({ value }) =>
         Object.values(value()).some(Boolean)
           ? null

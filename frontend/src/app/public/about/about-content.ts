@@ -13,7 +13,8 @@ export interface SiteVideo {
    */
   readonly src: string;
   readonly title: string;
-  readonly durationLabel: string;
+  /** Shown on the cover when known ("28 secondes"). Absent: only "avec le son". */
+  readonly durationLabel?: string;
   /** What is said in the video, for watching without sound and for search engines. Empty: not shown. */
   readonly transcript: string;
 }

@@ -34,4 +34,19 @@ describe('OfferingEditorPage', () => {
     expect(page.querySelector('#deposit')).toBeNull();
     expect(page.textContent).not.toContain('en ligne');
   });
+
+  it('offers two optional video fields, each explained by a hint', async () => {
+    const fixture = TestBed.createComponent(OfferingEditorPage);
+    await fixture.whenStable();
+
+    const page: HTMLElement = fixture.nativeElement;
+    const path = page.querySelector('#video-path');
+    const transcript = page.querySelector('#video-transcript');
+    expect(path?.hasAttribute('required')).toBe(false);
+    expect(transcript?.hasAttribute('required')).toBe(false);
+    expect(page.querySelector('#video-path-hint')?.textContent).toContain('dossier des vidéos du serveur');
+    expect(page.querySelector('#video-transcript-hint')?.textContent).toContain('accessible');
+    expect(path?.getAttribute('aria-describedby')).toBe('video-path-hint');
+    expect(transcript?.getAttribute('aria-describedby')).toBe('video-transcript-hint');
+  });
 });

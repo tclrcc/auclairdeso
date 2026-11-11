@@ -17,6 +17,9 @@ import { SiteVideo } from './about-content';
 })
 export class PresentationVideo {
   readonly video = input.required<SiteVideo>();
+  /** "none" downloads nothing before the click; "metadata" lets the browser read the duration first. */
+  readonly preload = input<'none' | 'metadata'>('none');
+  readonly transcriptLabel = input('Ce qui est dit dans la vidéo');
 
   private readonly player = viewChild.required<ElementRef<HTMLVideoElement>>('player');
 

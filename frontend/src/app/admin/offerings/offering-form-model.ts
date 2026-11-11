@@ -12,7 +12,13 @@ export interface OfferingFormModel {
   active: boolean;
   modes: Record<ConsultationMode, boolean>;
   category: OfferingCategory;
+  /** Empty means no video. */
+  videoPath: string;
+  videoTranscript: string;
 }
+
+/** Same rule as the backend (OfferingDraft): a plain file name, never a path. */
+export const VIDEO_PATH_PATTERN = /^[a-z0-9][a-z0-9-]*\.(mp4|webm)$/;
 
 export const ALL_MODES = Object.keys(MODE_LABELS) as ConsultationMode[];
 
@@ -26,7 +32,9 @@ export function emptyOfferingForm(): OfferingFormModel {
     displayOrder: 0,
     active: false,
     modes: modesRecord([]),
-    category: 'CLAIRVOYANCE'
+    category: 'CLAIRVOYANCE',
+    videoPath: '',
+    videoTranscript: '',
   };
 }
 
@@ -40,7 +48,9 @@ export function toFormModel(offering: AdminOffering): OfferingFormModel {
     displayOrder: offering.displayOrder,
     active: offering.active,
     modes: modesRecord(offering.modes),
-    category: offering.category
+    category: offering.category,
+    videoPath: offering.videoPath ?? '',
+    videoTranscript: offering.videoTranscript ?? '',
   };
 }
 
@@ -61,7 +71,9 @@ export function toDraft(model: OfferingFormModel): OfferingDraft {
     displayOrder: model.displayOrder,
     active: model.active,
     modes: ALL_MODES.filter((mode) => model.modes[mode]),
-    category: model.category
+    category: model.category,
+    videoPath: model.videoPath.trim() || null,
+    videoTranscript: model.videoTranscript.trim() || null,
   };
 }
 

@@ -25,6 +25,12 @@
       {{ current.durationMinutes }} min · {{ current.priceCents | euros }}, réglé après la séance
     </p>
 
+    @if (current.videoPath) {
+    <div class="mt-6">
+      <app-offering-video [offering]="current" />
+    </div>
+    }
+
     <section class="mt-10">
       <h2 class="font-display text-2xl">1. Comment souhaitez-vous consulter ?</h2>
       @if (availableModes().length === 0) {

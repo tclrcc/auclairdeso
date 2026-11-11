@@ -15,7 +15,9 @@ const GUIDANCE: Offering = {
   paymentPolicy: 'DEPOSIT_ONLINE',
   depositCents: 3000,
   modes: ['IN_PERSON', 'VIDEO', 'PHONE'],
-  category: 'CLAIRVOYANCE'
+  category: 'CLAIRVOYANCE',
+  videoPath: null,
+  videoTranscript: null,
 };
 
 describe('OfferingsPage', () => {
@@ -66,5 +68,53 @@ describe('OfferingsPage', () => {
     await fixture.whenStable();
 
     expect(fixture.nativeElement.querySelector('[role="alert"]')).not.toBeNull();
+  });
+
+  describe('video', () => {
+    async function openWith(offering: Offering) {
+      const fixture = TestBed.createComponent(OfferingsPage);
+      fixture.detectChanges();
+      httpTesting.expectOne('/api/offerings').flush([offering]);
+      await fixture.whenStable();
+      return fixture.nativeElement as HTMLElement;
+    }
+
+    it('shows nothing about a video when the offering has none', async () => {
+      const page = await openWith(GUIDANCE);
+
+      expect(page.querySelector('video')).toBeNull();
+      expect(page.querySelector('details')).toBeNull();
+    });
+
+    it('plays the video of the offering with the player of the about page', async () => {
+      const page = await openWith({ ...GUIDANCE, videoPath: 'guidance-1-h.mp4' });
+
+      const video = page.querySelector('video');
+      expect(video?.getAttribute('src')).toBe('/contenus/guidance-1-h.mp4');
+      expect(video?.getAttribute('preload')).toBe('metadata');
+      expect(video?.hasAttribute('controls')).toBe(true);
+      expect(video?.hasAttribute('autoplay')).toBe(false);
+      expect(video?.getAttribute('aria-label')).toBe('Guidance — 1 h');
+    });
+
+    it('offers the transcript under the video in a block that starts closed', async () => {
+      const page = await openWith({
+        ...GUIDANCE,
+        videoPath: 'guidance-1-h.mp4',
+        videoTranscript: 'Bonjour, je suis So.',
+      });
+
+      const details = page.querySelector('details');
+      expect(details?.querySelector('summary')?.textContent).toContain('Lire la transcription');
+      expect(details?.textContent).toContain('Bonjour, je suis So.');
+      expect(details?.open).toBe(false);
+    });
+
+    it('shows the video without a transcript block while none is written', async () => {
+      const page = await openWith({ ...GUIDANCE, videoPath: 'guidance-1-h.mp4' });
+
+      expect(page.querySelector('video')).not.toBeNull();
+      expect(page.querySelector('details')).toBeNull();
+    });
   });
 });

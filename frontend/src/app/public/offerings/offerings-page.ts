@@ -4,10 +4,11 @@ import { Meta } from '@angular/platform-browser';
 import { EurosPipe } from '../../shared/euros-pipe';
 import { ConsultationMode, MODE_LABELS, Offering } from './offering';
 import { RouterLink } from '@angular/router';
+import { OfferingVideo } from './offering-video';
 
 @Component({
   selector: 'app-offerings-page',
-  imports: [EurosPipe, RouterLink],
+  imports: [EurosPipe, RouterLink, OfferingVideo],
   templateUrl: './offerings-page.html',
 })
 export class OfferingsPage {

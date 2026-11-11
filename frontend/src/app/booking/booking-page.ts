@@ -11,6 +11,7 @@ import { problemMessage } from '../shared/problem-message';
 import { AppointmentView, ClientProfile, MODE_HINTS } from './booking';
 import { BookingApi } from './booking-api';
 import { BookingFormModel, emptyBookingForm, fromProfile, isAdult, toBookingRequest } from './booking-form-model';
+import { OfferingVideo } from '../public/offerings/offering-video';
 import { SlotPicker } from './slot-picker';
 
 const ACCEPTED_PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -19,7 +20,7 @@ const PHONE_PATTERN = /^\+?[0-9][0-9 .-]{8,18}$/;
 
 @Component({
   selector: 'app-booking-page',
-  imports: [FormField, FormRoot, RouterLink, EurosPipe, FieldErrors, SlotPicker],
+  imports: [FormField, FormRoot, RouterLink, EurosPipe, FieldErrors, SlotPicker, OfferingVideo],
   templateUrl: './booking-page.html',
 })
 export class BookingPage {

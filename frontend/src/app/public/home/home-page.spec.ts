@@ -17,6 +17,8 @@ function offering(slug: string, name: string, category: OfferingCategory): Offer
     depositCents: null,
     modes: ['VIDEO'],
     category,
+    videoPath: null,
+    videoTranscript: null,
   };
 }
 

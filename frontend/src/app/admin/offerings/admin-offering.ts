@@ -14,6 +14,8 @@ export interface AdminOffering {
   readonly active: boolean;
   readonly modes: readonly ConsultationMode[];
   readonly category: OfferingCategory;
+  readonly videoPath: string | null;
+  readonly videoTranscript: string | null;
 }
 
 /** Body sent to create or update an offering: mirror of the backend OfferingDraft record. */
