@@ -16,4 +16,5 @@ RUN groupadd --system app && useradd --system --gid app app
 COPY --from=build /workspace/target/*.jar app.jar
 USER app
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+# Pinned to UTC: Hibernate reads TIME columns through the JVM time zone (see the Surefire argLine in pom.xml).
+ENTRYPOINT ["java", "-Duser.timezone=UTC", "-jar", "/app/app.jar"]
