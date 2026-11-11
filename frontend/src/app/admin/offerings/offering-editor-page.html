@@ -28,7 +28,12 @@
 
       <div>
         <label class="block text-sm font-medium" for="description">Description</label>
-        <textarea id="description" rows="5" class="field-input" [formField]="offeringForm.description"></textarea>
+        <p id="description-hint" class="mt-1 rounded-lg bg-sand p-3 text-sm">
+          Ce texte est public. Ne citez jamais de pathologie ni de maladie, ne promettez aucun résultat, et
+          ne laissez jamais croire que la séance soigne, notamment un cancer.
+        </p>
+        <textarea id="description" rows="5" class="field-input" aria-describedby="description-hint"
+                  [formField]="offeringForm.description"></textarea>
         <app-field-errors [state]="offeringForm.description()" />
       </div>
 
