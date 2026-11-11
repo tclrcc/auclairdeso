@@ -86,7 +86,7 @@ class AppointmentTests {
     void anAppointmentTakenByThePractitionerIsConfirmedAtOnce() {
         var client = Client.byPractitioner(new ManualClient("Louise", "Martin", "06 11 22 33 44", null, null), null);
         var offering = new OfferingView("consultation-1-h", "Consultation approfondie", "Une heure.", 60, 15, 8_000,
-            PaymentPolicy.ON_SITE, null, List.of(ConsultationMode.PHONE), OfferingCategory.CLAIRVOYANCE);
+            PaymentPolicy.ON_SITE, null, List.of(ConsultationMode.PHONE), OfferingCategory.CLAIRVOYANCE, null, null);
         var request = new ManualAppointmentRequest("consultation-1-h", ConsultationMode.PHONE,
             LocalDateTime.of(2026, 10, 23, 19, 0), null, null, "Appel en urgence", null, null);
 
@@ -124,7 +124,7 @@ class AppointmentTests {
         var client = new Client("alice@example.com");
         client.update(details);
         var offering = new OfferingView("consultation-1-h", "Consultation approfondie", "Une heure.", 60, 15, 8_000,
-            PaymentPolicy.ON_SITE, null, List.of(ConsultationMode.VIDEO), OfferingCategory.CLAIRVOYANCE);
+            PaymentPolicy.ON_SITE, null, List.of(ConsultationMode.VIDEO), OfferingCategory.CLAIRVOYANCE, null, null);
         var booking = new BookingRequest("consultation-1-h", ConsultationMode.VIDEO,
             OffsetDateTime.parse("2026-10-12T14:00:00+02:00"), details, "Une question.", null, "Alice M",
             true, true);

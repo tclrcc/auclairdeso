@@ -18,7 +18,9 @@ record OfferingDetails(
     int displayOrder,
     boolean active,
     List<ConsultationMode> modes,
-    OfferingCategory category) {
+    OfferingCategory category,
+    @Nullable String videoPath,
+    @Nullable String videoTranscript) {
 
     OfferingDetails {
         modes = List.copyOf(modes);

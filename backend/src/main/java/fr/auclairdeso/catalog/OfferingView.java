@@ -1,6 +1,7 @@
 package fr.auclairdeso.catalog;
 
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 public record OfferingView(
     String slug,
@@ -10,9 +11,11 @@ public record OfferingView(
     int bufferMinutes,
     int priceCents,
     PaymentPolicy paymentPolicy,
-    Integer depositCents,
+    @Nullable Integer depositCents,
     List<ConsultationMode> modes,
-    OfferingCategory category) {
+    OfferingCategory category,
+    @Nullable String videoPath,
+    @Nullable String videoTranscript) {
 
     public OfferingView {
         modes = List.copyOf(modes);

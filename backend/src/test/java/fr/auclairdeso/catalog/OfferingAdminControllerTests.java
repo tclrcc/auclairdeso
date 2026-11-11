@@ -10,6 +10,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import fr.auclairdeso.WebSecurityTestConfiguration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -38,6 +40,13 @@ class OfferingAdminControllerTests {
              "displayOrder": 0, "active": true, "modes": []}
             """;
 
+    private static final String WITH_VIDEO = """
+            {"name": "Guidance — 1 h", "description": "Une séance complète.", "durationMinutes": 60,
+             "bufferMinutes": 15, "priceCents": 8000, "displayOrder": 10, "active": true,
+             "category": "CLAIRVOYANCE", "modes": ["PHONE"],
+             "videoPath": "%s", "videoTranscript": "Bonjour, je suis So."}
+            """;
+
     @Autowired
     private MockMvcTester mvc;
 
@@ -48,7 +57,7 @@ class OfferingAdminControllerTests {
     void createsAnOfferingAndPointsToIt() {
         given(administration.create(any())).willReturn(new OfferingDetails("guidance-1-h", "Guidance — 1 h",
             "Une séance complète.", 60, 15, 8_000, PaymentPolicy.DEPOSIT_ONLINE, 3_000, 10, true,
-            List.of(ConsultationMode.VIDEO, ConsultationMode.PHONE), OfferingCategory.CLAIRVOYANCE));
+            List.of(ConsultationMode.VIDEO, ConsultationMode.PHONE), OfferingCategory.CLAIRVOYANCE, null, null));
 
         var result = mvc.post().uri("/api/admin/offerings").with(practitioner()).with(csrf())
             .contentType(MediaType.APPLICATION_JSON).content(VALID)
@@ -68,6 +77,47 @@ class OfferingAdminControllerTests {
             .asArray()
             .contains("name", "modes")
             .doesNotContain("paymentPolicy", "depositConsistent");
+    }
+
+    @Test
+    void createsAnOfferingWithItsVideo() {
+        given(administration.create(any())).willReturn(new OfferingDetails("guidance-1-h", "Guidance — 1 h",
+            "Une séance complète.", 60, 15, 8_000, PaymentPolicy.ON_SITE, null, 10, true,
+            List.of(ConsultationMode.PHONE), OfferingCategory.CLAIRVOYANCE, "guidance-1-h.mp4",
+            "Bonjour, je suis So."));
+
+        var result = mvc.post().uri("/api/admin/offerings").with(practitioner()).with(csrf())
+            .contentType(MediaType.APPLICATION_JSON).content(WITH_VIDEO.formatted("guidance-1-h.mp4"))
+            .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.CREATED)
+            .bodyJson().extractingPath("$.videoPath").isEqualTo("guidance-1-h.mp4");
+    }
+
+    @Test
+    void readsBackTheVideoInTheAdministrationResponse() {
+        given(administration.find("guidance-1-h")).willReturn(java.util.Optional.of(new OfferingDetails(
+            "guidance-1-h", "Guidance — 1 h", "Une séance complète.", 60, 15, 8_000, PaymentPolicy.ON_SITE, null, 10,
+            true, List.of(ConsultationMode.PHONE), OfferingCategory.CLAIRVOYANCE, "guidance-1-h.mp4",
+            "Bonjour, je suis So.")));
+
+        var body = assertThat(mvc.get().uri("/api/admin/offerings/guidance-1-h").with(practitioner()))
+            .hasStatusOk().bodyJson();
+
+        body.extractingPath("$.videoPath").isEqualTo("guidance-1-h.mp4");
+        body.extractingPath("$.videoTranscript").isEqualTo("Bonjour, je suis So.");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"videos/guidance.mp4", "../guidance.mp4", "guidance.mov"})
+    void refusesAVideoPathThatIsNotAPlainFileName(String path) {
+        assertThat(mvc.post().uri("/api/admin/offerings").with(practitioner()).with(csrf())
+            .contentType(MediaType.APPLICATION_JSON).content(WITH_VIDEO.formatted(path)))
+            .hasStatus(HttpStatus.BAD_REQUEST)
+            .bodyJson()
+            .extractingPath("$.errors[*].field")
+            .asArray()
+            .containsExactly("videoPath");
     }
 
     @Test

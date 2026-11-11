@@ -68,6 +68,12 @@ class Offering {
     @Column(name = "mode", nullable = false, length = 20)
     private Set<ConsultationMode> modes = EnumSet.noneOf(ConsultationMode.class);
 
+    @Column(name = "video_path", length = 100)
+    private @Nullable String videoPath;
+
+    @Column(name = "video_transcript", columnDefinition = "text")
+    private @Nullable String videoTranscript;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -106,6 +112,8 @@ class Offering {
         this.modes.clear();
         this.modes.addAll(draft.modes());
         this.category = Objects.requireNonNull(draft.category(), "category");
+        this.videoPath = draft.videoPath();
+        this.videoTranscript = draft.videoTranscript();
     }
 
     String slug() {
@@ -114,12 +122,13 @@ class Offering {
 
     OfferingView toView() {
         return new OfferingView(slug, name, description, durationMinutes, bufferMinutes, priceCents,
-            paymentPolicy, depositCents, sortedModes(), category);
+            paymentPolicy, depositCents, sortedModes(), category, videoPath, videoTranscript);
     }
 
     OfferingDetails toDetails() {
         return new OfferingDetails(slug, name, description, durationMinutes, bufferMinutes, priceCents,
-            paymentPolicy, depositCents, displayOrder, active, sortedModes(), category);
+            paymentPolicy, depositCents, displayOrder, active, sortedModes(), category, videoPath,
+            videoTranscript);
     }
 
     private java.util.List<ConsultationMode> sortedModes() {

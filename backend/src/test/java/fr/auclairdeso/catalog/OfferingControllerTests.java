@@ -37,6 +37,28 @@ class OfferingControllerTests {
     }
 
     @Test
+    void exposesTheVideoAndItsTranscriptToTheVisitors() {
+        given(catalog.findActiveOffering("guidance-1-h")).willReturn(Optional.of(guidance()));
+
+        var body = assertThat(mvc.get().uri("/api/offerings/guidance-1-h")).hasStatusOk().bodyJson();
+
+        body.extractingPath("$.videoPath").isEqualTo("guidance-1-h.mp4");
+        body.extractingPath("$.videoTranscript").isEqualTo("Bonjour, je suis So.");
+    }
+
+    @Test
+    void returnsNullForTheVideoOfAnOfferingWithoutOne() {
+        given(catalog.findActiveOffering("sans-video")).willReturn(Optional.of(new OfferingView("sans-video",
+            "Sans vidéo", "Description", 60, 15, 8_000, PaymentPolicy.ON_SITE, null,
+            List.of(ConsultationMode.PHONE), OfferingCategory.CLAIRVOYANCE, null, null)));
+
+        var body = assertThat(mvc.get().uri("/api/offerings/sans-video")).hasStatusOk().bodyJson();
+
+        body.extractingPath("$.videoPath").isNull();
+        body.extractingPath("$.videoTranscript").isNull();
+    }
+
+    @Test
     void unknownSlugReturnsAProblemDetail() {
         given(catalog.findActiveOffering("inconnue")).willReturn(Optional.empty());
 
@@ -47,6 +69,7 @@ class OfferingControllerTests {
 
     private static OfferingView guidance() {
         return new OfferingView("guidance-1-h", "Guidance — 1 h", "Description", 60, 15, 8_000,
-            PaymentPolicy.FULL_ONLINE, null, List.of(ConsultationMode.PHONE), OfferingCategory.CLAIRVOYANCE);
+            PaymentPolicy.FULL_ONLINE, null, List.of(ConsultationMode.PHONE), OfferingCategory.CLAIRVOYANCE,
+            "guidance-1-h.mp4", "Bonjour, je suis So.");
     }
 }

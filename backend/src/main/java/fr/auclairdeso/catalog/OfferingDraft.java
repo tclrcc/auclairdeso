@@ -49,14 +49,36 @@ record OfferingDraft(
     Set<ConsultationMode> modes,
 
     @NotNull(message = "La catégorie est obligatoire.")
-    OfferingCategory category) {
+    OfferingCategory category,
+
+    @Size(max = 100, message = "Le nom du fichier vidéo ne doit pas dépasser 100 caractères.")
+    @Pattern(regexp = OfferingDraft.VIDEO_PATH_PATTERN,
+        message = "Le nom du fichier vidéo est un nom simple, en minuscules, chiffres et tirets, "
+            + "terminé par .mp4 ou .webm.")
+    @Nullable String videoPath,
+
+    @Size(max = 4000, message = "La transcription ne doit pas dépasser 4000 caractères.")
+    @Nullable String videoTranscript) {
+
+    /**
+     * A plain file name under MEDIA_DIR, as served at /contenus/: no slash, no "..", only lower-case letters,
+     * digits and hyphens before a .mp4 or .webm extension (the dot is allowed once, only before the extension).
+     */
+    static final String VIDEO_PATH_PATTERN = "^[a-z0-9][a-z0-9-]*\\.(mp4|webm)$";
 
     /**
      * The site takes no online payment (docs/specification.md, 3.5): whatever the caller sends, an offering is
      * paid on site and carries no deposit. The enum and the column stay as they are.
+     * An empty video path or transcript means "no video" and "no transcript": both are stored as null.
      */
     OfferingDraft {
         paymentPolicy = PaymentPolicy.ON_SITE;
         depositCents = null;
+        videoPath = blankToNull(videoPath);
+        videoTranscript = blankToNull(videoTranscript);
+    }
+
+    private static @Nullable String blankToNull(@Nullable String value) {
+        return value == null || value.isBlank() ? null : value.strip();
     }
 }

@@ -71,7 +71,7 @@ class ClientErasureTests {
     private static Appointment videoRequest() {
         var details = new ClientDetails("Alice", "Martin", LocalDate.of(1990, 5, 4), "06 12 34 56 78", null);
         var offering = new OfferingView("consultation-1-h", "Consultation approfondie", "Une heure.", 60, 15, 8_000,
-            PaymentPolicy.ON_SITE, null, List.of(ConsultationMode.VIDEO), OfferingCategory.CLAIRVOYANCE);
+            PaymentPolicy.ON_SITE, null, List.of(ConsultationMode.VIDEO), OfferingCategory.CLAIRVOYANCE, null, null);
         var booking = new BookingRequest("consultation-1-h", ConsultationMode.VIDEO,
             OffsetDateTime.parse("2026-10-21T14:00:00+02:00"), details, "Une question.", null, "Alice M",
             true, true);
