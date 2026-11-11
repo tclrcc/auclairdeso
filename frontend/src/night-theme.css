@@ -157,6 +157,20 @@
     }
   }
 
+  /* The title of an inner page (Séances, À propos, legal pages): 44 px on a phone, 60 px from "md" on. */
+  .night-page-title {
+    font-family: var(--font-night-serif);
+    font-size: calc(44rem / 17);
+    font-weight: 500;
+    line-height: 1.05;
+    color: var(--color-cream);
+    text-wrap: balance;
+
+    @media (width >= 48rem) {
+      font-size: calc(60rem / 17);
+    }
+  }
+
   .night-h2 {
     font-family: var(--font-night-serif);
     font-size: calc(34rem / 17);

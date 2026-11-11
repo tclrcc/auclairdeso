@@ -1,72 +1,75 @@
-<main>
-  <section class="px-5 py-16 sm:py-20">
-    <div class="mx-auto max-w-5xl">
-      <h1 class="font-display text-5xl leading-none text-cream sm:text-6xl">À propos</h1>
-      @for (paragraph of intro; track paragraph) {
-      <p class="mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft">{{ paragraph }}</p>
-      }
-    </div>
-  </section>
-
-  <section aria-labelledby="presentation-title" class="px-5 py-20 sm:py-24">
-    <div class="mx-auto max-w-5xl">
-      @if (journey.length) {
-      <div class="grid gap-12 md:grid-cols-[21rem_1fr] md:items-start md:gap-16">
-        <app-presentation-video [video]="presentation" />
-        <div>
-          <h2 id="presentation-title" class="font-display text-5xl text-cream">Son parcours</h2>
-          @for (paragraph of journey; track paragraph) {
-          <p class="mt-5 leading-relaxed text-ink-soft">{{ paragraph }}</p>
-          }
-        </div>
-      </div>
-      } @else {
-      <div class="text-center">
-        <h2 id="presentation-title" class="font-display text-5xl text-cream">Sa présentation</h2>
-        <p class="mx-auto mt-4 max-w-xl leading-relaxed text-ink-muted">
-          Quelques secondes pour l’entendre, avant de pousser la porte.
-        </p>
-        <div class="mt-10 text-left">
-          <app-presentation-video [video]="presentation" />
-        </div>
-      </div>
-      }
-    </div>
-  </section>
-
-  <section aria-labelledby="commitments-title" class="px-5 py-20 sm:py-24">
-    <div class="mx-auto max-w-5xl">
-      <h2 id="commitments-title" class="font-display text-5xl text-cream">Le cadre des séances</h2>
-      <p class="mt-4 max-w-2xl leading-relaxed text-ink-muted">
-        Rien ici n’est une formule : chacun de ces points est ce que le site fait réellement, et vous pouvez
-        le vérifier à chaque étape.
-      </p>
-
-      <ul class="mt-12 grid gap-x-12 gap-y-9 sm:grid-cols-2">
-        @for (commitment of commitments; track commitment.title) {
-        <li class="flex gap-4">
-          <svg viewBox="-10 -10 20 20" aria-hidden="true" class="mt-1.5 size-3.5 shrink-0 fill-gold">
-            <path [attr.d]="sparkle" />
-          </svg>
-          <div>
-            <h3 class="text-lg font-medium text-cream">{{ commitment.title }}</h3>
-            <p class="mt-1 leading-relaxed text-ink-muted">{{ commitment.text }}</p>
-          </div>
-        </li>
+<main class="flex-1 pb-section">
+  <!-- Every block whose content is missing (portrait, path, transcript) is left out: never a placeholder. -->
+  <section class="night-container pt-14 sm:pt-20">
+    <div class="flex flex-col-reverse gap-10 md:flex-row md:items-center md:justify-between md:gap-16">
+      <div class="max-w-2xl">
+        <h1 class="night-page-title">À propos</h1>
+        @for (paragraph of intro; track paragraph) {
+        <p class="night-lead mt-6">{{ paragraph }}</p>
         }
-      </ul>
+      </div>
+      @if (portrait; as photo) {
+      <img [ngSrc]="photo" alt="Portrait de So" width="208" height="208" priority
+           class="size-44 shrink-0 rounded-full object-cover ring-2 ring-gold ring-offset-4 ring-offset-abyss md:size-52" />
+      }
     </div>
   </section>
 
-  <section class="px-5 py-20 sm:py-24">
-    <div class="mx-auto night-card flex max-w-5xl flex-col items-start gap-8 p-8 sm:flex-row sm:items-center sm:justify-between">
+  <section aria-labelledby="presentation-title" class="night-container pt-section">
+    @if (journey.length) {
+    <div class="grid gap-12 md:grid-cols-[21rem_1fr] md:items-start md:gap-16">
+      <app-presentation-video [video]="presentation" transcriptLabel="Lire la transcription" />
+      <div class="max-w-2xl">
+        <h2 id="presentation-title" class="night-h2">Son parcours</h2>
+        @for (paragraph of journey; track paragraph) {
+        <p class="mt-5 leading-relaxed text-ink-soft">{{ paragraph }}</p>
+        }
+      </div>
+    </div>
+    } @else {
+    <div class="text-center">
+      <h2 id="presentation-title" class="night-h2">Sa présentation</h2>
+      <p class="mx-auto mt-4 max-w-xl leading-relaxed text-ink-soft">
+        Quelques secondes pour l’entendre, avant de pousser la porte.
+      </p>
+      <div class="mt-10 text-left">
+        <app-presentation-video [video]="presentation" transcriptLabel="Lire la transcription" />
+      </div>
+    </div>
+    }
+  </section>
+
+  <section aria-labelledby="commitments-title" class="night-container pt-section">
+    <h2 id="commitments-title" class="night-h2">Le cadre des séances</h2>
+    <p class="mt-4 max-w-2xl leading-relaxed text-ink-soft">
+      Rien ici n’est une formule : chacun de ces points est ce que le site fait réellement, et vous pouvez
+      le vérifier à chaque étape.
+    </p>
+
+    <ul class="mt-12 grid gap-x-12 gap-y-9 sm:grid-cols-2">
+      @for (commitment of commitments; track commitment.title) {
+      <li class="flex gap-4">
+        <svg viewBox="-10 -10 20 20" aria-hidden="true" class="mt-1.5 size-3.5 shrink-0 fill-gold">
+          <path [attr.d]="sparkle" />
+        </svg>
+        <div>
+          <h3 class="font-display text-2xl font-semibold leading-tight text-cream">{{ commitment.title }}</h3>
+          <p class="mt-2 leading-relaxed text-ink-muted">{{ commitment.text }}</p>
+        </div>
+      </li>
+      }
+    </ul>
+  </section>
+
+  <section class="night-container pt-section">
+    <div class="night-card flex flex-col items-start gap-8 p-8 sm:flex-row sm:items-center sm:justify-between md:p-12">
       <div>
-        <h2 class="font-display text-4xl text-cream sm:text-5xl">Prendre rendez-vous</h2>
+        <h2 class="night-h2">Prendre rendez-vous</h2>
         <p class="mt-3 max-w-xl leading-relaxed text-ink-soft">
           Le détail et le tarif de chaque séance, puis un créneau du lendemain jusqu’à deux mois à l’avance.
         </p>
       </div>
-      <a routerLink="/seances" class="btn-gold shrink-0">Voir les séances</a>
+      <a routerLink="/seances" class="btn-gold w-full shrink-0 sm:w-auto">Voir les séances</a>
     </div>
   </section>
 </main>

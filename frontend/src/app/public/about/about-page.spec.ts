@@ -35,6 +35,14 @@ describe('about page', () => {
     expect(openPage().nativeElement.textContent).not.toContain('Son parcours');
   });
 
+  it('shows no placeholder for what is still missing: no portrait, no text in brackets', () => {
+    const page = openPage().nativeElement as HTMLElement;
+
+    // PORTRAIT is null: no image of her at all (the logo of the video cover is not a portrait).
+    expect(page.querySelector('img[alt="Portrait de So"]')).toBeNull();
+    expect(page.textContent).not.toMatch(/[[\]]/);
+  });
+
   describe('presentation video', () => {
     function openVideo(video: SiteVideo = VIDEO) {
       const fixture = TestBed.createComponent(PresentationVideo);

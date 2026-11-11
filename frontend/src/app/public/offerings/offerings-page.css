@@ -3,22 +3,6 @@
  * (see night-theme.css), and grow with the font size of the browser.
  */
 
-/* The title of the page: 44 px on a phone, 60 px from "md" on. */
-.page-title {
-  font-family: var(--font-night-serif);
-  font-size: calc(44rem / 17);
-  font-weight: 500;
-  line-height: 1.05;
-  color: var(--color-cream);
-  text-wrap: balance;
-}
-
-@media (width >= 48rem) {
-  .page-title {
-    font-size: calc(60rem / 17);
-  }
-}
-
 /* Phone: one column. From "lg" on: [video] | text | price, the video column only when there is one. */
 .offering-card {
   display: grid;
