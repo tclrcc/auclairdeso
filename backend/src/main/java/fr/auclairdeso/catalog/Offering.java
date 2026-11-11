@@ -91,9 +91,6 @@ class Offering {
 
     private void apply(OfferingDraft draft) {
         Objects.requireNonNull(draft, "draft");
-        if (!draft.isDepositConsistent()) {
-            throw new IllegalArgumentException("The deposit does not match the payment policy");
-        }
         if (draft.modes() == null || draft.modes().isEmpty()) {
             throw new IllegalArgumentException("At least one consultation mode is required");
         }
@@ -102,7 +99,7 @@ class Offering {
         this.durationMinutes = draft.durationMinutes();
         this.bufferMinutes = draft.bufferMinutes();
         this.priceCents = draft.priceCents();
-        this.paymentPolicy = Objects.requireNonNull(draft.paymentPolicy(), "paymentPolicy");
+        this.paymentPolicy = draft.paymentPolicy();
         this.depositCents = draft.depositCents();
         this.displayOrder = draft.displayOrder();
         this.active = draft.active();

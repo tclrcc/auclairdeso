@@ -66,7 +66,8 @@ class OfferingAdminControllerTests {
             .bodyJson()
             .extractingPath("$.errors[*].field")
             .asArray()
-            .contains("name", "modes", "depositConsistent");
+            .contains("name", "modes")
+            .doesNotContain("paymentPolicy", "depositConsistent");
     }
 
     @Test

@@ -1,7 +1,6 @@
 package fr.auclairdeso.catalog;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
@@ -10,17 +9,24 @@ import org.junit.jupiter.api.Test;
 class OfferingTests {
 
     @Test
-    void depositPolicyRequiresADepositNotGreaterThanThePrice() {
-        assertThatIllegalArgumentException()
-            .isThrownBy(() -> new Offering("guidance", draft(PaymentPolicy.DEPOSIT_ONLINE, null)));
-        assertThatIllegalArgumentException()
-            .isThrownBy(() -> new Offering("guidance", draft(PaymentPolicy.DEPOSIT_ONLINE, 9_000)));
+    void anOfferingIsAlwaysPaidOnSiteWithoutDeposit() {
+        for (var policy : PaymentPolicy.values()) {
+            var details = new Offering("guidance", draft(policy, 3_000)).toDetails();
+
+            assertThat(details.paymentPolicy()).as("policy received: %s", policy).isEqualTo(PaymentPolicy.ON_SITE);
+            assertThat(details.depositCents()).as("deposit received with %s", policy).isNull();
+        }
     }
 
     @Test
-    void otherPoliciesRejectADeposit() {
-        assertThatIllegalArgumentException()
-            .isThrownBy(() -> new Offering("guidance", draft(PaymentPolicy.FULL_ONLINE, 1_000)));
+    void updatingAnOfferingKeepsItPaidOnSite() {
+        var offering = new Offering("guidance", draft(PaymentPolicy.ON_SITE, null));
+
+        offering.update(draft(PaymentPolicy.DEPOSIT_ONLINE, 2_000));
+
+        var details = offering.toDetails();
+        assertThat(details.paymentPolicy()).isEqualTo(PaymentPolicy.ON_SITE);
+        assertThat(details.depositCents()).isNull();
     }
 
     @Test
@@ -35,12 +41,12 @@ class OfferingTests {
         var offering = new Offering("guidance", draft(PaymentPolicy.FULL_ONLINE, null));
 
         offering.update(new OfferingDraft("  Guidance renommée ", "Nouvelle description", 45, 15, 6_000,
-            PaymentPolicy.DEPOSIT_ONLINE, 2_000, 5, true, Set.of(ConsultationMode.VIDEO), OfferingCategory.CLAIRVOYANCE));
+            PaymentPolicy.ON_SITE, null, 5, true, Set.of(ConsultationMode.VIDEO), OfferingCategory.CLAIRVOYANCE));
 
         var details = offering.toDetails();
         assertThat(details.slug()).isEqualTo("guidance");
         assertThat(details.name()).isEqualTo("Guidance renommée");
-        assertThat(details.depositCents()).isEqualTo(2_000);
+        assertThat(details.priceCents()).isEqualTo(6_000);
         assertThat(details.modes()).containsExactly(ConsultationMode.VIDEO);
     }
 

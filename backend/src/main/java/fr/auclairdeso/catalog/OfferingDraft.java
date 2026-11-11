@@ -1,6 +1,5 @@
 package fr.auclairdeso.catalog;
 
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -12,7 +11,8 @@ import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Everything the practitioner can set on an offering, except its slug. Amounts are in euro cents.
+ * Everything the practitioner can set on an offering, except its slug. Amounts are in euro cents. The payment
+ * policy and the deposit are always forced to ON_SITE and nothing, whatever is received.
  */
 record OfferingDraft(
     @NotBlank(message = "Le nom est obligatoire.")
@@ -36,7 +36,6 @@ record OfferingDraft(
     @Max(value = 1_000_000, message = "Le prix ne doit pas dépasser 10 000 €.")
     int priceCents,
 
-    @NotNull(message = "Le mode de paiement est obligatoire.")
     PaymentPolicy paymentPolicy,
 
     @Nullable Integer depositCents,
@@ -52,12 +51,12 @@ record OfferingDraft(
     @NotNull(message = "La catégorie est obligatoire.")
     OfferingCategory category) {
 
-    /** The same rule as the offering_deposit_ck constraint of the database. */
-    @AssertTrue(message = "L'acompte doit être compris entre 0,01 € et le prix, et seulement avec le paiement par acompte.")
-    boolean isDepositConsistent() {
-        if (paymentPolicy == PaymentPolicy.DEPOSIT_ONLINE) {
-            return depositCents != null && depositCents >= 1 && depositCents <= priceCents;
-        }
-        return depositCents == null;
+    /**
+     * The site takes no online payment (docs/specification.md, 3.5): whatever the caller sends, an offering is
+     * paid on site and carries no deposit. The enum and the column stay as they are.
+     */
+    OfferingDraft {
+        paymentPolicy = PaymentPolicy.ON_SITE;
+        depositCents = null;
     }
 }
