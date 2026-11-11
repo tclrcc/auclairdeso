@@ -1,9 +1,10 @@
-<main class="flex-1 px-6 py-20 sm:py-28">
-  <div class="mx-auto w-full max-w-sm">
+<main class="flex flex-1 items-start justify-center px-5 py-16 sm:py-24">
+  <!-- One card, 480 px at most: the form, then "Vérifiez votre boîte mail" in its place. -->
+  <div class="night-card w-full max-w-[calc(480rem/17)] p-6 sm:p-10">
     @if (sentTo(); as address) {
-    <h1 class="font-display text-5xl text-cream">Vérifiez votre boîte mail</h1>
-    <p class="mt-4 leading-relaxed">
-      Un lien vient d'être envoyé à <strong>{{ address }}</strong>.
+    <h1 class="font-display text-4xl font-medium leading-tight text-cream sm:text-5xl">Vérifiez votre boîte mail</h1>
+    <p class="mt-5 leading-relaxed">
+      Un lien vient d'être envoyé à <strong class="break-words text-cream">{{ address }}</strong>.
       Il est valable 10 minutes et ne fonctionne qu'une fois.
     </p>
     @if (fromBooking()) {
@@ -12,16 +13,17 @@
     <p class="mt-4 text-sm text-ink-muted">Pensez à regarder dans les courriers indésirables.</p>
     } @else {
     @if (fromBooking()) {
-    <h1 class="font-display text-5xl text-cream">Confirmez votre adresse email</h1>
-    <p class="mt-3 leading-relaxed text-ink-muted">
+    <h1 class="font-display text-4xl font-medium leading-tight text-cream sm:text-5xl">Confirmez votre adresse email</h1>
+    <p class="mt-4 leading-relaxed text-ink-soft">
       Vous recevrez un lien pour terminer votre demande. Pas de compte à créer, pas de mot de passe.
     </p>
     } @else {
-    <h1 class="font-display text-5xl text-cream">Se connecter</h1>
-    <p class="mt-3 leading-relaxed text-ink-muted">
+    <h1 class="font-display text-4xl font-medium leading-tight text-cream sm:text-5xl">Se connecter</h1>
+    <p class="mt-4 leading-relaxed text-ink-soft">
       Indiquez votre adresse email : vous recevrez un lien de connexion, sans mot de passe à retenir.
     </p>
     }
+    <p class="mt-3 text-sm text-ink-muted">Le lien est valable 10 minutes et ne fonctionne qu'une fois.</p>
 
     <form class="mt-8" [formRoot]="loginForm">
       <label class="block text-sm font-medium" for="email">Adresse email</label>
@@ -38,7 +40,7 @@
       <p class="field-error mt-4 text-sm" role="alert">{{ error.message }}</p>
       }
 
-      <button type="submit" class="btn-primary mt-6 w-full py-3" [disabled]="loginForm().submitting()">
+      <button type="submit" class="btn-primary mt-6 w-full" [disabled]="loginForm().submitting()">
         @if (loginForm().submitting()) {
         Envoi…
         } @else {

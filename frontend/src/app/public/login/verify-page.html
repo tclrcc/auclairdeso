@@ -1,24 +1,25 @@
-<main class="flex-1 px-6 py-20 sm:py-28">
-  <div class="mx-auto w-full max-w-sm text-center">
+<main class="flex flex-1 items-start justify-center px-5 py-16 sm:py-24">
+  <!-- The same card as the login page: the second half of the same step. -->
+  <div class="night-card w-full max-w-[calc(480rem/17)] p-6 text-center sm:p-10">
     @switch (state()) {
     @case ('invalid') {
-    <h1 class="font-display text-5xl text-cream">Lien expiré ou déjà utilisé</h1>
-    <p class="mt-4 leading-relaxed">
+    <h1 class="font-display text-4xl font-medium leading-tight text-cream sm:text-5xl">Lien expiré ou déjà utilisé</h1>
+    <p class="mt-5 leading-relaxed">
       Pour votre sécurité, chaque lien ne fonctionne qu'une fois et pendant 10 minutes.
     </p>
-    <a routerLink="/connexion" [queryParams]="{ redirect: redirect() }" class="btn-primary mt-8 px-6 py-3">
+    <a routerLink="/connexion" [queryParams]="{ redirect: redirect() }" class="btn-primary mt-8 w-full">
       Recevoir un nouveau lien
     </a>
     }
     @case ('error') {
-    <h1 class="font-display text-5xl text-cream">Confirmation impossible</h1>
-    <p class="mt-4">Une erreur est survenue. Merci de réessayer dans un instant.</p>
-    <button type="button" class="btn-primary mt-8 px-6 py-3" (click)="confirm()">Réessayer</button>
+    <h1 class="font-display text-4xl font-medium leading-tight text-cream sm:text-5xl">Confirmation impossible</h1>
+    <p class="mt-5">Une erreur est survenue. Merci de réessayer dans un instant.</p>
+    <button type="button" class="btn-primary mt-8 w-full" (click)="confirm()">Réessayer</button>
     }
     @default {
-    <h1 class="font-display text-5xl text-cream">Dernière étape</h1>
-    <p class="mt-4 leading-relaxed">Confirmez votre adresse email pour continuer.</p>
-    <button type="button" class="btn-primary mt-8 px-6 py-3" (click)="confirm()"
+    <h1 class="font-display text-4xl font-medium leading-tight text-cream sm:text-5xl">Dernière étape</h1>
+    <p class="mt-5 leading-relaxed">Confirmez votre adresse email pour continuer.</p>
+    <button type="button" class="btn-primary mt-8 w-full" (click)="confirm()"
             [disabled]="state() === 'verifying'">
       @if (state() === 'verifying') {
       Confirmation…
