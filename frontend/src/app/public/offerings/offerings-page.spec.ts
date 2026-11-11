@@ -45,7 +45,12 @@ describe('OfferingsPage', () => {
     expect(page.querySelector('h2')?.textContent).toContain('Guidance — 1 h');
     expect(page.textContent).toContain('Par téléphone');
     expect(page.textContent).not.toContain('En présentiel');
-    expect(page.textContent).toContain('Réglé après la séance');
+    expect(page.textContent).toContain('Le règlement se fait après la séance');
+    expect(page.textContent).toContain("Aucun paiement n'est demandé en ligne.");
+    expect(page.textContent).toContain('Voyance');
+    expect(page.textContent).toContain('1 h');
+    const booking = page.querySelector<HTMLAnchorElement>('a[href="/reserver/guidance-1-h"]');
+    expect(booking?.textContent).toContain('Demander un créneau');
     expect(page.textContent).not.toContain('Acompte');
     expect(page.textContent).not.toContain('en ligne à la réservation');
   });

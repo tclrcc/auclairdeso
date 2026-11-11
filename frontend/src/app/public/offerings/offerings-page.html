@@ -1,42 +1,58 @@
-<main class="flex-1 px-6 py-16">
-  <div class="mx-auto max-w-3xl">
-    <h1 class="font-display text-5xl text-cream">Séances et tarifs</h1>
-    <p class="mt-4 text-ink-muted">Les séances proposées, leur durée et leur tarif.</p>
+<main class="flex-1 pt-14 pb-section sm:pt-20">
+  <div class="night-container">
+    <header class="max-w-3xl">
+      <p class="night-eyebrow">Séances et tarifs</p>
+      <h1 class="page-title mt-4">Choisissez votre séance</h1>
+      <p class="night-lead mt-5 max-w-2xl">
+        Le règlement se fait après la séance, par virement, en espèces ou par paiement mobile.
+        Aucun paiement n'est demandé en ligne.
+      </p>
+    </header>
 
     @if (offerings.isLoading()) {
-    <p class="mt-10" aria-live="polite">Chargement des séances…</p>
+    <p class="mt-12 text-ink-muted" aria-live="polite">Chargement des séances…</p>
     } @else if (offerings.error()) {
-    <p class="night-card mt-10 p-4" role="alert">
+    <p class="night-card mt-12 p-6" role="alert">
       Les séances ne peuvent pas être affichées pour le moment. Merci de réessayer un peu plus tard.
     </p>
     } @else {
-    <ul class="mt-10 grid gap-6 sm:grid-cols-2">
+    <ul class="mt-12 space-y-6 sm:mt-14">
       @for (offering of offerings.value(); track offering.slug) {
       <li>
-        <article class="night-card flex h-full flex-col p-6">
-          <h2 class="night-card-title">{{ offering.name }}</h2>
-          <p class="mt-1 text-sm text-ink-muted">{{ offering.durationMinutes }} min</p>
-          <p class="mt-4 flex-1 leading-relaxed">{{ offering.description }}</p>
-
+        <!--
+          Desktop: video (200 px) | category, name, description, modes | price, duration, button.
+          Without a video, the first column is not drawn at all. Phone: everything stacks.
+        -->
+        <article class="offering-card night-card">
           @if (offering.videoPath) {
-          <div class="mt-4">
+          <div class="offering-media">
             <app-offering-video [offering]="offering" />
           </div>
           }
 
-          @let publicModes = publicModesOf(offering);
-          @if (publicModes.length > 0) {
-          <ul class="mt-4 flex flex-wrap gap-2" aria-label="Modes de consultation">
-            @for (mode of publicModes; track mode) {
-            <li class="rounded-full border border-ink-faint/50 px-3 py-1 text-sm text-ink-soft">{{ modeLabels[mode] }}</li>
+          <div class="min-w-0">
+            <p class="night-eyebrow text-ink-faint">{{ categoryLabels[offering.category] }}</p>
+            <h2 class="offering-name mt-3">{{ offering.name }}</h2>
+            @if (offering.description) {
+            <p class="mt-4 max-w-prose leading-relaxed text-ink-soft">{{ offering.description }}</p>
             }
-          </ul>
-          }
+            @let publicModes = publicModesOf(offering);
+            @if (publicModes.length > 0) {
+            <ul class="mt-5 flex flex-wrap gap-2" aria-label="Modes de consultation">
+              @for (mode of publicModes; track mode) {
+              <li class="offering-mode">{{ modeLabels[mode] }}</li>
+              }
+            </ul>
+            }
+          </div>
 
-          <p class="mt-6 font-display text-3xl font-semibold text-price">{{ offering.priceCents | euros }}</p>
-          <p class="text-sm text-ink-muted">Réglé après la séance, par virement, en espèces ou par paiement mobile</p>
-
-          <a [routerLink]="['/reserver', offering.slug]" class="btn-primary mt-6 self-start">Réserver</a>
+          <div class="offering-booking">
+            <p class="offering-price">{{ offering.priceCents | euros }}</p>
+            <p class="mt-2 text-sm text-ink-muted">{{ formatDuration(offering.durationMinutes) }}</p>
+            <a [routerLink]="['/reserver', offering.slug]" class="btn-gold offering-button">
+              Demander un créneau<span class="sr-only"> : {{ offering.name }}</span>
+            </a>
+          </div>
         </article>
       </li>
       } @empty {

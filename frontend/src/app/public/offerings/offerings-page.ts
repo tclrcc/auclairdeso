@@ -2,7 +2,8 @@ import { Component, inject } from '@angular/core';
 import { httpResource } from '@angular/common/http';
 import { Meta } from '@angular/platform-browser';
 import { EurosPipe } from '../../shared/euros-pipe';
-import { ConsultationMode, MODE_LABELS, Offering } from './offering';
+import { formatDuration } from '../../shared/duration';
+import { CATEGORY_LABELS, ConsultationMode, MODE_LABELS, Offering } from './offering';
 import { RouterLink } from '@angular/router';
 import { OfferingVideo } from './offering-video';
 
@@ -10,6 +11,7 @@ import { OfferingVideo } from './offering-video';
   selector: 'app-offerings-page',
   imports: [EurosPipe, RouterLink, OfferingVideo],
   templateUrl: './offerings-page.html',
+  styleUrl: './offerings-page.css',
 })
 export class OfferingsPage {
   protected readonly offerings = httpResource<Offering[]>(() => '/api/offerings', {
@@ -17,6 +19,8 @@ export class OfferingsPage {
   });
 
   protected readonly modeLabels = MODE_LABELS;
+  protected readonly categoryLabels = CATEGORY_LABELS;
+  protected readonly formatDuration = formatDuration;
 
   /**
    * The list is served to anyone, and the practitioner's own premises are reserved to clients she

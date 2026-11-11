@@ -1,0 +1,111 @@
+/*
+ * "Séances et tarifs": one wide card per offering. Sizes in calc(N rem / 17) are N px at our 17 px root
+ * (see night-theme.css), and grow with the font size of the browser.
+ */
+
+/* The title of the page: 44 px on a phone, 60 px from "md" on. */
+.page-title {
+  font-family: var(--font-night-serif);
+  font-size: calc(44rem / 17);
+  font-weight: 500;
+  line-height: 1.05;
+  color: var(--color-cream);
+  text-wrap: balance;
+}
+
+@media (width >= 48rem) {
+  .page-title {
+    font-size: calc(60rem / 17);
+  }
+}
+
+/* Phone: one column. From "lg" on: [video] | text | price, the video column only when there is one. */
+.offering-card {
+  display: grid;
+  gap: calc(24rem / 17);
+  padding: calc(24rem / 17);
+}
+
+@media (width >= 40rem) {
+  .offering-card {
+    padding: calc(32rem / 17);
+  }
+}
+
+@media (width >= 64rem) {
+  .offering-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: calc(40rem / 17);
+    align-items: start;
+  }
+
+  .offering-card:has(.offering-media) {
+    grid-template-columns: calc(200rem / 17) minmax(0, 1fr) auto;
+  }
+}
+
+.offering-media {
+  width: 100%;
+  max-width: calc(200rem / 17);
+}
+
+.offering-name {
+  font-family: var(--font-night-serif);
+  font-size: calc(32rem / 17);
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--color-cream);
+  text-wrap: balance;
+}
+
+@media (width >= 48rem) {
+  .offering-name {
+    font-size: calc(38rem / 17);
+  }
+}
+
+.offering-mode {
+  padding: calc(4rem / 17) calc(12rem / 17);
+  border: 1px solid rgb(185 169 214 / 0.5);
+  border-radius: 999px;
+  font-size: calc(14rem / 17);
+  color: var(--color-ink-soft);
+}
+
+/* Phone: under the text, the button on the whole width. From "lg" on: a column aligned on the right. */
+.offering-booking {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: calc(20rem / 17);
+  border-top: 1px solid rgb(232 200 114 / 0.2);
+}
+
+@media (width >= 64rem) {
+  .offering-booking {
+    align-items: flex-end;
+    min-width: calc(220rem / 17);
+    padding-top: 0;
+    border-top: 0;
+    text-align: right;
+  }
+}
+
+.offering-price {
+  font-family: var(--font-night-serif);
+  font-size: calc(52rem / 17);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-price);
+}
+
+.offering-button {
+  width: 100%;
+  margin-top: calc(20rem / 17);
+}
+
+@media (width >= 40rem) {
+  .offering-button {
+    width: auto;
+  }
+}
