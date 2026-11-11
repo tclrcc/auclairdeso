@@ -1,21 +1,96 @@
-/* The account entry, always at the top right: a light outline, filled on hover. */
-.account-link {
+/* The name of the site, next to the logo. */
+.site-name {
+  font-family: var(--font-night-serif);
+  font-size: calc(28rem / 17);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-cream);
+}
+
+/* Three bars in a gold circle of 44 × 44 px: the touch target the guidelines ask for. */
+.menu-button {
   display: inline-flex;
   align-items: center;
-  border: 1px solid color-mix(in oklab, var(--color-pearl) 55%, transparent);
-  border-radius: 9999px;
-  padding: 0.4rem 1rem;
-  font-weight: 500;
+  justify-content: center;
+  width: calc(44rem / 17);
+  height: calc(44rem / 17);
+  border: 1px solid var(--color-gold);
+  border-radius: 999px;
+  color: var(--color-gold);
+}
+
+.menu-button:hover {
+  background-color: rgb(232 200 114 / 0.12);
+}
+
+/* From "md" on, the links fit on one line: no button. */
+@media (width >= 48rem) {
+  .menu-button {
+    display: none;
+  }
+}
+
+/*
+ * Phone: the menu takes the whole width, under the logo, as a column of 44 px links;
+ * folded until the button unfolds it. From "md" on: one line, on the right of the logo.
+ */
+.site-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  width: 100%;
+  margin-top: 1rem;
+  padding-block: 1rem;
+  border-top: 1px solid rgb(232 200 114 / 0.2);
+}
+
+.site-menu:not([data-open='true']) {
+  display: none;
+}
+
+.site-links {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+@media (width >= 48rem) {
+  .site-menu,
+  .site-menu:not([data-open='true']) {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+    width: auto;
+    margin-top: 0;
+    padding-block: 0;
+    border-top: 0;
+  }
+
+  .site-links {
+    flex-direction: row;
+    gap: 1.75rem;
+    width: auto;
+  }
+}
+
+.site-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: calc(44rem / 17);
+  font-size: calc(15rem / 17);
+  color: var(--color-ink-soft);
   white-space: nowrap;
-  transition: background-color 150ms, color 150ms;
+  text-underline-offset: 8px;
+  transition: color 150ms;
 }
 
-.account-link:hover {
-  background-color: var(--color-pearl);
-  color: var(--color-night);
+.site-link:hover,
+.site-link.is-active {
+  color: var(--color-gold);
 }
 
-.account-link:focus-visible {
-  outline: 2px solid var(--color-pearl);
-  outline-offset: 3px;
+.site-link.is-active {
+  text-decoration: underline;
 }

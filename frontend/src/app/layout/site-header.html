@@ -1,37 +1,37 @@
-<header class="bg-night text-pearl">
-  <!--
-    Four entries do not fit on one line of a phone. Below "sm" the account stays beside the logo and
-    the pages drop to a bar of their own; from "sm" on, "order" puts everything back on a single line.
-  -->
-  <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3 sm:px-6">
-    <a routerLink="/"
-       class="mr-auto flex items-center gap-3 rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-pearl">
-      <img src="logo.webp" alt="" width="48" height="48" class="size-12 rounded-full" />
-      <span class="sr-only font-display text-2xl sm:not-sr-only">Au clair de So</span>
-    </a>
+<header class="night-container relative z-10 flex flex-wrap items-center gap-x-8 py-4 md:flex-nowrap">
+  <a routerLink="/" class="mr-auto flex items-center gap-3 rounded-full">
+    <!-- The logo is a dark disc: a fine gold ring keeps it apart from the night of the page. -->
+    <img src="logo.webp" alt="" width="48" height="48" class="size-12 rounded-full ring-1 ring-gold/45" />
+    <span class="site-name sr-only sm:not-sr-only">Au clair de So</span>
+  </a>
 
-    <div class="order-2 sm:order-3">
-      @if (auth.isStaff()) {
-      <a routerLink="/admin" class="account-link">Administration</a>
-      } @else if (auth.isAuthenticated()) {
-      <a routerLink="/mon-espace" class="account-link">Mes rendez-vous</a>
-      } @else {
-      <a routerLink="/connexion" class="account-link">Se connecter</a>
-      }
-    </div>
+  <button #menuButton type="button" class="menu-button" aria-controls="site-menu"
+          [attr.aria-expanded]="menuOpen()" (click)="toggleMenu()">
+    <span class="sr-only">Menu</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="size-5" fill="none" stroke="currentColor"
+         stroke-width="1.5" stroke-linecap="round">
+      <path d="M4 7h16M4 12h16M4 17h16" />
+    </svg>
+  </button>
 
-    <nav aria-label="Navigation principale"
-         class="order-3 w-full border-t border-pearl/15 pt-3 sm:order-2 sm:w-auto sm:border-0 sm:pt-0">
-      <ul class="flex items-center gap-6 sm:gap-8">
-        <li>
-          <a routerLink="/seances" routerLinkActive="text-pearl! underline" ariaCurrentWhenActive="page"
-             class="whitespace-nowrap text-pearl/80 underline-offset-8 transition-colors hover:text-pearl">Séances</a>
-        </li>
-        <li>
-          <a routerLink="/a-propos" routerLinkActive="text-pearl! underline" ariaCurrentWhenActive="page"
-             class="whitespace-nowrap text-pearl/80 underline-offset-8 transition-colors hover:text-pearl">À propos</a>
-        </li>
-      </ul>
-    </nav>
-  </div>
+  <!-- Shown from "md" on; below, unfolded by the button above. -->
+  <nav id="site-menu" aria-label="Navigation principale" class="site-menu" [attr.data-open]="menuOpen()">
+    <ul class="site-links">
+      <li>
+        <a routerLink="/seances" routerLinkActive="is-active" ariaCurrentWhenActive="page" class="site-link">Séances et tarifs</a>
+      </li>
+      <li>
+        <a routerLink="/a-propos" routerLinkActive="is-active" ariaCurrentWhenActive="page" class="site-link">À propos</a>
+      </li>
+      <li>
+        <a routerLink="/mon-espace" routerLinkActive="is-active" ariaCurrentWhenActive="page" class="site-link">Mes rendez-vous</a>
+      </li>
+    </ul>
+
+    @if (auth.isStaff()) {
+    <a routerLink="/admin" class="btn-gold-outline">Administration</a>
+    } @else if (!auth.isAuthenticated()) {
+    <a routerLink="/connexion" class="btn-gold-outline">Se connecter</a>
+    }
+  </nav>
 </header>

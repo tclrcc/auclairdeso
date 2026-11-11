@@ -42,4 +42,25 @@ describe('SiteHeader', () => {
 
     expect(header.querySelector('a[href="/admin"]')?.textContent).toContain('Administration');
   });
+
+  it('unfolds the menu with its button and folds it back with Escape, focus on the button', async () => {
+    const fixture = TestBed.createComponent(SiteHeader);
+    await fixture.whenStable();
+    const header = fixture.nativeElement as HTMLElement;
+    const button = header.querySelector<HTMLButtonElement>('button[aria-controls="site-menu"]')!;
+    const menu = header.querySelector('#site-menu')!;
+
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+    expect(menu.getAttribute('data-open')).toBe('false');
+
+    button.click();
+    await fixture.whenStable();
+    expect(button.getAttribute('aria-expanded')).toBe('true');
+    expect(menu.getAttribute('data-open')).toBe('true');
+
+    menu.querySelector('a')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    await fixture.whenStable();
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+    expect(document.activeElement).toBe(button);
+  });
 });
