@@ -96,4 +96,12 @@ describe('legal pages', () => {
     expect(text).toContain('journaux d’accès du serveur');
     expect(text).toContain('imprimée sur la note');
   });
+
+  it('gives the exact retention of the server access logs', async () => {
+    const fixture = await open(ConfidentialitePage);
+
+    const text = (fixture.nativeElement.textContent as string).replace(/\s+/g, ' ');
+    expect(text).toContain('Environ deux semaines (rotation quotidienne, 14 archives), puis effacés automatiquement');
+    expect(text).not.toContain('Le temps nécessaire à la sécurité');
+  });
 });
