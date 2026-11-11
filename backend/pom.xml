@@ -175,6 +175,17 @@
                     <profiles>
                         <profile>dev</profile>
                     </profiles>
+                    <!-- Same reason as the Surefire argLine below, for spring-boot:run. -->
+                    <jvmArguments>-Duser.timezone=UTC</jvmArguments>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- Hibernate reads TIME columns through the JVM time zone (hibernate.jdbc.time_zone=UTC):
+                         pin it so the opening hours come back as stored, whatever machine the tests run on. -->
+                    <argLine>-Duser.timezone=UTC</argLine>
                 </configuration>
             </plugin>
             <plugin>
