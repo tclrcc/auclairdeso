@@ -89,6 +89,15 @@ class SlotCalculatorTests {
     }
 
     @Test
+    void aDayWithTwoSessionsStillOffersTheThird() {
+        assertThat(startsOn(MONDAY_12, 30, 30,
+            session(MONDAY_12, 14, 0, 30, 30),
+            session(MONDAY_12, 15, 0, 30, 30)))
+            .containsExactly(at(16, 0), at(17, 0));
+    }
+
+    /** The hours would allow a fourth session (17:00): only the maximum of three a day stops it. */
+    @Test
     void aFullDayOffersNothing() {
         assertThat(startsOn(MONDAY_12, 30, 30,
             session(MONDAY_12, 14, 0, 30, 30),

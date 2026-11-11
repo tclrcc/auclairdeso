@@ -40,13 +40,21 @@ final class TestBookings {
     }
 
     static MockMultipartHttpServletRequestBuilder bookingRequest(String start, boolean withPhoto, String phone) {
+        return bookingRequest("consultation-1-h", "VIDEO", start, "1990-05-04", null, withPhoto, phone);
+    }
+
+    /** Every field a booking rule looks at: the offering, the mode, the birth date and the home address. */
+    static MockMultipartHttpServletRequestBuilder bookingRequest(String offeringSlug, String mode, String start,
+                                                                 String birthDate, String address,
+                                                                 boolean withPhoto, String phone) {
         var json = """
-                {"offeringSlug": "consultation-1-h", "mode": "VIDEO", "start": "%s",
-                 "client": {"firstName": "Alice", "lastName": "Martin", "birthDate": "1990-05-04",
+                {"offeringSlug": "%s", "mode": "%s", "start": "%s",
+                 "client": {"firstName": "Alice", "lastName": "Martin", "birthDate": "%s",
                             "phone": "%s", "city": null},
-                 "reason": "Une question sur mon avenir professionnel.", "address": null,
+                 "reason": "Une question sur mon avenir professionnel.", "address": %s,
                  "messengerName": "Alice Martin", "acceptedTerms": true, "consentsToDataProcessing": true}
-                """.formatted(start, phone);
+                """.formatted(offeringSlug, mode, start, birthDate, phone,
+            address == null ? "null" : "\"" + address + "\"");
         var request = multipart("/api/bookings").file(new MockMultipartFile("request", "",
             MediaType.APPLICATION_JSON_VALUE, json.getBytes(StandardCharsets.UTF_8)));
         if (withPhoto) {

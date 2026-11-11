@@ -121,6 +121,20 @@ class NotificationFlowTests {
     }
 
     @Test
+    void theReminderLeavesAtNoonTheDayBefore() throws Exception {
+        clock.set("2026-11-01T08:00:00Z"); // Sunday 1 November, 09:00 in Paris
+        var id = book("rose@example.com", "2026-11-02T14:00:00+01:00");
+        assertThat(mvc.post().uri("/api/admin/appointments/{id}/confirm", id).with(practitioner()).with(csrf()))
+            .hasStatusOk();
+
+        clock.set("2026-11-01T10:59:00Z"); // 11:59
+        assertThat(deadlines.sendReminders()).isZero();
+
+        clock.set("2026-11-01T11:00:00Z"); // 12:00
+        assertThat(deadlines.sendReminders()).isEqualTo(1);
+    }
+
+    @Test
     void anUnansweredRequestExpiresTheEveningBefore() throws Exception {
         clock.set("2026-10-20T17:30:00Z"); // Tuesday 20 October, 19:30 in Paris
         book("bruno@example.com", "2026-10-21T14:00:00+02:00");
