@@ -1,0 +1,75 @@
+/*
+ * The state of an appointment, as a pill. Each tone keeps its text at 5.5:1 or more on the lightest card
+ * of the theme (a card over the violet halo), and the label always says the state in words: the colour
+ * only repeats it.
+ */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: calc(30rem / 17);
+  padding-inline: calc(12rem / 17);
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: calc(13rem / 17);
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Waiting for the practitioner. */
+.status-pill[data-tone='pending'] {
+  border-color: rgb(232 200 114 / 0.6);
+  background-color: rgb(232 200 114 / 0.14);
+  color: var(--color-gold-bright);
+}
+
+/* The slot is hers. */
+.status-pill[data-tone='confirmed'] {
+  border-color: rgb(95 208 138 / 0.6);
+  background-color: rgb(95 208 138 / 0.14);
+  color: #b5ecc4;
+}
+
+/* The session took place. */
+.status-pill[data-tone='done'] {
+  border-color: rgb(185 169 214 / 0.55);
+  background-color: rgb(185 169 214 / 0.12);
+  color: var(--color-ink-soft);
+}
+
+/* Withdrawn, cancelled or expired: nothing more to do. */
+.status-pill[data-tone='closed'] {
+  border-color: rgb(185 169 214 / 0.35);
+  background-color: rgb(185 169 214 / 0.06);
+  color: var(--color-ink-muted);
+}
+
+/* Declined by the practitioner, or missed. */
+.status-pill[data-tone='alert'] {
+  border-color: rgb(255 180 166 / 0.55);
+  background-color: rgb(255 180 166 / 0.12);
+  color: var(--color-alert);
+}
+
+/* The erasure: outlined in coral, like an error, and as large as the other buttons (44 px). */
+.btn-alert-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(44rem / 17);
+  padding-inline: calc(20rem / 17);
+  border: 1px solid var(--color-alert);
+  border-radius: 999px;
+  color: var(--color-alert);
+  font-weight: 500;
+  transition: background-color 150ms;
+}
+
+.btn-alert-outline:hover {
+  background-color: rgb(255 180 166 / 0.1);
+}
+
+.btn-alert-outline:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

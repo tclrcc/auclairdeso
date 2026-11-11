@@ -1,15 +1,15 @@
-<main class="flex-1 px-6 py-16">
-  <div class="mx-auto max-w-xl">
-    <h1 class="font-display text-5xl text-cream">Mon espace</h1>
+<main class="flex-1 pt-14 pb-section sm:pt-20">
+  <div class="night-container max-w-[calc(832rem/17)]">
+    <h1 class="night-page-title">Mon espace</h1>
 
     <!--
       The target of "Mon compte" in the header: who is signed in, and the logout. At the top of the page,
       above the appointments, so that their loading never pushes it away once the browser has scrolled to it.
     -->
-    <section id="compte" class="night-card mt-8 scroll-mt-6 p-5" aria-labelledby="account-title">
-      <h2 id="account-title" class="font-display text-3xl text-cream">Mon compte</h2>
-      <p class="mt-2">Connecté avec <strong>{{ auth.currentUser()?.email }}</strong>.</p>
-      <div class="mt-4 flex flex-wrap gap-4">
+    <section id="compte" class="night-card mt-10 scroll-mt-6 p-6 sm:p-8" aria-labelledby="account-title">
+      <h2 id="account-title" class="night-card-title">Mon compte</h2>
+      <p class="mt-2 text-ink-soft">Connecté avec <strong class="break-words text-cream">{{ auth.currentUser()?.email }}</strong>.</p>
+      <div class="mt-5 flex flex-wrap gap-3">
         @if (auth.isStaff()) {
         <a routerLink="/admin" class="btn-primary">Administration</a>
         }
@@ -17,48 +17,51 @@
       </div>
     </section>
 
-    <h2 class="mt-10 font-display text-3xl text-cream">Mes rendez-vous</h2>
+    <h2 class="night-h2 mt-14">Mes rendez-vous</h2>
     @if (notice(); as message) {
-    <p class="night-card mt-4 p-3 text-sm" role="status">{{ message }}</p>
+    <p class="night-card mt-5 p-4 text-sm" role="status">{{ message }}</p>
     }
     @if (bookings.isLoading()) {
-    <p class="mt-4 text-ink-muted">Chargement…</p>
+    <p class="mt-5 text-ink-muted">Chargement…</p>
     } @else if (bookings.error()) {
-    <p class="mt-4 text-alert" role="alert">Vos rendez-vous ne peuvent pas être affichés pour le moment.</p>
+    <p class="mt-5 text-alert" role="alert">Vos rendez-vous ne peuvent pas être affichés pour le moment.</p>
     } @else {
-    <ul class="mt-4 space-y-3">
+    <ul class="mt-6 space-y-4">
       @for (booking of bookings.value(); track booking.id) {
-      <li class="night-card p-4">
-        <p class="font-medium text-cream">{{ booking.offeringName }}</p>
-        <p class="text-sm text-ink-muted first-letter:uppercase">
-          {{ formatDayOf(booking.start) }} à {{ formatTime(booking.start) }} · {{ modeLabels[booking.mode] }}
-          · {{ booking.priceCents | euros }}
+      <li class="night-card p-6 sm:p-8">
+        <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+          <h3 class="night-card-title">{{ booking.offeringName }}</h3>
+          <p class="status-pill" [attr.data-tone]="statusTones[booking.status]">{{ statusLabels[booking.status] }}</p>
+        </div>
+        <p class="mt-3 text-cream first-letter:uppercase">
+          {{ formatDayOf(booking.start) }} à {{ formatTime(booking.start) }}
         </p>
-        <p class="mt-2 text-sm font-medium text-gold">{{ statusLabels[booking.status] }}</p>
+        <p class="mt-1 text-sm text-ink-muted">{{ modeLabels[booking.mode] }} · {{ booking.priceCents | euros }}</p>
         @if (canCancel(booking)) {
-        <button type="button" class="mt-3 min-h-11 text-sm font-medium text-gold underline underline-offset-4 hover:text-gold-bright" (click)="cancel(booking)">
+        <button type="button" class="btn-gold-outline mt-5 w-full sm:w-auto" (click)="cancel(booking)">
           {{ booking.status === 'REQUESTED' ? 'Retirer ma demande' : 'Annuler' }}
         </button>
         }
       </li>
       } @empty {
-      <li class="text-ink-muted">
-        Aucun rendez-vous pour le moment. <a routerLink="/seances" class="night-link underline">Voir les séances</a>
+      <li class="night-card p-6 text-ink-soft sm:p-8">
+        Aucun rendez-vous pour le moment.
+        <a routerLink="/seances" class="night-link underline">Voir les séances</a>
       </li>
       }
     </ul>
     }
 
     @if (erased(); as summary) {
-    <section class="night-card mt-10 p-5" aria-labelledby="erased-title">
-      <h2 id="erased-title" class="font-display text-3xl text-cream">Compte supprimé</h2>
-      <p class="mt-2">{{ summary }}</p>
-      <a routerLink="/" class="btn-primary mt-4">Revenir à l’accueil</a>
+    <section class="night-card mt-14 p-6 sm:p-8" aria-labelledby="erased-title">
+      <h2 id="erased-title" class="night-card-title">Compte supprimé</h2>
+      <p class="mt-3">{{ summary }}</p>
+      <a routerLink="/" class="btn-primary mt-5">Revenir à l’accueil</a>
     </section>
     } @else if (!auth.isStaff()) {
-    <section class="mt-12 border-t border-ink-faint/30 pt-6" aria-labelledby="erasure-title">
-      <h2 id="erasure-title" class="font-display text-3xl text-cream">Supprimer mon compte</h2>
-      <p class="mt-2 text-ink-soft">
+    <section class="mt-16 border-t border-gold/20 pt-8" aria-labelledby="erasure-title">
+      <h2 id="erasure-title" class="night-card-title">Supprimer mon compte</h2>
+      <p class="mt-3 max-w-prose leading-relaxed text-ink-soft">
         Vos coordonnées, vos photos, les textes que vous avez écrits et les notes de la praticienne sont
         effacés tout de suite. Vos séances passées restent, avec leurs notes et votre nom, dix ans :
         <a routerLink="/confidentialite" class="night-link underline">la politique de confidentialité</a> explique
@@ -67,8 +70,7 @@
       @if (erasureError(); as message) {
       <p class="mt-3 text-sm text-alert" role="alert">{{ message }}</p>
       }
-      <button type="button" class="mt-4 min-h-11 rounded-full border border-alert px-5 py-2 text-alert hover:bg-alert/10 disabled:opacity-60"
-              [disabled]="erasing()" (click)="erase()">
+      <button type="button" class="btn-alert-outline mt-5" [disabled]="erasing()" (click)="erase()">
         Supprimer mon compte
       </button>
     </section>

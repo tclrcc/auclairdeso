@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { AppointmentView, STATUS_LABELS } from '../booking/booking';
+import { AppointmentStatus, AppointmentView, STATUS_LABELS } from '../booking/booking';
 import { BookingApi } from '../booking/booking-api';
 import { canCancel, cancellationQuestion } from '../booking/booking-cancellation';
 import { AuthSession } from '../core/auth/auth-session';
@@ -12,10 +12,22 @@ import { formatDayOf, formatTime } from '../shared/paris-time';
 import { problemMessage } from '../shared/problem-message';
 import { ErasureReport, erasureSummary } from './account-erasure';
 
+/** The colour of each state on the page (account-page.css); the label says it in words. */
+const STATUS_TONES: Record<AppointmentStatus, 'pending' | 'confirmed' | 'done' | 'closed' | 'alert'> = {
+  REQUESTED: 'pending',
+  CONFIRMED: 'confirmed',
+  COMPLETED: 'done',
+  CANCELLED: 'closed',
+  EXPIRED: 'closed',
+  DECLINED: 'alert',
+  NO_SHOW: 'alert',
+};
+
 @Component({
   selector: 'app-account-page',
   imports: [RouterLink, EurosPipe],
   templateUrl: './account-page.html',
+  styleUrl: './account-page.css',
 })
 export class AccountPage {
   protected readonly auth = inject(AuthSession);
@@ -32,6 +44,7 @@ export class AccountPage {
   protected readonly erasureError = signal<string | null>(null);
 
   protected readonly statusLabels = STATUS_LABELS;
+  protected readonly statusTones = STATUS_TONES;
   protected readonly modeLabels = MODE_LABELS;
   protected readonly formatDayOf = formatDayOf;
   protected readonly formatTime = formatTime;
