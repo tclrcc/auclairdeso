@@ -1,10 +1,12 @@
 package fr.auclairdeso.shared.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authorization.AuthorizationManagerFactories;
+import org.springframework.security.authorization.SingleResultAuthorizationManager;
 import org.springframework.security.config.annotation.authorization.EnableMultiFactorAuthentication;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
@@ -24,7 +26,9 @@ public class SecurityConfiguration {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                            OneTimeTokenGenerationSuccessHandler magicLinkSender) throws Exception {
+                                            OneTimeTokenGenerationSuccessHandler magicLinkSender,
+                                            @Value("${springdoc.api-docs.enabled:true}") boolean apiDocsEnabled)
+        throws Exception {
         var bothFactors = AuthorizationManagerFactories.multiFactor()
             .requireFactors(FactorGrantedAuthority.OTT_AUTHORITY, FactorGrantedAuthority.PASSWORD_AUTHORITY)
             .build();
@@ -37,7 +41,10 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                // Open only where springdoc is on (development): closed here too, not only by the gateway.
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+                .access(apiDocsEnabled ? SingleResultAuthorizationManager.permitAll()
+                    : SingleResultAuthorizationManager.denyAll())
                 .requestMatchers(HttpMethod.GET, "/api/offerings/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/legal").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/account").hasRole("CLIENT")
@@ -47,6 +54,9 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/account/password").hasAnyRole("PRACTITIONER", "ADMIN")
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().denyAll())
+            // HSTS is switched on in one place only, the rendering server (HSTS_MAX_AGE, deploy/.env.example),
+            // once the definitive domain is served over HTTPS. The other default headers stay.
+            .headers(headers -> headers.httpStrictTransportSecurity(hsts -> hsts.disable()))
             .csrf(CsrfConfigurer::spa)
             .addFilterAfter(new CsrfCookieFilter(), CsrfFilter.class)
             .oneTimeTokenLogin(ott -> ott

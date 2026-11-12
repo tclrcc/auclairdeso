@@ -58,6 +58,7 @@ Le document de cadrage fait référence pour le périmètre, l'architecture et l
 - Vidéo d'une prestation : `public/offerings/offering-video` (utilisé par « Séances et tarifs » et la page de réservation) réutilise le lecteur `public/about/presentation-video` ; transcription dans un bloc « Lire la transcription ».
 - Pages publiques dans `public/` (dont `about/` et `legal/`, ce dernier lit l'identité légale depuis l'API) ; facturation côté praticienne dans `admin/billing/` (note de séance, encaissements, livre des recettes) ; suppression de compte dans `account/account-erasure.ts`.
 - Jamais `window` ou `document` sans vérifier la plateforme (compatibilité SSR).
+- En-têtes de sécurité posés par le serveur de rendu (`src/server.ts`, valeurs dans `src/server-security.ts`) : CSP stricte à nonce. Ne pas retirer `ngCspNonce` de `index.html` ; aucun script ou style en ligne, ni `style="…"`, ajouté à la main (la CSP les bloquerait).
 - Le client API doit être généré depuis l'OpenAPI du backend (springdoc) : ne pas l'éditer à la main. Pas encore en place : les appels passent pour l'instant par des fichiers `*-api.ts` écrits à la main (ex. `booking/booking-api.ts`).
 - Les règles Angular détaillées (signals, Signal Forms, pas de `standalone: true`, pas d'`OnPush` explicite, a11y) sont dans `frontend/CLAUDE.md`.
 - Accessibilité visée : WCAG AA. Mobile d'abord, surtout pour l'admin.
@@ -68,6 +69,8 @@ Le document de cadrage fait référence pour le périmètre, l'architecture et l
 - Accès public : https://vps-5ff241d3.vps.ovh.net:8443 ; mot de passe demandé une fois à la porte `/recette/acces`, puis cookie de 90 jours (nginx du VPS ; fichiers dans `deploy/host/`, installés à la main ; secret dans `/etc/nginx/auclairdeso-recette.conf`).
 - Accès par le tunnel SSH : http://127.0.0.1:8090 ; Mailpit : http://localhost:8025 (tunnel uniquement).
 - Secrets : `deploy/.env` et `/etc/nginx/auclairdeso.htpasswd`, jamais versionnés.
+- Lien magique limité (nginx par IP ; backend par IP, par adresse 3/15 min et 10/24 h, 100/jour au total hors personnel, `MagicLinkQuota`). Un lien refusé n'est pas envoyé mais la réponse reste 204 ; un WARN sans adresse apparaît dans `docker compose logs backend`. Compteurs en mémoire : `docker compose restart backend` débloque aussitôt un membre du personnel.
+- HSTS coupé tant que le domaine définitif n'est pas en HTTPS : interrupteur unique `HSTS_MAX_AGE` (`deploy/.env`), mode d'emploi dans `deploy/.env.example`. Spring Security n'en envoie pas.
 
 ## Spécification
 - Le comportement métier attendu est décrit dans `docs/specification.md`.

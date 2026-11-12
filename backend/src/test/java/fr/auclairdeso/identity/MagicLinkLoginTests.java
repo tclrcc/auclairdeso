@@ -44,6 +44,8 @@ class MagicLinkLoginTests {
             .hasStatus(HttpStatus.NO_CONTENT);
 
         var token = tokenSentTo("client@example.com");
+        // In the fragment only: the browser never sends it to a server.
+        assertThat(sentLink()).contains("/connexion/verifier#token=" + token).doesNotContain("?token=");
 
         var login = mvc.post().uri("/api/auth/magic-link/verify").with(csrf())
             .param("token", token)
@@ -72,6 +74,23 @@ class MagicLinkLoginTests {
             .hasStatus(HttpStatus.NO_CONTENT);
         assertThat(mvc.post().uri("/api/auth/magic-link/verify").with(csrf()).param("token", token))
             .hasStatus(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    void theReturnPathStaysAQueryParameterBeforeTheFragment() {
+        mvc.post().uri("/api/auth/magic-link").with(csrf())
+            .param("username", "booking@example.com")
+            .param("redirect", "/reserver/guidance")
+            .exchange();
+        var token = tokenSentTo("booking@example.com");
+
+        assertThat(sentLink()).contains("/connexion/verifier?redirect=%2Freserver%2Fguidance#token=" + token);
+    }
+
+    private String sentLink() {
+        var captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+        verify(mailSender).send(captor.capture());
+        return captor.getValue().getText();
     }
 
     private String tokenSentTo(String expectedRecipient) {

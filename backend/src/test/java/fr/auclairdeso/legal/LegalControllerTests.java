@@ -35,4 +35,14 @@ class LegalControllerTests {
         // No mediator has been chosen yet: the pages say so rather than invent one.
         assertThat(result).bodyJson().extractingPath("$.mediator").isNull();
     }
+
+    @Test
+    void theApiSendsNoHstsEvenOverHttps() {
+        var result = mvc.get().uri("/api/legal").secure(true).exchange();
+
+        assertThat(result).hasStatusOk();
+        // HSTS is decided by the rendering server alone (HSTS_MAX_AGE), not by the API.
+        assertThat(result).headers().doesNotContainHeader("Strict-Transport-Security");
+        assertThat(result).headers().hasValue("X-Content-Type-Options", "nosniff");
+    }
 }
