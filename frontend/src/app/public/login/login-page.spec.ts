@@ -47,6 +47,17 @@ describe('LoginPage', () => {
     expect(fixture.nativeElement.textContent).toContain('Vérifiez votre boîte mail');
   });
 
+  it('asks to wait when there were too many requests', async () => {
+    const fixture = await submitEmail('client@example.com');
+
+    httpTesting
+      .expectOne('/api/auth/magic-link')
+      .flush(null, { status: 429, statusText: 'Too Many Requests' });
+    await settle();
+    await fixture.whenStable();
+    expect(fixture.nativeElement.textContent).toContain('Trop de demandes depuis votre connexion');
+  });
+
   it('presents the link as a confirmation of the email address during a booking', async () => {
     const fixture = TestBed.createComponent(LoginPage);
     fixture.componentRef.setInput('redirect', '/reserver/guidance-1-h?mode=VIDEO');

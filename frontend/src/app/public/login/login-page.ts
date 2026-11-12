@@ -1,4 +1,5 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { email, form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { AuthSession } from '../../core/auth/auth-session';
 
@@ -35,10 +36,14 @@ export class LoginPage {
             await this.auth.requestMagicLink(address, this.redirect());
             this.sentTo.set(address);
             return;
-          } catch {
+          } catch (error) {
+            // 429: too many requests from this connection (gateway or backend), whatever the address.
+            const tooMany = error instanceof HttpErrorResponse && error.status === 429;
             return {
               kind: 'serverError',
-              message: "L'envoi du lien a échoué. Merci de réessayer dans un instant.",
+              message: tooMany
+                ? 'Trop de demandes depuis votre connexion. Merci de réessayer dans quelques minutes.'
+                : "L'envoi du lien a échoué. Merci de réessayer dans un instant.",
             };
           }
         },

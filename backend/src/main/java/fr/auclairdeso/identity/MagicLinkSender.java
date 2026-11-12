@@ -13,21 +13,32 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.HashMap;
 
 /**
- * Emails the magic link once Spring Security has generated a one-time token.
+ * Emails the magic link once Spring Security has generated a one-time token, within the limits of
+ * {@link MagicLinkQuota}. The answer is the same whether the email leaves or not.
  */
 @Component
 class MagicLinkSender implements OneTimeTokenGenerationSuccessHandler {
 
     private final JavaMailSender mailSender;
     private final AppProperties properties;
+    private final MagicLinkQuota quota;
 
-    MagicLinkSender(JavaMailSender mailSender, AppProperties properties) {
+    MagicLinkSender(JavaMailSender mailSender, AppProperties properties, MagicLinkQuota quota) {
         this.mailSender = mailSender;
         this.properties = properties;
+        this.quota = quota;
     }
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, OneTimeToken token) {
+        // A refused link is not sent; its unused token expires on its own.
+        if (quota.allows(token.getUsername())) {
+            mailSender.send(message(request, token));
+        }
+        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+    }
+
+    private SimpleMailMessage message(HttpServletRequest request, OneTimeToken token) {
         var variables = new HashMap<String, String>();
         variables.put("token", token.getTokenValue());
         var builder = UriComponentsBuilder.fromUri(properties.frontendUrl())
@@ -53,8 +64,6 @@ class MagicLinkSender implements OneTimeTokenGenerationSuccessHandler {
 
                 Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet email.
                 """.formatted(MagicLinkConfiguration.TOKEN_VALIDITY.toMinutes(), link));
-
-        mailSender.send(message);
-        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        return message;
     }
 }
