@@ -43,7 +43,8 @@ class MagicLinkSender implements OneTimeTokenGenerationSuccessHandler {
         variables.put("token", token.getTokenValue());
         var builder = UriComponentsBuilder.fromUri(properties.frontendUrl())
             .path("/connexion/verifier")
-            .queryParam("token", "{token}");
+            // In the fragment, which the browser never sends to a server: out of every access log.
+            .fragment("token={token}");
         ReturnPaths.from(request.getParameter("redirect")).ifPresent(path -> {
             builder.queryParam("redirect", "{redirect}");
             variables.put("redirect", path);
