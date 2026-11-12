@@ -19,34 +19,43 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * Limits magic link requests per client address, before any token is generated.
+ * Limits login requests per client address, before Spring Security handles them: magic link
+ * requests, and password attempts of the staff.
  *
- * <p>The answer depends on the caller only, never on the email address asked for: the limits per
- * address are in {@link MagicLinkQuota}, which answers the same whether the link leaves or not.
+ * <p>The answer depends on the caller only, never on the email address or the account: the limits
+ * per address are in {@link MagicLinkQuota}, which answers the same whether the link leaves or not.
+ * There is no account lockout: with two staff accounts, it would give anyone a way to lock them out.
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 100)
-class MagicLinkRateLimitFilter extends OncePerRequestFilter {
+class LoginRateLimitFilter extends OncePerRequestFilter {
 
-    static final String PATH = "/api/auth/magic-link";
+    static final String MAGIC_LINK_PATH = "/api/auth/magic-link";
+    static final String PASSWORD_PATH = "/api/auth/password";
 
     private static final String TOO_MANY_REQUESTS = """
             {"type": "about:blank", "title": "Too Many Requests", "status": 429, \
-            "detail": "Trop de demandes de lien de connexion. Merci de réessayer dans quelques minutes."}""";
+            "detail": "Trop de demandes de connexion. Merci de réessayer dans quelques minutes."}""";
 
-    /** Matches the path as Spring Security does, so that an encoded variant of it is caught as well. */
-    private final RequestMatcher magicLink = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, PATH);
-    private final AttemptLimiter perClient = new AttemptLimiter(20, Duration.ofHours(1));
+    // Matched as Spring Security matches them, so that an encoded variant of a path is caught as well.
+    private final RequestMatcher magicLink = PathPatternRequestMatcher.withDefaults()
+        .matcher(HttpMethod.POST, MAGIC_LINK_PATH);
+    private final RequestMatcher password = PathPatternRequestMatcher.withDefaults()
+        .matcher(HttpMethod.POST, PASSWORD_PATH);
+
+    private final AttemptLimiter magicLinksPerClient = new AttemptLimiter(20, Duration.ofHours(1));
+    private final AttemptLimiter passwordsPerClient = new AttemptLimiter(10, Duration.ofMinutes(15));
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return !magicLink.matches(request);
+        return !magicLink.matches(request) && !password.matches(request);
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        if (perClient.tryAcquire(request.getRemoteAddr())) {
+        var limiter = magicLink.matches(request) ? magicLinksPerClient : passwordsPerClient;
+        if (limiter.tryAcquire(request.getRemoteAddr())) {
             filterChain.doFilter(request, response);
             return;
         }
