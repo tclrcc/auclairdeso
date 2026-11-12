@@ -10,7 +10,14 @@ import { join } from 'node:path';
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+
+/**
+ * Only the gateway reaches this server: port 4000 is published nowhere (deploy/compose.yaml), and the
+ * gateway always sets X-Forwarded-Proto. Trusting that header, and only that one, lets the rendered
+ * application know whether the visitor came over HTTP (SSH tunnel) or HTTPS (nginx of the VPS).
+ * Any other X-Forwarded-* header a visitor might send is ignored.
+ */
+const angularApp = new AngularNodeAppEngine({ trustProxyHeaders: ['x-forwarded-proto'] });
 
 /**
  * Example Express Rest API endpoints can be defined here.
