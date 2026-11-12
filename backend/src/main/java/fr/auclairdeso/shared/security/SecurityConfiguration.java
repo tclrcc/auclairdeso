@@ -47,6 +47,9 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/account/password").hasAnyRole("PRACTITIONER", "ADMIN")
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().denyAll())
+            // HSTS is switched on in one place only, the rendering server (HSTS_MAX_AGE, deploy/.env.example),
+            // once the definitive domain is served over HTTPS. The other default headers stay.
+            .headers(headers -> headers.httpStrictTransportSecurity(hsts -> hsts.disable()))
             .csrf(CsrfConfigurer::spa)
             .addFilterAfter(new CsrfCookieFilter(), CsrfFilter.class)
             .oneTimeTokenLogin(ott -> ott

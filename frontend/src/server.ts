@@ -5,11 +5,21 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
+import { randomBytes } from 'node:crypto';
 import { join } from 'node:path';
+import {
+  contentSecurityPolicy,
+  insertNonce,
+  SECURITY_HEADERS,
+  strictTransportSecurity,
+} from './server-security';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
+app.disable('x-powered-by');
+// For req.secure (HSTS below): X-Forwarded-Proto is believed only from a private network, the gateway's.
+app.set('trust proxy', 'uniquelocal');
 
 /**
  * Only the gateway reaches this server: port 4000 is published nowhere (deploy/compose.yaml), and the
@@ -19,17 +29,24 @@ const app = express();
  */
 const angularApp = new AngularNodeAppEngine({ trustProxyHeaders: ['x-forwarded-proto'] });
 
+/** Off until HSTS_MAX_AGE is set (deploy/.env.example). */
+const hsts = strictTransportSecurity(process.env['HSTS_MAX_AGE']);
+
 /**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/{*splat}', (req, res) => {
- *   // Handle API request
- * });
- * ```
+ * Security headers on every response, with a fresh nonce for the inline scripts and styles of the page.
  */
+app.use((req, res, next) => {
+  const nonce = randomBytes(16).toString('base64');
+  res.locals['cspNonce'] = nonce;
+  res.setHeader('Content-Security-Policy', contentSecurityPolicy(nonce));
+  for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
+    res.setHeader(name, value);
+  }
+  if (hsts && req.secure) {
+    res.setHeader('Strict-Transport-Security', hsts);
+  }
+  next();
+});
 
 /**
  * Serve static files from /browser
@@ -46,13 +63,33 @@ app.use(
  * Handle all other requests by rendering the Angular application.
  */
 app.use((req, res, next) => {
+  // Each page carries its own nonce: never answer 304 and let the browser reuse an older copy.
+  delete req.headers['if-none-match'];
   angularApp
     .handle(req)
-    .then((response) =>
-      response ? writeResponseToNodeResponse(response, res) : next(),
+    .then(async (response) =>
+      response
+        ? writeResponseToNodeResponse(await withNonce(response, res.locals['cspNonce']), res)
+        : next(),
     )
     .catch(next);
 });
+
+/** The HTML of the page with the nonce of this response, which no cache may keep or revalidate. */
+async function withNonce(response: Response, nonce: string): Promise<Response> {
+  if (!response.headers.get('content-type')?.startsWith('text/html')) {
+    return response;
+  }
+  const headers = new Headers(response.headers);
+  headers.delete('content-length');
+  headers.delete('etag');
+  headers.set('cache-control', 'no-cache');
+  return new Response(insertNonce(await response.text(), nonce), {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
 
 /**
  * Start the server if this module is the main entry point, or it is ran via PM2.

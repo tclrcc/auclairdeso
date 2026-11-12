@@ -68,6 +68,8 @@ services:
     environment:
       API_ORIGIN: http://backend:8080
       NG_ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      # Empty: no HSTS. See deploy/.env.example before setting it.
+      HSTS_MAX_AGE: ${HSTS_MAX_AGE:-}
     mem_limit: 256m
     logging: *logging
 
