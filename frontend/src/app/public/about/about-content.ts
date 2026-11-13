@@ -32,10 +32,43 @@ export const PRESENTATION: SiteVideo = {
   transcript: '',
 };
 
+/** The title of the page, under the "À propos" eyebrow. PROVISIONAL — to validate with So. */
+export const HEADLINE = 'So, en quelques mots';
+
+/** Under the title, beside the video. */
 export const INTRO: readonly string[] = [
   'So propose des séances de voyance, de magnétisme et de rééquilibrage énergétique. ' +
   'À domicile autour de Chazey-sur-Ain, en visio ou par téléphone.',
-  'Chaque demande est lue et validée par elle, une par une. Le créneau choisi est gardé en attendant sa réponse.',
+];
+
+/** Opens "Comment se passe une demande". */
+export const REQUEST_LEAD =
+  'Chaque demande est lue et validée par elle, une par une. Le créneau choisi est gardé en attendant sa réponse.';
+
+export interface RequestStep {
+  readonly title: string;
+  readonly text: string;
+}
+
+/**
+ * "Comment se passe une demande": what the site really does, step by step (BookingPage, the e-mails of
+ * the notification module). PROVISIONAL — to validate with So.
+ */
+export const REQUEST_STEPS: readonly RequestStep[] = [
+  {
+    title: 'Vous choisissez',
+    text: 'Une séance, la façon de consulter qui vous convient et un créneau libre dans le calendrier.',
+  },
+  {
+    title: 'So vous répond',
+    text:
+      'Elle lit votre demande et vous répond par e-mail, qu’elle l’accepte ou non. ' +
+      'En attendant, le créneau vous est gardé.',
+  },
+  {
+    title: 'La séance a lieu',
+    text: 'Au moment prévu, selon le mode choisi. Vous réglez ensuite : rien n’est payé en ligne.',
+  },
 ];
 
 /**

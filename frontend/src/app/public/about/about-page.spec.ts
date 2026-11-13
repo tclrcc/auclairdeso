@@ -30,6 +30,26 @@ describe('about page', () => {
     expect(text).toContain('personnes majeures');
   });
 
+  it('opens on her presentation video, large, right after the title', () => {
+    const page = openPage().nativeElement as HTMLElement;
+
+    const title = page.querySelector('h1')!;
+    const video = page.querySelector('video')!;
+    expect(title.textContent).toContain('So, en quelques mots');
+    expect(title.compareDocumentPosition(video)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(video.closest('.video-halo')).not.toBeNull();
+    expect(video.hasAttribute('autoplay')).toBe(false);
+  });
+
+  it('explains how a request goes, in three steps, without naming any length of horizon', () => {
+    const page = openPage().nativeElement as HTMLElement;
+
+    const steps = page.querySelectorAll('section[aria-labelledby="request-title"] ol > li');
+    expect(steps).toHaveLength(3);
+    expect(steps[1].textContent).toContain('vous répond par e-mail, qu’elle l’accepte ou non');
+    expect(page.textContent).not.toMatch(/deux mois|lendemain/);
+  });
+
   it('keeps her own words hidden until she has said them', () => {
     // JOURNEY is empty: better no section at all than a text written in her place.
     expect(openPage().nativeElement.textContent).not.toContain('Son parcours');
