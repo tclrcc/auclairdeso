@@ -1,4 +1,16 @@
-import { Component, computed, effect, inject, input, linkedSignal, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Injector,
+  afterNextRender,
+  computed,
+  effect,
+  inject,
+  input,
+  linkedSignal,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { HttpErrorResponse, httpResource } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { form, FormField, FormRoot, maxLength, pattern, required, validate } from '@angular/forms/signals';
@@ -13,6 +25,9 @@ import { BookingApi } from './booking-api';
 import { BookingFormModel, emptyBookingForm, fromProfile, isAdult, toBookingRequest } from './booking-form-model';
 import { OfferingVideo } from '../public/offerings/offering-video';
 import { SlotPicker } from './slot-picker';
+import { BookingStep, BookingSummary } from './booking-summary';
+// The four-pointed sparkle of the logo marks the notice that So validates each request.
+import { SPARKLE_PATH } from '../public/home/sparkle';
 
 const ACCEPTED_PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
@@ -20,13 +35,16 @@ const PHONE_PATTERN = /^\+?[0-9][0-9 .-]{8,18}$/;
 
 @Component({
   selector: 'app-booking-page',
-  imports: [FormField, FormRoot, RouterLink, EurosPipe, FieldErrors, SlotPicker, OfferingVideo],
+  imports: [FormField, FormRoot, RouterLink, EurosPipe, FieldErrors, SlotPicker, OfferingVideo, BookingSummary],
   templateUrl: './booking-page.html',
 })
 export class BookingPage {
   private readonly api = inject(BookingApi);
   protected readonly auth = inject(AuthSession);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly injector = inject(Injector);
   private readonly slotPicker = viewChild(SlotPicker);
+  private readonly sentTitle = viewChild<ElementRef<HTMLElement>>('sentTitle');
 
   /** Bound from the route and its query parameters (?mode=...&debut=...). */
   readonly slug = input.required<string>();
@@ -37,6 +55,12 @@ export class BookingPage {
   protected readonly modeHints = MODE_HINTS;
   protected readonly formatDayOf = formatDayOf;
   protected readonly formatTime = formatTime;
+  protected readonly sparkle = SPARKLE_PATH;
+  /**
+   * The visitor's time zone, to add her own time beside the times of Paris when they differ. Read by the
+   * browser: this route is never rendered by the server (app.routes.server.ts).
+   */
+  protected readonly visitorZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   protected readonly offering = httpResource<Offering>(() => `/api/offerings/${encodeURIComponent(this.slug())}`);
   private readonly profile = httpResource<ClientProfile | null>(() =>
@@ -146,7 +170,8 @@ export class BookingPage {
               this.photo(),
             );
             this.sent.set(appointment);
-            window.scrollTo({ top: 0 });
+            // The page changes under the button: the focus goes to its new title, which brings it into view.
+            afterNextRender(() => this.sentTitle()?.nativeElement.focus(), { injector: this.injector });
             return;
           } catch (error) {
             if (error instanceof HttpErrorResponse && error.status === 409) {
@@ -172,6 +197,17 @@ export class BookingPage {
       this.photoPreview.set(url);
       onCleanup(() => URL.revokeObjectURL(url));
     });
+  }
+
+  /** Sends the client back to a step from the summary: its title takes the focus, and comes into view. */
+  protected goToStep(step: BookingStep): void {
+    const title = this.host.nativeElement.querySelector<HTMLElement>(`#step-${step}`);
+    title?.scrollIntoView({ block: 'start' });
+    title?.focus({ preventScroll: true });
+  }
+
+  protected minutesOf(appointment: AppointmentView): number {
+    return Math.round((Date.parse(appointment.end) - Date.parse(appointment.start)) / 60_000);
   }
 
   protected onPhotoSelected(event: Event): void {

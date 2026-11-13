@@ -58,6 +58,16 @@ describe('OfferingVideo', () => {
     );
   });
 
+  it('takes its cover image from the file of the same name in .jpg, beside the video', async () => {
+    const fixture = TestBed.createComponent(OfferingVideo);
+    fixture.componentRef.setInput('offering', { ...GUIDANCE, videoPath: 'guidance-30-min.webm' });
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).querySelector('img[src="/contenus/guidance-30-min.jpg"]')).not.toBeNull();
+  });
+
   it('has no transcript block while no transcript is written', () => {
     expect(open({ ...GUIDANCE, videoPath: 'guidance-30-min.mp4' }).querySelector('details')).toBeNull();
   });

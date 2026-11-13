@@ -1,4 +1,4 @@
-import {addDays, groupByParisDay, parisDate} from './paris-time';
+import { addDays, addMonths, formatMonth, groupByParisDay, isoWeekday, monthOf, parisDate } from './paris-time';
 
 describe('paris time', () => {
   it('gives the Paris date of an instant, even near midnight UTC', () => {
@@ -19,5 +19,25 @@ describe('paris time', () => {
       ['2026-10-12', 2],
       ['2026-10-13', 1],
     ]);
+  });
+
+  it('gives the month of a date', () => {
+    expect(monthOf('2026-11-19')).toBe('2026-11');
+  });
+
+  it('adds months across years, both ways', () => {
+    expect(addMonths('2026-11', 2)).toBe('2027-01');
+    expect(addMonths('2027-01', -1)).toBe('2026-12');
+    expect(addMonths('2026-03', 0)).toBe('2026-03');
+  });
+
+  it('numbers the days of the week from Monday to Sunday', () => {
+    expect(isoWeekday('2026-11-16')).toBe(1); // a Monday
+    expect(isoWeekday('2026-11-19')).toBe(4); // a Thursday
+    expect(isoWeekday('2026-11-22')).toBe(7); // a Sunday
+  });
+
+  it('names a month in French', () => {
+    expect(formatMonth('2026-11')).toBe('novembre 2026');
   });
 });

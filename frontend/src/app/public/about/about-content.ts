@@ -15,6 +15,11 @@ export interface SiteVideo {
   readonly title: string;
   /** Shown on the cover when known ("28 secondes"). Absent: only "avec le son". */
   readonly durationLabel?: string;
+  /**
+   * An image of the video shown on its cover, under /contenus/ beside the video, taken from it with ffmpeg
+   * (docs/exploitation/videos.md). Absent, or impossible to load: the cover drawn by the page stays.
+   */
+  readonly poster?: string;
   /** What is said in the video, for watching without sound and for search engines. Empty: not shown. */
   readonly transcript: string;
 }
@@ -22,14 +27,48 @@ export interface SiteVideo {
 export const PRESENTATION: SiteVideo = {
   src: '/contenus/presentation.mp4',
   title: 'So se présente',
+  poster: '/contenus/presentation.jpg',
   durationLabel: '28 secondes',
   transcript: '',
 };
 
+/** The title of the page, under the "À propos" eyebrow. PROVISIONAL — to validate with So. */
+export const HEADLINE = 'So, en quelques mots';
+
+/** Under the title, beside the video. */
 export const INTRO: readonly string[] = [
   'So propose des séances de voyance, de magnétisme et de rééquilibrage énergétique. ' +
   'À domicile autour de Chazey-sur-Ain, en visio ou par téléphone.',
-  'Chaque demande est lue et validée par elle, une par une. Le créneau choisi est gardé en attendant sa réponse.',
+];
+
+/** Opens "Comment se passe une demande". */
+export const REQUEST_LEAD =
+  'Chaque demande est lue et validée par elle, une par une. Le créneau choisi est gardé en attendant sa réponse.';
+
+export interface RequestStep {
+  readonly title: string;
+  readonly text: string;
+}
+
+/**
+ * "Comment se passe une demande": what the site really does, step by step (BookingPage, the e-mails of
+ * the notification module). PROVISIONAL — to validate with So.
+ */
+export const REQUEST_STEPS: readonly RequestStep[] = [
+  {
+    title: 'Vous choisissez',
+    text: 'Une séance, la façon de consulter qui vous convient et un créneau libre dans le calendrier.',
+  },
+  {
+    title: 'So vous répond',
+    text:
+      'Elle lit votre demande et vous répond par e-mail, qu’elle l’accepte ou non. ' +
+      'En attendant, le créneau vous est gardé.',
+  },
+  {
+    title: 'La séance a lieu',
+    text: 'Au moment prévu, selon le mode choisi. Vous réglez ensuite : rien n’est payé en ligne.',
+  },
 ];
 
 /**
@@ -44,6 +83,22 @@ export const JOURNEY: readonly string[] = [];
  * is it while JOURNEY is empty, since its text is the start of her path.
  */
 export const PORTRAIT: string | null = null;
+
+/** A sound of the vitrine, under /contenus/ (MEDIA_DIR) as the videos. */
+export interface SiteAudio {
+  readonly src: string;
+  readonly title: string;
+  /** Shown under its title when known ("40 secondes"). */
+  readonly durationLabel?: string;
+  /** What is said, for reading instead of listening. Empty: not shown. */
+  readonly transcript: string;
+}
+
+/**
+ * An extract of her voice, to come: null as long as there is none, and then the "Sa voix" section is not
+ * shown at all.
+ */
+export const VOICE: SiteAudio | null = null;
 
 export interface Commitment {
   readonly title: string;

@@ -117,6 +117,7 @@
     .night-theme *::before,
     .night-theme *::after {
       transition: none !important;
+      animation: none !important;
     }
   }
 }
@@ -443,5 +444,217 @@
     & td {
       border-color: rgb(185 169 214 / 0.22);
     }
+  }
+
+  /*
+   * The halo behind the presentation video of "À propos" (public/about/presentation-video, "feature"):
+   * gold at the heart, violet around, blurred. Static. It stays within the side margin of a phone, so
+   * that it never makes the page scroll sideways.
+   */
+  .video-halo {
+    position: relative;
+    isolation: isolate;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -5% -4%;
+      z-index: -1;
+      border-radius: 50%;
+      background-image: radial-gradient(closest-side, rgb(232 200 114 / 0.22), rgb(59 31 105 / 0.6) 60%, transparent);
+      filter: blur(28px);
+    }
+  }
+
+  /*
+   * The booking calendar (booking/availability-calendar) and the times of the chosen day
+   * (booking/slot-picker). A day with slots is marked three ways, never by colour alone: a brighter and
+   * bolder number, a violet disk and a gold dot. A day without any slot keeps the faint text (5.6:1).
+   */
+  .calendar-nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(44rem / 17);
+    height: calc(44rem / 17);
+    border-radius: 999px;
+    color: var(--color-gold);
+    transition: background-color 150ms, color 150ms;
+
+    &:hover:not(:disabled) {
+      background-color: rgb(232 200 114 / 0.12);
+      color: var(--color-gold-bright);
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+  }
+
+  .calendar-day {
+    height: calc(48rem / 17);
+    padding: 0;
+    text-align: center;
+    vertical-align: middle;
+    color: var(--color-ink-faint);
+
+    /* The focus ring is drawn around the disk rather than the square cell. */
+    &:focus-visible {
+      outline: none;
+    }
+
+    &:focus-visible .calendar-disk {
+      outline: 2px solid var(--color-gold);
+      outline-offset: 2px;
+    }
+  }
+
+  .calendar-disk {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: calc(44rem / 17);
+    height: calc(44rem / 17);
+    border-radius: 999px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    transition: background-color 150ms, color 150ms, box-shadow 150ms;
+  }
+
+  .calendar-dot {
+    display: block;
+    width: 4px;
+    height: 4px;
+    margin-top: 4px;
+    border-radius: 999px;
+  }
+
+  .calendar-day-available {
+    cursor: pointer;
+    color: var(--color-cream);
+    font-weight: 600;
+
+    & .calendar-disk {
+      background-color: rgb(59 31 105 / 0.6);
+    }
+
+    & .calendar-dot {
+      background-color: var(--color-gold);
+    }
+
+    &:not(.calendar-day-selected):hover .calendar-disk {
+      background-color: rgb(59 31 105 / 0.95);
+      box-shadow: inset 0 0 0 1px rgb(232 200 114 / 0.55);
+    }
+  }
+
+  .calendar-day-today .calendar-disk {
+    box-shadow: inset 0 0 0 1px rgb(251 243 221 / 0.6);
+  }
+
+  .calendar-day-selected {
+    & .calendar-disk {
+      background-color: var(--color-gold);
+      color: var(--color-on-gold);
+      box-shadow: 0 0 0 4px rgb(232 200 114 / 0.18), 0 0 18px rgb(232 200 114 / 0.35);
+    }
+
+    & .calendar-dot {
+      background-color: var(--color-on-gold);
+    }
+  }
+
+  .calendar-skeleton {
+    display: block;
+    height: calc(44rem / 17);
+    border-radius: 999px;
+    background-color: rgb(59 31 105 / 0.45);
+  }
+
+  /* A time is a radio button drawn as a chip: the native input keeps the arrows and the announcements. */
+  .slot-chip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(44rem / 17);
+    border: 1px solid rgb(232 200 114 / 0.4);
+    border-radius: 999px;
+    background-color: rgb(15 8 32 / 0.55);
+    color: var(--color-cream);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: background-color 150ms, border-color 150ms, color 150ms;
+
+    &:hover {
+      border-color: var(--color-gold);
+      background-color: rgb(232 200 114 / 0.12);
+    }
+
+    &:has(:focus-visible) {
+      outline: 2px solid var(--color-gold);
+      outline-offset: 3px;
+    }
+
+    &:has(:checked) {
+      border-color: var(--color-gold);
+      background-color: var(--color-gold);
+      color: var(--color-on-gold);
+      font-weight: 600;
+    }
+  }
+
+  /*
+   * Motion, only for a visitor who accepts it (the rule of the base layer stops it otherwise): the times
+   * of a day rise into place one after the other, the empty calendar breathes while it loads, and the
+   * tick of a sent request draws itself.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    .slot-chip {
+      animation: night-rise 220ms ease-out backwards;
+    }
+
+    .slot-chip:nth-child(2) {
+      animation-delay: 40ms;
+    }
+
+    .slot-chip:nth-child(3) {
+      animation-delay: 80ms;
+    }
+
+    .slot-chip:nth-child(n + 4) {
+      animation-delay: 120ms;
+    }
+
+    .calendar-skeleton {
+      animation: night-breathe 1.6s ease-in-out infinite;
+    }
+
+    /* The tick of "Demande envoyée" draws itself once, on the confirmation of a booking request. */
+    .night-check path {
+      stroke-dasharray: 24;
+      animation: night-draw 450ms ease-out 150ms backwards;
+    }
+  }
+}
+
+@keyframes night-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes night-draw {
+  from {
+    stroke-dashoffset: 24;
+  }
+}
+
+@keyframes night-breathe {
+  50% {
+    opacity: 0.45;
   }
 }

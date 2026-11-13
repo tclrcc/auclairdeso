@@ -55,7 +55,7 @@ Le document de cadrage fait référence pour le périmètre, l'architecture et l
 
 ## Frontend
 - Rendu défini dans `app.routes.server.ts` : `account/` (route `mon-espace`), `admin/`, `reserver/:slug` et `connexion` en rendu client (guards) ; `''`, `seances`, `a-propos` et les pages légales (`mentions-legales`, `conditions-generales`, `confidentialite`) en rendu serveur (`RenderMode.Server`) ; le reste est prérendu. Toute nouvelle route doit y être déclarée.
-- Vidéo d'une prestation : `public/offerings/offering-video` (utilisé par « Séances et tarifs » et la page de réservation) réutilise le lecteur `public/about/presentation-video` ; transcription dans un bloc « Lire la transcription ».
+- Vidéo d'une prestation : `public/offerings/offering-video` (utilisé par « Séances et tarifs » et la page de réservation) réutilise le lecteur `public/about/presentation-video` (formes `standard`, `feature` pour « À propos », `compact` pour la réservation) ; transcription dans un bloc « Lire la transcription » ; image de couverture = même nom en `.jpg` dans `MEDIA_DIR` (`docs/exploitation/videos.md`).
 - Pages publiques dans `public/` (dont `about/` et `legal/`, ce dernier lit l'identité légale depuis l'API) ; facturation côté praticienne dans `admin/billing/` (note de séance, encaissements, livre des recettes) ; suppression de compte dans `account/account-erasure.ts`.
 - Jamais `window` ou `document` sans vérifier la plateforme (compatibilité SSR).
 - En-têtes de sécurité posés par le serveur de rendu (`src/server.ts`, valeurs dans `src/server-security.ts`) : CSP stricte à nonce. Ne pas retirer `ngCspNonce` de `index.html` ; aucun script ou style en ligne, ni `style="…"`, ajouté à la main (la CSP les bloquerait).

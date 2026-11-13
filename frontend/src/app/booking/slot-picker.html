@@ -1,38 +1,64 @@
-<div>
-  <div class="flex items-center justify-between gap-2">
-    <button type="button" class="min-h-11 text-sm text-gold underline underline-offset-4 hover:text-gold-bright disabled:opacity-40" [disabled]="!canGoBack()"
-            (click)="previousWeek()">
-      ← Semaine précédente
-    </button>
-    <button type="button" class="min-h-11 text-sm text-gold underline underline-offset-4 hover:text-gold-bright disabled:opacity-40" [disabled]="!canGoForward()"
-            (click)="nextWeek()">
-      Semaine suivante →
-    </button>
+@if (slots.isLoading() && !slots.hasValue()) {
+<div class="night-card p-3 sm:p-6">
+  <p class="text-ink-muted" aria-live="polite">Recherche des créneaux…</p>
+  <div class="mt-4 grid grid-cols-7 gap-1" aria-hidden="true">
+    @for (cell of skeleton; track $index) {
+    <span class="calendar-skeleton"></span>
+    }
   </div>
-  <p class="mt-2 text-sm text-ink-muted">{{ weekLabel() }}</p>
-
-  @if (slots.isLoading()) {
-  <p class="mt-4 text-ink-muted" aria-live="polite">Recherche des créneaux…</p>
-  } @else if (slots.error()) {
-  <p class="mt-4 text-alert" role="alert">Les créneaux ne peuvent pas être affichés pour le moment.</p>
-  } @else {
-  @for (day of days(); track day.date) {
-  <div class="mt-5">
-    <p class="text-sm font-medium first-letter:uppercase">{{ day.label }}</p>
-    <div class="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
-      @for (slot of day.slots; track slot.start) {
-      <button type="button" class="min-h-11 rounded-lg border px-3 py-2 text-sm"
-              [class.border-ink-faint/70]="!isSelected(slot)" [class.bg-abyss/60]="!isSelected(slot)"
-              [class.border-gold]="isSelected(slot)" [class.bg-gold]="isSelected(slot)"
-              [class.text-on-gold]="isSelected(slot)" [class.font-semibold]="isSelected(slot)"
-              [attr.aria-pressed]="isSelected(slot)" (click)="selected.set(slot.start)">
-        {{ formatTime(slot.start) }}
-      </button>
-      }
-    </div>
-  </div>
-  } @empty {
-  <p class="mt-4 text-ink-muted">Aucun créneau libre cette semaine.</p>
-  }
-  }
 </div>
+} @else if (slots.error()) {
+<div class="night-card p-6">
+  <p role="alert">Les créneaux ne peuvent pas être affichés pour le moment.</p>
+  <button type="button" class="btn-gold-outline mt-4" (click)="reload()">Réessayer</button>
+</div>
+} @else if (!firstAvailable()) {
+<div class="night-card p-6">
+  <p>Aucun créneau n'est libre pour cette séance en ce moment.</p>
+  <p class="mt-2 text-sm text-ink-muted">De nouveaux jours s'ouvrent à la réservation au fil du temps.</p>
+</div>
+} @else {
+<div class="night-card p-3 sm:grid sm:grid-cols-[minmax(0,1fr)_13rem] sm:gap-8 sm:p-6"
+     [attr.aria-busy]="slots.isLoading() ? true : null">
+  <div>
+    @if (firstAvailable(); as first) {
+    @if (selectedDay() !== first) {
+    <button type="button" class="night-link mb-3 min-h-11 text-left text-sm underline underline-offset-4"
+            (click)="goToFirstAvailable()">
+      Première disponibilité : {{ formatDay(first) }}
+    </button>
+    }
+    }
+    <app-availability-calendar [available]="availableDays()" [first]="firstDay" [last]="lastDay()" [today]="today"
+                               [(month)]="month" [selected]="selectedDay()" (selectedChange)="pickDay($event)" />
+  </div>
+
+  <div id="slot-times" class="mt-6 border-t border-gold/20 pt-5 sm:mt-0 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-8">
+    @if (notice(); as message) {
+    <p class="mb-4 text-sm text-alert" role="status">{{ message }}</p>
+    }
+    @if (selectedDay()) {
+    <fieldset aria-live="polite">
+      <legend class="text-sm font-medium text-cream">
+        Horaires du {{ dayLabel() }}
+        <span class="block text-mention font-normal text-ink-muted">heure de Paris</span>
+      </legend>
+      @if (daySlots().length) {
+      <div class="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-2">
+        @for (slot of daySlots(); track slot.start) {
+        <label class="slot-chip">
+          <input type="radio" name="slot" class="sr-only" [checked]="isSelected(slot)" (change)="pickSlot(slot)" />
+          <span>{{ formatTime(slot.start) }}</span>
+        </label>
+        }
+      </div>
+      } @else {
+      <p class="mt-3 text-sm text-ink-muted">Plus aucun horaire libre ce jour-là. Choisissez un autre jour.</p>
+      }
+    </fieldset>
+    } @else {
+    <p class="text-sm text-ink-muted">Choisissez un jour pour voir ses horaires.</p>
+    }
+  </div>
+</div>
+}

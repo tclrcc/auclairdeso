@@ -1,0 +1,48 @@
+<div class="flex items-center justify-between gap-2">
+  <button type="button" class="calendar-nav" [disabled]="!canGoBack()" [attr.aria-label]="previousLabel()"
+          (click)="previousMonth()">
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="size-5 fill-none stroke-current stroke-2"><path d="M15 5l-7 7 7 7" /></svg>
+  </button>
+  <h3 id="calendar-month" class="font-display text-2xl font-semibold text-cream first-letter:uppercase"
+      aria-live="polite">{{ monthLabel() }}</h3>
+  <button type="button" class="calendar-nav" [disabled]="!canGoForward()" [attr.aria-label]="nextLabel()"
+          (click)="nextMonth()">
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="size-5 fill-none stroke-current stroke-2"><path d="M9 5l7 7-7 7" /></svg>
+  </button>
+</div>
+
+<table role="grid" aria-labelledby="calendar-month" class="mt-3 w-full table-fixed border-separate border-spacing-y-1">
+  <thead>
+    <tr>
+      @for (weekday of weekdays; track weekday.long) {
+      <th scope="col" class="pb-1 text-mention font-medium text-ink-faint">
+        <span aria-hidden="true">{{ weekday.short }}</span><span class="sr-only">{{ weekday.long }}</span>
+      </th>
+      }
+    </tr>
+  </thead>
+  <tbody>
+    @for (week of weeks(); track $index) {
+    <tr>
+      @for (cell of week; track $index) {
+      @if (cell) {
+      <td class="calendar-day group" [attr.data-date]="cell.date" [attr.tabindex]="cell.date === focusDate() ? 0 : -1"
+          [attr.aria-selected]="cell.date === selected()" [attr.aria-disabled]="cell.available ? null : true"
+          [attr.aria-current]="cell.today ? 'date' : null"
+          [class.calendar-day-available]="cell.available" [class.calendar-day-selected]="cell.date === selected()"
+          [class.calendar-day-today]="cell.today"
+          (click)="pick(cell)" (keydown)="onKeydown($event, cell)">
+        <span class="calendar-disk" aria-hidden="true">
+          {{ cell.number }}
+          <span class="calendar-dot"></span>
+        </span>
+        <span class="sr-only">{{ cell.label }}</span>
+      </td>
+      } @else {
+      <td></td>
+      }
+      }
+    </tr>
+    }
+  </tbody>
+</table>
