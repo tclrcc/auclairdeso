@@ -25,7 +25,7 @@
     @if (selectedDay() !== first) {
     <button type="button" class="night-link mb-3 min-h-11 text-left text-sm underline underline-offset-4"
             (click)="goToFirstAvailable()">
-      Première disponibilité : <span class="first-letter:uppercase">{{ formatDay(first) }}</span>
+      Première disponibilité : {{ formatDay(first) }}
     </button>
     }
     }
