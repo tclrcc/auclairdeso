@@ -39,7 +39,7 @@
         } @else {
         <img src="logo.webp" alt="" width="88" height="88" class="relative size-22 rounded-full ring-1 ring-gold/40" />
         }
-        <span class="relative flex flex-col items-center gap-5" [class.mt-auto]="poster()" [class.pb-4]="poster()">
+        <span [class]="coverContentClass()">
           <span [class]="titleClass()">{{ video().title }}</span>
           <span aria-hidden="true" [class]="playDiskClass()">
             <svg viewBox="0 0 24 24" [class]="playIconClass()"><path d="M5 3l16 9-16 9z" /></svg>

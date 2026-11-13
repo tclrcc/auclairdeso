@@ -1,19 +1,24 @@
 <main class="flex-1 pb-section">
   <!-- Every block whose content is missing (portrait, path, voice, transcript) is left out: never a placeholder. -->
 
-  <!-- The opening: her words on one side, her video on the other; on a phone, the video right under the title. -->
-  <section aria-labelledby="about-title" class="night-container pt-14 sm:pt-20">
-    <div class="grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-16">
-      <div class="lg:col-span-6 xl:col-span-5">
+  <!--
+    The opening. On a phone: the title, the video right under it (its play button on the first screen), then
+    her words. From "lg" on: the title and her words in one column, the video beside them over both rows.
+  -->
+  <section aria-labelledby="about-title" class="night-container pt-10 sm:pt-20">
+    <div class="grid gap-8 lg:grid-cols-12 lg:gap-x-16 lg:gap-y-0">
+      <div class="lg:col-span-6 lg:self-end xl:col-span-5">
         <p class="night-eyebrow">À propos</p>
         <h1 id="about-title" class="night-page-title mt-4">{{ headline }}</h1>
+      </div>
+      <div class="lg:col-span-6 lg:col-start-7 lg:row-span-2 lg:row-start-1 lg:self-center xl:col-span-7 xl:col-start-6">
+        <app-presentation-video [video]="presentation" variant="feature" transcriptLabel="Lire la transcription" />
+      </div>
+      <div class="lg:col-span-6 lg:self-start xl:col-span-5">
         @for (paragraph of intro; track paragraph) {
-        <p class="night-lead mt-6">{{ paragraph }}</p>
+        <p class="night-lead lg:mt-6">{{ paragraph }}</p>
         }
         <a routerLink="/seances" class="btn-gold-outline mt-8 hidden lg:inline-flex">Voir les séances et tarifs</a>
-      </div>
-      <div class="lg:col-span-6 xl:col-span-7">
-        <app-presentation-video [video]="presentation" variant="feature" transcriptLabel="Lire la transcription" />
       </div>
     </div>
   </section>

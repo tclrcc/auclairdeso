@@ -4,7 +4,8 @@ import { SiteVideo } from './about-content';
 /**
  * How a video sits in its page:
  * - "standard": a phone-sized portrait (Séances et tarifs);
- * - "feature": large, sized by the height of the screen, with a halo ("À propos");
+ * - "feature": large, sized by the height of the screen (two thirds on a phone, where it comes right under
+ *   the title, its play button on the first screen), with a halo ("À propos");
  * - "compact": a one-line "Voir la présentation" that opens the player in place (booking page, where the
  *   calendar matters more).
  */
@@ -55,12 +56,21 @@ export class PresentationVideo {
   protected readonly frameClass = computed(() =>
     ({
       standard: 'mx-auto block w-full max-w-[21rem]',
-      feature: 'mx-auto block w-[min(100%,calc(70svh*9/16))] lg:w-[min(100%,calc(min(80vh,44rem)*9/16))]',
+      feature: 'mx-auto block w-[min(100%,calc(66svh*9/16))] lg:w-[min(100%,calc(min(80vh,44rem)*9/16))]',
       compact: 'block w-full',
     })[this.variant()],
   );
   protected readonly playerClass = computed(() =>
     ({ standard: '', feature: 'video-halo', compact: 'mx-auto mt-3 max-w-[18rem]' })[this.variant()],
+  );
+  /**
+   * Over a cover image, the title and the play button sit low on a large screen, over the darkened bottom
+   * of the image; on a phone they stay in the middle, so that the play button is on the first screen.
+   */
+  protected readonly coverContentClass = computed(() =>
+    this.poster()
+      ? 'relative flex flex-col items-center gap-5 lg:mt-auto lg:pb-4'
+      : 'relative flex flex-col items-center gap-5',
   );
   protected readonly titleClass = computed(() =>
     this.variant() === 'feature' ? 'font-display text-3xl sm:text-4xl' : 'font-display text-3xl',
