@@ -107,6 +107,8 @@ Chaque prestation peut avoir une **vidéo de présentation**, facultative, avec 
 - Le nom du fichier est un **nom simple** : minuscules, chiffres et tirets, terminé par `.mp4` ou `.webm` (par exemple `guidance-30-min.mp4`). Aucun dossier, aucun `..`, 100 caractères au maximum. La transcription fait 4 000 caractères au maximum. Un champ vide signifie « pas de vidéo » / « pas de transcription ».
 - Elle se saisit dans l'éditeur de prestation de l'administration (deux champs facultatifs) et apparaît sur « Séances et tarifs » et sur la page de réservation, avec le **même lecteur** que la page « À propos » : commandes visibles, aucune lecture automatique, rien de téléchargé avant le clic hormis les métadonnées.
 - La transcription s'affiche sous la vidéo, dans un bloc repliable « Lire la transcription » : elle rend la vidéo accessible aux personnes qui ne peuvent pas l'écouter. Sans vidéo, rien ne change.
+- Son **image de couverture** est le fichier du même nom en `.jpg`, à côté de la vidéo dans `MEDIA_DIR` (`guidance-30-min.mp4` → `guidance-30-min.jpg`) : aucun champ de plus, aucune migration. Sans ce fichier, le lecteur garde sa couverture dessinée. Procédure (extraction avec `ffmpeg`, dépôt, vérification) : `docs/exploitation/videos.md`.
+- Sur la page de réservation, la vidéo prend une forme **compacte** (« Voir la présentation ») qui ouvre le lecteur sur place, pour laisser la place au calendrier.
 - Les mêmes règles de ton s'appliquent à ce qui est dit et transcrit : on décrit la séance, aucune promesse de résultat, aucun conseil médical, juridique ou financier.
 
 ## 4. Planning
