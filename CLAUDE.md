@@ -69,6 +69,7 @@ Le document de cadrage fait référence pour le périmètre, l'architecture et l
 - Accès public : https://vps-5ff241d3.vps.ovh.net:8443 ; mot de passe demandé une fois à la porte `/recette/acces`, puis cookie de 90 jours (nginx du VPS ; fichiers dans `deploy/host/`, installés à la main ; secret dans `/etc/nginx/auclairdeso-recette.conf`).
 - Accès par le tunnel SSH : http://127.0.0.1:8090 ; Mailpit : http://localhost:8025 (tunnel uniquement).
 - Secrets : `deploy/.env` et `/etc/nginx/auclairdeso.htpasswd`, jamais versionnés.
+- Sauvegardes : `deploy/backup.sh` (pg_dump chiffré par age pour une clé publique, clé privée jamais sur le VPS ; rétention 27 jours au plus), timer systemd à 03:45 (unités dans `deploy/host/`), état `deploy/backup-status.sh`, test jetable `deploy/restore-test.sh` ; `deploy.sh` sauvegarde avant de déployer (`--skip-backup` pour passer outre). Procédure : `docs/exploitation/sauvegardes.md`.
 - Lien magique limité (nginx par IP ; backend par IP, par adresse 3/15 min et 10/24 h, 100/jour au total hors personnel, `MagicLinkQuota`). Un lien refusé n'est pas envoyé mais la réponse reste 204 ; un WARN sans adresse apparaît dans `docker compose logs backend`. Compteurs en mémoire : `docker compose restart backend` débloque aussitôt un membre du personnel.
 - HSTS coupé tant que le domaine définitif n'est pas en HTTPS : interrupteur unique `HSTS_MAX_AGE` (`deploy/.env`), mode d'emploi dans `deploy/.env.example`. Spring Security n'en envoie pas.
 
