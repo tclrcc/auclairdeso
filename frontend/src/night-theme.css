@@ -588,7 +588,8 @@
 
   /*
    * Motion, only for a visitor who accepts it (the rule of the base layer stops it otherwise): the times
-   * of a day rise into place one after the other, and the empty calendar breathes while it loads.
+   * of a day rise into place one after the other, the empty calendar breathes while it loads, and the
+   * tick of a sent request draws itself.
    */
   @media (prefers-reduced-motion: no-preference) {
     .slot-chip {
@@ -610,6 +611,12 @@
     .calendar-skeleton {
       animation: night-breathe 1.6s ease-in-out infinite;
     }
+
+    /* The tick of "Demande envoyée" draws itself once, on the confirmation of a booking request. */
+    .night-check path {
+      stroke-dasharray: 24;
+      animation: night-draw 450ms ease-out 150ms backwards;
+    }
   }
 }
 
@@ -617,6 +624,12 @@
   from {
     opacity: 0;
     transform: translateY(6px);
+  }
+}
+
+@keyframes night-draw {
+  from {
+    stroke-dashoffset: 24;
   }
 }
 

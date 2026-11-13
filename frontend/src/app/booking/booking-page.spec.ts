@@ -174,4 +174,50 @@ describe('BookingPage steps', () => {
 
     expect(document.activeElement?.id).toBe('step-slot');
   });
+
+  it('shows the request as waiting for So once sent, never as confirmed', async () => {
+    const { fixture, page } = await open(true);
+    await choose(fixture, page);
+
+    const fill = (selector: string, value: string) => {
+      const field = page.querySelector<HTMLInputElement | HTMLTextAreaElement>(selector)!;
+      field.value = value;
+      field.dispatchEvent(new Event('input'));
+    };
+    fill('#first-name', 'Alice');
+    fill('#last-name', 'Martin');
+    fill('#birth-date', '1990-04-12');
+    fill('#phone', '06 12 34 56 78');
+    fill('#reason', 'Un moment pour souffler.');
+    page.querySelectorAll<HTMLInputElement>('form input[type="checkbox"]').forEach((box) => box.click());
+    fixture.detectChanges();
+
+    page.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+    await fixture.whenStable();
+    httpTesting.expectOne('/api/bookings').flush({
+      id: 7,
+      offeringSlug: MAGNETISM.slug,
+      offeringName: MAGNETISM.name,
+      mode: 'PHONE',
+      start: SLOT.start,
+      end: SLOT.end,
+      status: 'REQUESTED',
+      priceCents: 6000,
+      cancellationDeadline: '2026-11-17T14:00:00+01:00',
+      lateCancellation: false,
+    });
+    await fixture.whenStable();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const title = page.querySelector('h1')!;
+    expect(title.textContent).toContain('Votre demande est envoyée');
+    expect(document.activeElement).toBe(title);
+    const text = page.textContent!.replace(/\s+/g, ' ');
+    expect(text).toContain('En attente de validation par So');
+    expect(text).toContain('Le créneau du jeudi 19 novembre à 14:00 vous est gardé');
+    expect(text).toContain("Vous recevez sa réponse par e-mail, qu'elle accepte ou non la demande");
+    expect(text).toContain('la veille de la séance à 21 h, la demande expire et le créneau est libéré');
+    expect(text).not.toMatch(/confirmé/i);
+  });
 });

@@ -3,16 +3,52 @@
     <a routerLink="/seances" class="night-link text-sm">← Séances et tarifs</a>
 
     @if (sent(); as appointment) {
-    <section class="night-card mt-6 p-6">
-      <h1 class="font-display text-4xl text-cream">Demande envoyée</h1>
-      <p class="mt-4 leading-relaxed">
-        Votre demande pour <strong>{{ appointment.offeringName }}</strong>,
-        le <strong>{{ formatDayOf(appointment.start) }} à {{ formatTime(appointment.start) }}</strong>
-        ({{ modeLabels[appointment.mode] }}), est bien enregistrée.
+    <section class="night-card mx-auto mt-6 max-w-2xl p-6 sm:p-10">
+      <p class="inline-flex items-center gap-2 rounded-full border border-gold/50 px-3 py-1 text-sm text-gold">
+        <span class="size-2 rounded-full bg-gold motion-safe:animate-pulse" aria-hidden="true"></span>
+        En attente de validation par So
       </p>
-      <p class="mt-4">Vous recevrez un email dès qu'elle sera confirmée.</p>
-      <p class="mt-4 text-sm text-ink-muted">En cas d'empêchement, merci d'annuler au moins 48 h à l'avance.</p>
-      <a routerLink="/mon-espace" class="btn-primary mt-8">Voir mes rendez-vous</a>
+      <h1 #sentTitle tabindex="-1" class="mt-5 font-display text-4xl text-cream sm:text-5xl">Votre demande est envoyée</h1>
+      <p class="mt-4 leading-relaxed">
+        Elle est en attente de validation par So. Le créneau du
+        <strong class="text-cream">{{ formatDayOf(appointment.start) }} à {{ formatTime(appointment.start) }}</strong>
+        vous est gardé d'ici là.
+      </p>
+
+      <ol class="mt-8 space-y-4" aria-label="Où en est votre demande">
+        <li class="flex items-center gap-3">
+          <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-gold" aria-hidden="true">
+            <svg viewBox="0 0 24 24" class="night-check size-4 fill-none stroke-on-gold stroke-3"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+          </span>
+          <span>Demande envoyée<span class="sr-only"> : fait</span></span>
+        </li>
+        <li class="flex items-center gap-3" aria-current="step">
+          <span class="flex size-8 shrink-0 items-center justify-center rounded-full border border-gold" aria-hidden="true">
+            <span class="size-2 rounded-full bg-gold"></span>
+          </span>
+          <span class="font-medium text-cream">So étudie votre demande<span class="sr-only"> : en cours</span></span>
+        </li>
+        <li class="flex items-center gap-3 text-ink-muted">
+          <span class="size-8 shrink-0 rounded-full border border-ink-faint/60" aria-hidden="true"></span>
+          <span>Vous recevez sa réponse par e-mail, qu'elle accepte ou non la demande</span>
+        </li>
+      </ol>
+
+      <div class="mt-8">
+        <app-booking-summary [offeringName]="appointment.offeringName" [durationMinutes]="minutesOf(appointment)"
+                             [priceCents]="appointment.priceCents" [mode]="appointment.mode" [start]="appointment.start" />
+      </div>
+
+      <p class="mt-6 text-sm leading-relaxed text-ink-muted">
+        Sans réponse de sa part la veille de la séance à 21 h, la demande expire et le créneau est libéré ;
+        un e-mail vous en informe.
+      </p>
+      <p class="mt-2 text-sm leading-relaxed text-ink-muted">En cas d'empêchement, merci d'annuler au moins 48 h à l'avance.</p>
+
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+        <a routerLink="/mon-espace" class="btn-gold">Voir mes rendez-vous</a>
+        <a routerLink="/seances" class="btn-gold-outline">Retour aux séances</a>
+      </div>
     </section>
     } @else if (offering.isLoading()) {
     <p class="mt-8 text-ink-muted">Chargement…</p>
