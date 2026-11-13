@@ -1,6 +1,7 @@
 # Shared by backup.sh, backup-status.sh and restore-test.sh: where the backups are, how they are named,
 # and which ones are valid. Sourced, never executed.
-# shellcheck shell=bash
+# The variables below are used by the scripts that source this file.
+# shellcheck shell=bash disable=SC2034
 
 BACKUP_DIR="${BACKUP_DIR:-/srv/auclairdeso/sauvegardes}"
 BACKUP_STATUS_FILE="$BACKUP_DIR/last-backup.status"
