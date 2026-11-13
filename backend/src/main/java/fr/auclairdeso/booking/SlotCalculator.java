@@ -11,24 +11,27 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Computes the slots a client can book for one offering (docs/specification.md, 4.2).
+ * Computes the slots a client can book for one offering (docs/specification.md, 4.2 and 4.3).
  * Pure logic, without database or Spring, so that every rule can be tested in isolation.
  */
 final class SlotCalculator {
 
     private final BookingRules rules;
+    private final BookingDeadlines deadlines;
     private final Clock clock;
 
-    SlotCalculator(BookingRules rules, Clock clock) {
+    SlotCalculator(BookingRules rules, BookingDeadlines deadlines, Clock clock) {
         this.rules = rules;
+        this.deadlines = deadlines;
         this.clock = clock;
     }
 
     List<TimeSlot> availableSlots(LocalDate from, LocalDate to, Duration duration, Duration breakAfter,
                                   List<OpeningPeriod> openings, List<ClosedPeriod> closures,
                                   List<BookedSession> booked) {
-        var today = LocalDate.now(clock.withZone(rules.zone()));
-        var firstDay = latest(from, today.plusDays(rules.minDaysAhead()));
+        var now = ZonedDateTime.now(clock.withZone(rules.zone()));
+        var today = now.toLocalDate();
+        var firstDay = latest(from, latest(today.plusDays(rules.minDaysAhead()), firstDayBeforeCutoff(now)));
         var lastDay = earliest(to, today.plus(rules.horizon()));
 
         var slots = new ArrayList<TimeSlot>();
@@ -41,6 +44,15 @@ final class SlotCalculator {
             }
         }
         return slots;
+    }
+
+    /**
+     * A day is offered until the cutoff of the day before: later, its request could expire at the
+     * deadline of that same evening before the practitioner has had time to answer it.
+     */
+    private LocalDate firstDayBeforeCutoff(ZonedDateTime now) {
+        var tomorrow = now.toLocalDate().plusDays(1);
+        return now.toLocalTime().isBefore(deadlines.bookingCutoff()) ? tomorrow : tomorrow.plusDays(1);
     }
 
     /**

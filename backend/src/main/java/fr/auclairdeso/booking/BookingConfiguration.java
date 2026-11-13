@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 class BookingConfiguration {
 
     @Bean
-    SlotCalculator slotCalculator(BookingRules rules, Clock clock) {
-        return new SlotCalculator(rules, clock);
+    SlotCalculator slotCalculator(BookingRules rules, BookingDeadlines deadlines, Clock clock) {
+        return new SlotCalculator(rules, deadlines, clock);
     }
 }
