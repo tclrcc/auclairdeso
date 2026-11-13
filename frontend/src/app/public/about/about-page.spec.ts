@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { AboutPage } from './about-page';
 import { SiteVideo } from './about-content';
-import { PresentationVideo } from './presentation-video';
+import { PresentationVideo, VideoVariant } from './presentation-video';
 
 const VIDEO: SiteVideo = {
   src: '/contenus/presentation-de-test.mp4',
@@ -44,9 +44,10 @@ describe('about page', () => {
   });
 
   describe('presentation video', () => {
-    function openVideo(video: SiteVideo = VIDEO) {
+    function openVideo(video: SiteVideo = VIDEO, variant: VideoVariant = 'standard') {
       const fixture = TestBed.createComponent(PresentationVideo);
       fixture.componentRef.setInput('video', video);
+      fixture.componentRef.setInput('variant', variant);
       fixture.detectChanges();
       return fixture;
     }
@@ -77,6 +78,46 @@ describe('about page', () => {
       fixture.detectChanges();
 
       expect(element.querySelector('[role="alert"]')?.textContent).toContain('ne peut pas être lue');
+    });
+
+    it('names the play button after the video, its duration and its sound', () => {
+      const button = openVideo().nativeElement.querySelector('button') as HTMLButtonElement;
+
+      expect(button.getAttribute('aria-label')).toBe('Lire la vidéo « So se présente », 28 secondes, avec le son');
+    });
+
+    it('lays the cover image on the drawn cover once the page is live, and removes it if it cannot load', async () => {
+      const fixture = openVideo({ ...VIDEO, poster: '/contenus/presentation-de-test.jpg' });
+      await fixture.whenStable();
+      fixture.detectChanges();
+      const element = fixture.nativeElement as HTMLElement;
+
+      const poster = element.querySelector<HTMLImageElement>('img[src="/contenus/presentation-de-test.jpg"]')!;
+      expect(poster.getAttribute('alt')).toBe('');
+      expect(element.querySelector('img[src="logo.webp"]')).toBeNull();
+
+      poster.dispatchEvent(new Event('error'));
+      fixture.detectChanges();
+
+      expect(element.querySelector('img[src="/contenus/presentation-de-test.jpg"]')).toBeNull();
+      expect(element.querySelector('img[src="logo.webp"]')).not.toBeNull();
+      expect(element.querySelector('[role="alert"]')).toBeNull();
+    });
+
+    it('in its compact form, is one line that opens the player in place', () => {
+      const play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue();
+      const fixture = openVideo(VIDEO, 'compact');
+      const element = fixture.nativeElement as HTMLElement;
+
+      expect(element.querySelector('button')?.textContent).toContain('Voir la présentation');
+      expect(element.querySelector('video')?.closest('[hidden]')).not.toBeNull();
+
+      element.querySelector('button')!.click();
+      fixture.detectChanges();
+
+      expect(play).toHaveBeenCalledOnce();
+      expect(element.querySelector('button')).toBeNull();
+      expect(element.querySelector('video')?.closest('[hidden]')).toBeNull();
     });
 
     it('offers what is said in the video once it has been written down', () => {

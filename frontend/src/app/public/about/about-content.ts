@@ -15,6 +15,11 @@ export interface SiteVideo {
   readonly title: string;
   /** Shown on the cover when known ("28 secondes"). Absent: only "avec le son". */
   readonly durationLabel?: string;
+  /**
+   * An image of the video shown on its cover, under /contenus/ beside the video, taken from it with ffmpeg
+   * (docs/exploitation/videos.md). Absent, or impossible to load: the cover drawn by the page stays.
+   */
+  readonly poster?: string;
   /** What is said in the video, for watching without sound and for search engines. Empty: not shown. */
   readonly transcript: string;
 }
@@ -22,6 +27,7 @@ export interface SiteVideo {
 export const PRESENTATION: SiteVideo = {
   src: '/contenus/presentation.mp4',
   title: 'So se présente',
+  poster: '/contenus/presentation.jpg',
   durationLabel: '28 secondes',
   transcript: '',
 };

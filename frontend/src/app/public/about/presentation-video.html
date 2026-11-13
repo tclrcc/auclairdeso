@@ -1,22 +1,54 @@
-<div class="mx-auto w-full max-w-[21rem]">
-  <div class="relative overflow-hidden rounded-3xl border border-gold/30 bg-abyss-top">
-    <!-- 480 × 854 : the portrait of a phone. The ratio is held by the cover as well, so the
-         layout does not jump when one replaces the other. -->
-    <video #player class="block aspect-9/16 w-full" [src]="video().src" [attr.aria-label]="video().title"
-           [attr.preload]="preload()" playsinline controls (error)="failed.set(true)"></video>
+<div [class]="frameClass()">
+  @if (variant() === 'compact' && !playing()) {
+  <!-- Compact: one line that opens the player in place. -->
+  <button type="button" (click)="play()" [attr.aria-label]="playLabel()"
+          class="group flex w-full items-center gap-4 rounded-2xl border border-gold/30 bg-abyss/60 p-3 text-left transition-colors hover:border-gold/60">
+    <span class="relative flex h-16 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-abyss-top ring-1 ring-gold/30">
+      @if (poster(); as image) {
+      <img [src]="image" alt="" width="36" height="64" class="absolute inset-0 size-full object-cover" (error)="onPosterError()" />
+      } @else {
+      <img src="logo.webp" alt="" width="28" height="28" class="size-7 rounded-full" />
+      }
+    </span>
+    <span class="min-w-0 flex-1">
+      <span class="block font-medium text-cream">Voir la présentation</span>
+      <span class="block text-sm text-ink-muted">{{ video().durationLabel ? video().durationLabel + ' · ' : '' }}avec le son</span>
+    </span>
+    <span aria-hidden="true"
+          class="flex size-11 shrink-0 items-center justify-center rounded-full border border-gold/60 transition-colors group-hover:bg-gold/10">
+      <svg viewBox="0 0 24 24" class="ml-0.5 size-5 fill-gold"><path d="M5 3l16 9-16 9z" /></svg>
+    </span>
+  </button>
+  }
 
-    @if (!playing()) {
-    <button type="button" (click)="play()"
-            class="group absolute inset-0 flex flex-col items-center justify-center gap-5 bg-abyss-top px-6 text-center text-cream focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-gold">
-      <img src="logo.webp" alt="" width="88" height="88" class="size-22 rounded-full ring-1 ring-gold/40" />
-      <span class="font-display text-3xl">{{ video().title }}</span>
-      <span aria-hidden="true"
-            class="flex size-16 items-center justify-center rounded-full border border-gold/60 transition-colors group-hover:bg-gold/10">
-        <svg viewBox="0 0 24 24" class="ml-1 size-7 fill-gold"><path d="M5 3l16 9-16 9z" /></svg>
-      </span>
-      <span class="text-sm text-ink-muted">{{ video().durationLabel ? video().durationLabel + ' · ' : '' }}avec le son</span>
-    </button>
-    }
+  <div [class]="playerClass()" [hidden]="variant() === 'compact' && !playing()">
+    <div class="relative overflow-hidden rounded-3xl border border-gold/30 bg-abyss-top">
+      <!-- 480 × 854 : the portrait of a phone. The ratio is held by the cover as well, so the
+           layout does not jump when one replaces the other. -->
+      <video #player class="block aspect-9/16 w-full" [src]="video().src" [attr.aria-label]="video().title"
+             [attr.preload]="preload()" playsinline controls (error)="failed.set(true)"></video>
+
+      @if (!playing() && variant() !== 'compact') {
+      <button type="button" (click)="play()" [attr.aria-label]="playLabel()"
+              class="group absolute inset-0 flex flex-col items-center justify-center gap-5 bg-abyss-top px-6 text-center text-cream focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-gold">
+        @if (poster(); as image) {
+        <img [src]="image" alt="" width="480" height="854" class="absolute inset-0 size-full object-cover"
+             (error)="onPosterError()" />
+        <!-- Darkens the bottom of the image, where the title and the duration sit. -->
+        <span aria-hidden="true" class="absolute inset-0 bg-linear-to-t from-abyss via-abyss/30 to-transparent"></span>
+        } @else {
+        <img src="logo.webp" alt="" width="88" height="88" class="relative size-22 rounded-full ring-1 ring-gold/40" />
+        }
+        <span class="relative flex flex-col items-center gap-5" [class.mt-auto]="poster()" [class.pb-4]="poster()">
+          <span [class]="titleClass()">{{ video().title }}</span>
+          <span aria-hidden="true" [class]="playDiskClass()">
+            <svg viewBox="0 0 24 24" [class]="playIconClass()"><path d="M5 3l16 9-16 9z" /></svg>
+          </span>
+          <span class="text-sm text-ink-soft">{{ video().durationLabel ? video().durationLabel + ' · ' : '' }}avec le son</span>
+        </span>
+      </button>
+      }
+    </div>
   </div>
 
   @if (failed()) {

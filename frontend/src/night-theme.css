@@ -447,6 +447,26 @@
   }
 
   /*
+   * The halo behind the presentation video of "À propos" (public/about/presentation-video, "feature"):
+   * gold at the heart, violet around, blurred. Static. It stays within the side margin of a phone, so
+   * that it never makes the page scroll sideways.
+   */
+  .video-halo {
+    position: relative;
+    isolation: isolate;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -5% -4%;
+      z-index: -1;
+      border-radius: 50%;
+      background-image: radial-gradient(closest-side, rgb(232 200 114 / 0.22), rgb(59 31 105 / 0.6) 60%, transparent);
+      filter: blur(28px);
+    }
+  }
+
+  /*
    * The booking calendar (booking/availability-calendar) and the times of the chosen day
    * (booking/slot-picker). A day with slots is marked three ways, never by colour alone: a brighter and
    * bolder number, a violet disk and a gold dot. A day without any slot keeps the faint text (5.6:1).
