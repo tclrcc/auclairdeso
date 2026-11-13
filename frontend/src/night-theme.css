@@ -117,6 +117,7 @@
     .night-theme *::before,
     .night-theme *::after {
       transition: none !important;
+      animation: none !important;
     }
   }
 }
@@ -583,5 +584,44 @@
       color: var(--color-on-gold);
       font-weight: 600;
     }
+  }
+
+  /*
+   * Motion, only for a visitor who accepts it (the rule of the base layer stops it otherwise): the times
+   * of a day rise into place one after the other, and the empty calendar breathes while it loads.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    .slot-chip {
+      animation: night-rise 220ms ease-out backwards;
+    }
+
+    .slot-chip:nth-child(2) {
+      animation-delay: 40ms;
+    }
+
+    .slot-chip:nth-child(3) {
+      animation-delay: 80ms;
+    }
+
+    .slot-chip:nth-child(n + 4) {
+      animation-delay: 120ms;
+    }
+
+    .calendar-skeleton {
+      animation: night-breathe 1.6s ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes night-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes night-breathe {
+  50% {
+    opacity: 0.45;
   }
 }
