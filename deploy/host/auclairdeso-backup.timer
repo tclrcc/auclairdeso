@@ -1,0 +1,15 @@
+# Starts auclairdeso-backup.service every night at 03:45, server time (Europe/Paris).
+# 03:45 rather than 03:30: the nightly purge of the portraits runs at 03:30 (BookingSchedule), so the
+# portraits it deletes do not go into that night's backup.
+# Persistent: a night missed while the server was off is caught up at the next boot.
+# Installed by hand: sudo install -m 644 deploy/host/auclairdeso-backup.timer /etc/systemd/system/
+[Unit]
+Description=Nightly backup of the Au clair de So database
+
+[Timer]
+OnCalendar=*-*-* 03:45:00
+Persistent=true
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target
