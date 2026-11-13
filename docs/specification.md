@@ -141,11 +141,13 @@ Exemple avec une séance de 30 min déjà réservée à 14 h : une prestation d'
 | --- | --- | --- |
 | Séances par jour | 3 au maximum **[À confirmer : quelle que soit la durée]** | `auclairdeso.booking.max-sessions-per-day` |
 | Réservation au plus tôt | Le **lendemain** (jamais le jour même) | `auclairdeso.booking.min-days-ahead` |
+| Clôture des réservations du lendemain | La veille à **19 h** ; ensuite, le premier jour proposé est le surlendemain | `auclairdeso.booking.deadlines.booking-cutoff` |
 | Réservation au plus tard | **2 mois** à l'avance | `auclairdeso.booking.horizon` |
 | Fermetures (vacances, maladie) | Jours entiers, saisis dans l'administration | table `closure` |
 | Consultations urgentes | Saisies **à la main** par la praticienne, y compris en dehors des plages | — |
 
 - Une demande **en attente** bloque son créneau, comme une séance confirmée.
+- La clôture tombe avant l'heure d'expiration des demandes (5.5) : une demande envoyée à temps laisse au moins 2 h à la praticienne pour répondre, et figure dans le programme du soir (7). Un créneau resté affiché après la clôture est refusé à l'envoi (« Ce créneau n'est plus disponible »). L'application refuse de démarrer si la clôture n'est pas avant l'heure d'expiration.
 - La **question ciblée** n'occupe pas de créneau et ne compte pas dans le maximum journalier **[À confirmer]**.
 - Deux séances ne peuvent jamais se chevaucher : la base l'interdit (contrainte d'exclusion PostgreSQL sur les rendez-vous en attente ou confirmés).
 
@@ -196,7 +198,7 @@ La cliente **ne peut pas déplacer** un rendez-vous : elle annule et fait une no
 | `REQUESTED` | Demande en attente de la décision de la praticienne | Oui |
 | `CONFIRMED` | Acceptée | Oui |
 | `DECLINED` | Refusée par la praticienne | Non |
-| `EXPIRED` | Non traitée à temps **[À confirmer : la veille de la séance à 21 h]**, la cliente est prévenue | Non |
+| `EXPIRED` | Non traitée à temps **[À confirmer : la veille de la séance à 21 h]** (`auclairdeso.booking.deadlines.request-deadline`), la cliente est prévenue. Les réservations du lendemain ferment avant, à la clôture (4.3) | Non |
 | `CANCELLED` | Annulée, par la cliente (à temps ou tardivement) ou par la praticienne | Non |
 | `COMPLETED` | Séance honorée (puis marquée payée) | — |
 | `NO_SHOW` | La cliente ne s'est pas présentée | — |
