@@ -79,6 +79,20 @@ describe('AvailabilityCalendar', () => {
     expect(fixture.componentInstance.selected()).toBeNull();
   });
 
+  it('goes one step further at each press of a held key, even before the page renders', async () => {
+    const { fixture, cell } = open();
+    cell('2026-11-19').focus();
+
+    // Three presses reach the same cell: the page has not rendered in between.
+    for (let press = 0; press < 3; press++) {
+      cell('2026-11-19').dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    }
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(document.activeElement).toBe(cell('2026-11-22'));
+  });
+
   it('turns the page with Page Down, and the month follows the focus', async () => {
     const { fixture, element, cell } = open();
     cell('2026-11-19').focus();

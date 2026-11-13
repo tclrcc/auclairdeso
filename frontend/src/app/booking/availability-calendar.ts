@@ -119,11 +119,18 @@ export class AvailabilityCalendar {
       return;
     }
     event.preventDefault();
-    const target = moveFrom(cell.date, event.key, this.first(), this.last());
+    // From the day that holds the focus, not from the cell of the event: a held arrow key repeats faster
+    // than the page renders, and each press must go one step further.
+    const target = moveFrom(this.focusDate(), event.key, this.first(), this.last());
     this.month.set(monthOf(target));
     this.focusDate.set(target);
-    // The cell may belong to a month that is not drawn yet: focus it once it is.
-    afterNextRender(() => this.cellOf(target)?.focus(), { injector: this.injector });
+    const drawn = this.cellOf(target);
+    if (drawn) {
+      drawn.focus();
+    } else {
+      // The day belongs to a month that is not drawn yet: focus it once it is.
+      afterNextRender(() => this.cellOf(target)?.focus(), { injector: this.injector });
+    }
   }
 
   private isReachable(date: string): boolean {
