@@ -84,6 +84,22 @@ export const JOURNEY: readonly string[] = [];
  */
 export const PORTRAIT: string | null = null;
 
+/** A sound of the vitrine, under /contenus/ (MEDIA_DIR) as the videos. */
+export interface SiteAudio {
+  readonly src: string;
+  readonly title: string;
+  /** Shown under its title when known ("40 secondes"). */
+  readonly durationLabel?: string;
+  /** What is said, for reading instead of listening. Empty: not shown. */
+  readonly transcript: string;
+}
+
+/**
+ * An extract of her voice, to come: null as long as there is none, and then the "Sa voix" section is not
+ * shown at all.
+ */
+export const VOICE: SiteAudio | null = null;
+
 export interface Commitment {
   readonly title: string;
   readonly text: string;

@@ -55,8 +55,12 @@ describe('about page', () => {
     expect(openPage().nativeElement.textContent).not.toContain('Son parcours');
   });
 
-  it('shows no placeholder for what is still missing: no portrait, no text in brackets', () => {
+  it('shows no placeholder for what is still missing: no portrait, no voice, no text in brackets', () => {
     const page = openPage().nativeElement as HTMLElement;
+
+    // VOICE is null: no player and no "Sa voix" section.
+    expect(page.querySelector('audio')).toBeNull();
+    expect(page.textContent).not.toContain('Sa voix');
 
     // PORTRAIT is null: no image of her at all (the logo of the video cover is not a portrait).
     expect(page.querySelector('img[alt="Portrait de So"]')).toBeNull();

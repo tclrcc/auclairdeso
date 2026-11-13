@@ -1,5 +1,5 @@
 <main class="flex-1 pb-section">
-  <!-- Every block whose content is missing (portrait, path, transcript) is left out: never a placeholder. -->
+  <!-- Every block whose content is missing (portrait, path, voice, transcript) is left out: never a placeholder. -->
 
   <!-- The opening: her words on one side, her video on the other; on a phone, the video right under the title. -->
   <section aria-labelledby="about-title" class="night-container pt-14 sm:pt-20">
@@ -46,6 +46,15 @@
         <p class="mt-5 leading-relaxed text-ink-soft">{{ paragraph }}</p>
         }
       </div>
+    </div>
+  </section>
+  }
+
+  @if (voice; as extract) {
+  <section aria-labelledby="voice-title" class="night-container pt-section">
+    <h2 id="voice-title" class="night-h2">Sa voix</h2>
+    <div class="mt-8 max-w-2xl">
+      <app-voice-extract [audio]="extract" />
     </div>
   </section>
   }
