@@ -23,6 +23,8 @@ class SlotCalculatorTests {
     private static final ZoneId PARIS = ZoneId.of("Europe/Paris");
     private static final BookingRules RULES = new BookingRules(PARIS, 3, 1, Period.ofMonths(2),
         Duration.ofHours(48), 2, Duration.ofDays(7));
+    private static final BookingDeadlines DEADLINES = new BookingDeadlines(LocalTime.of(21, 0), LocalTime.of(12, 0),
+        LocalTime.of(19, 0));
 
     /** Sunday 11 October 2026, 10:00 in Paris. */
     private static final Clock SUNDAY = Clock.fixed(Instant.parse("2026-10-11T08:00:00Z"), ZoneOffset.UTC);
@@ -34,7 +36,7 @@ class SlotCalculatorTests {
         .map(day -> new OpeningPeriod(day, LocalTime.of(14, 0), LocalTime.of(18, 0)))
         .toList();
 
-    private final SlotCalculator calculator = new SlotCalculator(RULES, SUNDAY);
+    private final SlotCalculator calculator = new SlotCalculator(RULES, DEADLINES, SUNDAY);
 
     @Test
     void hourLongSessionsChainWithAQuarterHourBreak() {
@@ -53,10 +55,25 @@ class SlotCalculatorTests {
 
     @Test
     void todayIsNeverBookableButTomorrowIs() {
-        var mondayMorning = new SlotCalculator(RULES, Clock.fixed(Instant.parse("2026-10-12T07:00:00Z"), ZoneOffset.UTC));
+        var mondayMorning = mondayAt("2026-10-12T07:00:00Z");
 
         assertThat(slots(mondayMorning, MONDAY_12, 60, 15)).isEmpty();
         assertThat(slots(mondayMorning, TUESDAY_13, 60, 15)).hasSize(3);
+    }
+
+    @Test
+    void tomorrowIsStillOfferedOneMinuteBeforeTheCutoff() {
+        var mondayEvening = mondayAt("2026-10-12T16:59:00Z"); // 18:59 in Paris
+
+        assertThat(slots(mondayEvening, TUESDAY_13, 60, 15)).hasSize(3);
+    }
+
+    @Test
+    void tomorrowIsNoLongerOfferedFromTheCutoffButTheDayAfterIs() {
+        var mondayEvening = mondayAt("2026-10-12T17:00:00Z"); // 19:00 in Paris
+
+        assertThat(slots(mondayEvening, TUESDAY_13, 60, 15)).isEmpty();
+        assertThat(slots(mondayEvening, LocalDate.of(2026, 10, 14), 60, 15)).hasSize(3);
     }
 
     @Test
@@ -104,6 +121,10 @@ class SlotCalculatorTests {
             session(MONDAY_12, 15, 0, 30, 30),
             session(MONDAY_12, 16, 0, 30, 30)))
             .isEmpty();
+    }
+
+    private static SlotCalculator mondayAt(String instant) {
+        return new SlotCalculator(RULES, DEADLINES, Clock.fixed(Instant.parse(instant), ZoneOffset.UTC));
     }
 
     private List<LocalTime> startsOn(LocalDate day, int durationMinutes, int breakMinutes, BookedSession... booked) {

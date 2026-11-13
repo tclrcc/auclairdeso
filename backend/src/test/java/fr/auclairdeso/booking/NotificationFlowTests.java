@@ -30,6 +30,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
+import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
@@ -103,7 +104,7 @@ class NotificationFlowTests {
 
     @Test
     void theClientAndThePractitionerAreToldAtEachStep() throws Exception {
-        clock.set("2026-10-18T17:30:00Z"); // Sunday 18 October, 19:30 in Paris
+        clock.set("2026-10-18T16:30:00Z"); // Sunday 18 October, 18:30 in Paris, before the 19:00 cutoff
         var id = book("anna@example.com", "2026-10-19T14:00:00+02:00");
 
         assertThat(mvc.post().uri("/api/admin/appointments/{id}/confirm", id).with(practitioner()).with(csrf()))
@@ -136,8 +137,8 @@ class NotificationFlowTests {
 
     @Test
     void anUnansweredRequestExpiresTheEveningBefore() throws Exception {
-        clock.set("2026-10-20T17:30:00Z"); // Tuesday 20 October, 19:30 in Paris
-        book("bruno@example.com", "2026-10-21T14:00:00+02:00");
+        clock.set("2026-10-20T16:30:00Z"); // Tuesday 20 October, 18:30 in Paris, before the 19:00 cutoff
+        var id = book("bruno@example.com", "2026-10-21T14:00:00+02:00");
         assertThat(deadlines.expireUnansweredRequests()).isZero();
 
         clock.set("2026-10-20T19:05:00Z"); // 21:05
@@ -145,9 +146,41 @@ class NotificationFlowTests {
 
         assertThat(awaitMail("bruno@example.com", "Votre demande").getText())
             .contains("n'a pas pu être confirmée à temps");
-        assertThat(mvc.get().uri("/api/offerings/consultation-1-h/slots?from=2026-10-21&to=2026-10-21"))
+        // Tomorrow is no longer offered after the cutoff: the slot is freed by the status (HOLDING_SLOT).
+        assertThat(jdbc.queryForObject("SELECT status FROM appointment WHERE id = ?", String.class, id))
+            .isEqualTo(AppointmentStatus.EXPIRED.name());
+    }
+
+    /**
+     * Tomorrow closes at the cutoff, two hours before the deadline: a request accepted in time can still
+     * be answered, and it is in the evening program. A slot left on an open page is refused when sent.
+     */
+    @Test
+    void aRequestForTomorrowIsRefusedAfterTheCutoff() throws Exception {
+        clock.set("2026-10-26T17:50:00Z"); // Monday 26 October, 18:50 in Paris: the page is opened
+        assertThat(mvc.get().uri("/api/offerings/consultation-1-h/slots?from=2026-10-27&to=2026-10-27"))
             .bodyJson()
             .extractingPath("$.length()").isEqualTo(3);
+
+        clock.set("2026-10-26T17:59:00Z"); // 18:59
+        book("diane@example.com", "2026-10-27T14:00:00+01:00");
+
+        clock.set("2026-10-26T18:00:00Z"); // 19:00, the cutoff
+        assertThat(mvc.get().uri("/api/offerings/consultation-1-h/slots?from=2026-10-27&to=2026-10-27"))
+            .bodyJson()
+            .extractingPath("$.length()").isEqualTo(0);
+        assertThat(attempt("emma@example.com", "2026-10-27T15:15:00+01:00"))
+            .hasStatus(HttpStatus.CONFLICT)
+            .bodyJson()
+            .extractingPath("$.detail").isEqualTo("Ce créneau n'est plus disponible. Merci d'en choisir un autre.");
+
+        assertThat(deadlines.publishEveningProgram()).isTrue();
+        assertThat(awaitMail("so@example.com", "Votre programme").getText())
+            .contains("Demandes en attente de réponse")
+            .contains("- mardi 27 octobre à 14h00 : Alice Martin");
+
+        clock.set("2026-10-26T21:00:00Z"); // 22:00
+        assertThat(attempt("emma@example.com", "2026-10-27T16:30:00+01:00")).hasStatus(HttpStatus.CONFLICT);
     }
 
     @Test
@@ -171,6 +204,11 @@ class NotificationFlowTests {
         Number id = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
         awaitMail("so@example.com", "Nouvelle demande", "/admin/agenda/" + id);
         return id.longValue();
+    }
+
+    /** Sends a booking request without expecting it to be accepted. */
+    private MvcTestResult attempt(String email, String start) {
+        return mvc.perform(TestBookings.bookingRequest(start, true).with(user(email)).with(csrf()));
     }
 
     private SimpleMailMessage awaitMail(String to, String subjectStart) throws InterruptedException {
