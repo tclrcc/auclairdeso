@@ -1,4 +1,14 @@
-import { Component, computed, effect, inject, input, linkedSignal, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  computed,
+  effect,
+  inject,
+  input,
+  linkedSignal,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { HttpErrorResponse, httpResource } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { form, FormField, FormRoot, maxLength, pattern, required, validate } from '@angular/forms/signals';
@@ -13,6 +23,9 @@ import { BookingApi } from './booking-api';
 import { BookingFormModel, emptyBookingForm, fromProfile, isAdult, toBookingRequest } from './booking-form-model';
 import { OfferingVideo } from '../public/offerings/offering-video';
 import { SlotPicker } from './slot-picker';
+import { BookingStep, BookingSummary } from './booking-summary';
+// The four-pointed sparkle of the logo marks the notice that So validates each request.
+import { SPARKLE_PATH } from '../public/home/sparkle';
 
 const ACCEPTED_PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
@@ -20,12 +33,13 @@ const PHONE_PATTERN = /^\+?[0-9][0-9 .-]{8,18}$/;
 
 @Component({
   selector: 'app-booking-page',
-  imports: [FormField, FormRoot, RouterLink, EurosPipe, FieldErrors, SlotPicker, OfferingVideo],
+  imports: [FormField, FormRoot, RouterLink, EurosPipe, FieldErrors, SlotPicker, OfferingVideo, BookingSummary],
   templateUrl: './booking-page.html',
 })
 export class BookingPage {
   private readonly api = inject(BookingApi);
   protected readonly auth = inject(AuthSession);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly slotPicker = viewChild(SlotPicker);
 
   /** Bound from the route and its query parameters (?mode=...&debut=...). */
@@ -37,6 +51,7 @@ export class BookingPage {
   protected readonly modeHints = MODE_HINTS;
   protected readonly formatDayOf = formatDayOf;
   protected readonly formatTime = formatTime;
+  protected readonly sparkle = SPARKLE_PATH;
 
   protected readonly offering = httpResource<Offering>(() => `/api/offerings/${encodeURIComponent(this.slug())}`);
   private readonly profile = httpResource<ClientProfile | null>(() =>
@@ -172,6 +187,13 @@ export class BookingPage {
       this.photoPreview.set(url);
       onCleanup(() => URL.revokeObjectURL(url));
     });
+  }
+
+  /** Sends the client back to a step from the summary: its title takes the focus, and comes into view. */
+  protected goToStep(step: BookingStep): void {
+    const title = this.host.nativeElement.querySelector<HTMLElement>(`#step-${step}`);
+    title?.scrollIntoView({ block: 'start' });
+    title?.focus({ preventScroll: true });
   }
 
   protected onPhotoSelected(event: Event): void {

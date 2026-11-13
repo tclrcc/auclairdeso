@@ -1,0 +1,51 @@
+<div class="rounded-2xl border border-gold/40 bg-abyss/60 p-5">
+  @if (level() === 2) {
+  <h2 class="night-eyebrow">Votre demande</h2>
+  } @else {
+  <h3 class="night-eyebrow">Votre demande</h3>
+  }
+
+  <dl class="mt-4 space-y-3 text-sm">
+    <div>
+      <dt class="text-ink-faint">Séance</dt>
+      <dd class="mt-0.5 font-medium text-cream">{{ offeringName() }} · {{ formatDuration(durationMinutes()) }}</dd>
+    </div>
+
+    <div class="flex items-end justify-between gap-3">
+      <div>
+        <dt class="text-ink-faint">Mode</dt>
+        <dd class="mt-0.5 font-medium" [class.text-cream]="mode()" [class.text-ink-muted]="!mode()">
+          {{ mode() ? modeLabels[mode()!] : 'À choisir' }}
+        </dd>
+      </div>
+      @if (editable()) {
+      <button type="button" class="night-link min-h-11 shrink-0 underline underline-offset-4" (click)="edit.emit('mode')">
+        {{ mode() ? 'Modifier' : 'Choisir' }}<span class="sr-only"> le mode de consultation</span>
+      </button>
+      }
+    </div>
+
+    <div class="flex items-end justify-between gap-3">
+      <div>
+        <dt class="text-ink-faint">Date et heure</dt>
+        <dd class="mt-0.5 font-medium" [class.text-cream]="start()" [class.text-ink-muted]="!start()">
+          @if (start(); as chosen) {
+          <span class="inline-block first-letter:uppercase">{{ formatDayOf(chosen) }}</span> à {{ formatTime(chosen) }}
+          } @else {
+          À choisir
+          }
+        </dd>
+      </div>
+      @if (editable()) {
+      <button type="button" class="night-link min-h-11 shrink-0 underline underline-offset-4" (click)="edit.emit('slot')">
+        {{ start() ? 'Modifier' : 'Choisir' }}<span class="sr-only"> la date et l'heure</span>
+      </button>
+      }
+    </div>
+
+    <div>
+      <dt class="text-ink-faint">Règlement</dt>
+      <dd class="mt-0.5 font-medium text-cream">{{ priceCents() | euros }}, après la séance</dd>
+    </div>
+  </dl>
+</div>
