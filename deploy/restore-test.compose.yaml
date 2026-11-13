@@ -1,0 +1,25 @@
+# Disposable PostgreSQL for deploy/restore-test.sh. Never the database of the acceptance environment:
+# its own project, no network at all, no published port, and its data in memory only, so the restored
+# clear data never reaches the disk. restore-test.sh removes it at the end, even after an error.
+name: auclairdeso-restore-test
+
+services:
+  db:
+    image: postgres:17-alpine
+    network_mode: none
+    environment:
+      POSTGRES_DB: restore_test
+      POSTGRES_USER: restore_test
+      # No password: nothing can reach this container but docker exec.
+      POSTGRES_HOST_AUTH_METHOD: trust
+    # Nothing restored ends up in the logs: a failing statement would otherwise be quoted with its data.
+    command: [ "postgres", "-c", "log_min_messages=fatal", "-c", "log_min_error_statement=panic", "-c", "fsync=off" ]
+    tmpfs:
+      - /var/lib/postgresql/data:size=1g,mode=0700
+    mem_limit: 1536m
+    healthcheck:
+      # Over TCP: during its first start, the image runs a temporary server on the socket only.
+      test: [ "CMD-SHELL", "pg_isready -h 127.0.0.1 -U restore_test -d restore_test" ]
+      interval: 1s
+      timeout: 3s
+      retries: 60

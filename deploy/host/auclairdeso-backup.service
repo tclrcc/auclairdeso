@@ -1,0 +1,33 @@
+# Encrypted backup of the database of Au clair de So (deploy/backup.sh), started by auclairdeso-backup.timer.
+# Installed by hand: sudo install -m 644 deploy/host/auclairdeso-backup.service /etc/systemd/system/
+# Procedure: docs/exploitation/sauvegardes.md
+[Unit]
+Description=Encrypted backup of the Au clair de So database
+Documentation=file:///home/ubuntu/auclairdeso/docs/exploitation/sauvegardes.md
+After=docker.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+Group=ubuntu
+# The docker group gives access to the Docker socket, to run pg_dump in the postgres container.
+SupplementaryGroups=docker
+WorkingDirectory=/home/ubuntu/auclairdeso/deploy
+ExecStart=/home/ubuntu/auclairdeso/deploy/backup.sh
+TimeoutStartSec=30min
+UMask=0077
+Nice=10
+IOSchedulingClass=idle
+
+# Hardening. Whoever reaches the Docker socket can do a lot anyway: this only narrows what the script
+# itself may write. If the socket turns out to be blocked, see the procedure before loosening anything.
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/srv/auclairdeso/sauvegardes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes

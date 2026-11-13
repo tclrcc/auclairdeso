@@ -288,6 +288,7 @@ Plusieurs données sont **sensibles** : motifs de consultation (parfois liés à
 | Notes privées sur une cliente | Personnel | Tant que le compte existe |
 | Liste noire | Personnel | Tant que le compte existe |
 | Notes de séance et livre des recettes | Personnel | 10 ans (pièces comptables), même si la cliente supprime son compte |
+| Sauvegardes chiffrées de la base | Administrateur (clé privée hors du serveur) | **27 jours au plus** : chaque nuit, 14 jours de sauvegardes et les 4 derniers dimanches, puis effacement automatique (**fait**, `docs/exploitation/sauvegardes.md`) |
 
 - Consentement explicite à la réservation pour le traitement des données sensibles.
 - Collecte minimale : rien de plus que le tableau 5.2.
@@ -359,7 +360,7 @@ Plusieurs données sont **sensibles** : motifs de consultation (parfois liés à
 | 5B | Statistiques | À faire |
 | 6A | Pages légales, suppression du compte, purge des photos | Fait |
 | 6B | Vitrine : page « À propos », vidéo de présentation, navigation sur téléphone | **Fait** : reste le contenu de la praticienne (parcours, transcription, photos) et les témoignages |
-| 7 | Mise en production : nom de domaine, HTTPS, Docker, sauvegardes, Ubuntu 26.04 | À faire |
+| 7 | Mise en production : nom de domaine, HTTPS, Docker, sauvegardes, Ubuntu 26.04 | En partie : sauvegardes chiffrées faites (7B) ; copie hors du VPS, alertes et rejeu des effacements à décider ; le reste à faire |
 
 ## 13. Hors périmètre pour l'instant
 

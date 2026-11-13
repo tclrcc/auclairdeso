@@ -22,6 +22,10 @@ playwright-report/
 *.pem
 *.key
 
+# Database backups (deploy/backup.sh): encrypted, but they never belong in the repository
+*.age
+*.dump
+
 # Logs et OS
 *.log
 .DS_Store
