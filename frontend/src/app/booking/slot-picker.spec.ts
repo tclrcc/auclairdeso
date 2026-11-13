@@ -85,6 +85,7 @@ describe('SlotPicker', () => {
     fixture.detectChanges();
 
     expect(element.querySelector('legend')?.textContent).toContain('jeudi 19 novembre');
+    expect(element.querySelector('legend')?.textContent).toContain('heure de Paris');
     expect(times(element)).toEqual(['14:00', '15:15', '16:30']);
     expect(element.querySelectorAll('input[type="radio"][name="slot"]')).toHaveLength(3);
     // Once there, the shortcut has nothing left to offer.

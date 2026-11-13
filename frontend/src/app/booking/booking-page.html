@@ -36,7 +36,8 @@
 
       <div class="mt-8">
         <app-booking-summary [offeringName]="appointment.offeringName" [durationMinutes]="minutesOf(appointment)"
-                             [priceCents]="appointment.priceCents" [mode]="appointment.mode" [start]="appointment.start" />
+                             [priceCents]="appointment.priceCents" [mode]="appointment.mode" [start]="appointment.start"
+                             [visitorZone]="visitorZone" />
       </div>
 
       <p class="mt-6 text-sm leading-relaxed text-ink-muted">
@@ -120,7 +121,7 @@
             </p>
             <app-booking-summary class="mt-5 block lg:hidden" [level]="3" [editable]="true"
                                  [offeringName]="current.name" [durationMinutes]="current.durationMinutes"
-                                 [priceCents]="current.priceCents" [mode]="selectedMode()" [start]="selectedStart()"
+                                 [priceCents]="current.priceCents" [mode]="selectedMode()" [start]="selectedStart()" [visitorZone]="visitorZone"
                                  (edit)="goToStep($event)" />
             <a routerLink="/connexion" [queryParams]="{ redirect: returnUrl() }" class="btn-primary mt-5">
               Confirmer mon adresse email
@@ -226,7 +227,7 @@
 
             <app-booking-summary class="block lg:hidden" [level]="3" [editable]="true"
                                  [offeringName]="current.name" [durationMinutes]="current.durationMinutes"
-                                 [priceCents]="current.priceCents" [mode]="selectedMode()" [start]="selectedStart()"
+                                 [priceCents]="current.priceCents" [mode]="selectedMode()" [start]="selectedStart()" [visitorZone]="visitorZone"
                                  (edit)="goToStep($event)" />
 
             @for (error of bookingForm().errors(); track error.kind) {
@@ -251,7 +252,7 @@
         <div class="sticky top-8 mt-6">
           <app-booking-summary [editable]="true" [offeringName]="current.name"
                                [durationMinutes]="current.durationMinutes" [priceCents]="current.priceCents"
-                               [mode]="selectedMode()" [start]="selectedStart()" (edit)="goToStep($event)" />
+                               [mode]="selectedMode()" [start]="selectedStart()" [visitorZone]="visitorZone" (edit)="goToStep($event)" />
           <p class="mt-4 text-sm leading-relaxed text-ink-muted">
             Rien n'est payé en ligne. So vous répond par e-mail, qu'elle accepte ou non la demande.
           </p>

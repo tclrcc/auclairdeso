@@ -56,6 +56,11 @@ export class BookingPage {
   protected readonly formatDayOf = formatDayOf;
   protected readonly formatTime = formatTime;
   protected readonly sparkle = SPARKLE_PATH;
+  /**
+   * The visitor's time zone, to add her own time beside the times of Paris when they differ. Read by the
+   * browser: this route is never rendered by the server (app.routes.server.ts).
+   */
+  protected readonly visitorZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   protected readonly offering = httpResource<Offering>(() => `/api/offerings/${encodeURIComponent(this.slug())}`);
   private readonly profile = httpResource<ClientProfile | null>(() =>

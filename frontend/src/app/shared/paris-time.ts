@@ -69,6 +69,25 @@ export function formatTime(instant: string): string {
   return timeLabel.format(new Date(instant));
 }
 
+/** "lundi 12 octobre", for an instant, in another time zone (the visitor's). */
+export function formatDayIn(instant: string, zone: string): string {
+  return new Intl.DateTimeFormat('fr-FR', { timeZone: zone, weekday: 'long', day: 'numeric', month: 'long' }).format(
+    new Date(instant),
+  );
+}
+
+/** "08:00", for an instant, in another time zone (the visitor's). */
+export function formatTimeIn(instant: string, zone: string): string {
+  return new Intl.DateTimeFormat('fr-FR', { timeZone: zone, hour: '2-digit', minute: '2-digit' }).format(
+    new Date(instant),
+  );
+}
+
+/** Whether a time zone (an IANA name, from the browser) gives the same times as Paris. */
+export function isParisZone(zone: string | null | undefined): boolean {
+  return !zone || zone === ZONE;
+}
+
 export interface DayGroup<T> {
   readonly date: string;
   readonly label: string;

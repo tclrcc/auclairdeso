@@ -39,7 +39,10 @@
     }
     @if (selectedDay()) {
     <fieldset aria-live="polite">
-      <legend class="text-sm font-medium text-cream first-letter:uppercase">Horaires du {{ dayLabel() }}</legend>
+      <legend class="text-sm font-medium text-cream">
+        Horaires du {{ dayLabel() }}
+        <span class="block text-mention font-normal text-ink-muted">heure de Paris</span>
+      </legend>
       @if (daySlots().length) {
       <div class="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-2">
         @for (slot of daySlots(); track slot.start) {
