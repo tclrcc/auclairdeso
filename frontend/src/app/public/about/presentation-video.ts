@@ -83,9 +83,22 @@ export class PresentationVideo {
     afterNextRender(() => this.live.set(true));
   }
 
+  /**
+   * The cover gives way to the player and its controls. A browser may still refuse to start it: a click
+   * made before the page was live is replayed after hydration, without the user's gesture, and the
+   * sound then forbids autoplay (NotAllowedError). The controls are there: one more press plays it, so
+   * this is not a failure. Only a file the browser cannot read is one, and the (error) event of the
+   * video says it.
+   */
   protected play(): void {
     this.playing.set(true);
-    this.player().nativeElement.play().catch(() => this.failed.set(true));
+    this.player()
+      .nativeElement.play()
+      .catch((error: unknown) => {
+        if (!(error instanceof DOMException && (error.name === 'NotAllowedError' || error.name === 'AbortError'))) {
+          this.failed.set(true);
+        }
+      });
   }
 
   protected onPosterError(): void {

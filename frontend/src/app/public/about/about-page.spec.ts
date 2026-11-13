@@ -70,6 +70,20 @@ describe('about page', () => {
       expect((fixture.nativeElement as HTMLElement).querySelector('button')).toBeNull();
     });
 
+    it('leaves the controls to the visitor when the browser refuses to start the video', async () => {
+      vi.spyOn(HTMLMediaElement.prototype, 'play').mockRejectedValue(new DOMException('No gesture', 'NotAllowedError'));
+      const fixture = openVideo();
+      const element = fixture.nativeElement as HTMLElement;
+
+      element.querySelector('button')!.click();
+      await fixture.whenStable();
+      fixture.detectChanges();
+
+      expect(element.querySelector('button')).toBeNull();
+      expect(element.querySelector('video')?.hasAttribute('controls')).toBe(true);
+      expect(element.querySelector('[role="alert"]')).toBeNull();
+    });
+
     it('says so instead of leaving a black square when the file is missing', () => {
       const fixture = openVideo();
       const element = fixture.nativeElement as HTMLElement;
